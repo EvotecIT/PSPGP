@@ -77,3 +77,8 @@ Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -String $ProtectedStri
 
 Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -FolderPath $PSScriptRoot\Encoded
 ```
+
+### ChangeLog
+
+- 0.1.2 - 2021.05.09
+  - First release

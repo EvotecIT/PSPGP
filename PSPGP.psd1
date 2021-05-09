@@ -8,11 +8,11 @@
     Description          = 'Simple project to create Microsoft Word in PowerShell without having Office installed.'
     FunctionsToExport    = @('New-PGPKey', 'Protect-PGP', 'Test-PGP', 'Unprotect-PGP')
     GUID                 = 'edbf6d52-2d66-405e-a4d4-d4a95db8fb45'
-    ModuleVersion        = '0.1.1'
+    ModuleVersion        = '0.1.2'
     PowerShellVersion    = '5.1'
     PrivateData          = @{
         PSData = @{
-            Tags       = @('word', 'docx', 'write', 'PSWord', 'office', 'windows', 'doc')
+            Tags       = @('pgp', 'gpg', 'encrypt', 'decrypt', 'windows', 'macos', 'linux')
             ProjectUri = 'https://github.com/EvotecIT/PSPGP'
         }
     }
