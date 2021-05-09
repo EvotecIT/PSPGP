@@ -5,10 +5,10 @@
     CompanyName          = 'Evotec'
     CompatiblePSEditions = @('Desktop', 'Core')
     Copyright            = '(c) 2011 - 2021 Przemyslaw Klys @ Evotec. All rights reserved.'
-    Description          = 'Simple project to create Microsoft Word in PowerShell without having Office installed.'
+    Description          = 'Simple project to encrypt/decrypt files/folders and strings using PGP'
     FunctionsToExport    = @('New-PGPKey', 'Protect-PGP', 'Test-PGP', 'Unprotect-PGP')
     GUID                 = 'edbf6d52-2d66-405e-a4d4-d4a95db8fb45'
-    ModuleVersion        = '0.1.2'
+    ModuleVersion        = '0.1.3'
     PowerShellVersion    = '5.1'
     PrivateData          = @{
         PSData = @{
