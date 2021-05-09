@@ -3,22 +3,24 @@
     param(
         [Parameter(Mandatory, ParameterSetName = 'Folder')]
         [Parameter(Mandatory, ParameterSetName = 'File')]
+        [Parameter(Mandatory, ParameterSetName = 'String')]
         [string] $FilePathPublic,
 
         [Parameter(Mandatory, ParameterSetName = 'Folder')][string] $FolderPath,
         [Parameter(ParameterSetName = 'Folder')][string] $OutputFolderPath,
 
         [Parameter(Mandatory, ParameterSetName = 'File')][string] $FilePath,
-        [Parameter(ParameterSetName = 'File')][string] $OutFilePath
+        [Parameter(ParameterSetName = 'File')][string] $OutFilePath,
+
+        [Parameter(Mandatory, ParameterSetName = 'String')][string] $String
     )
 
     $PublicKey = [System.IO.FileInfo]::new($FilePathPublic)
     $EncryptionKeys = [PgpCore.EncryptionKeys]::new($PublicKey)
-
+    $PGP = [PgpCore.PGP]::new($EncryptionKeys)
     if ($FolderPath) {
         foreach ($File in Get-ChildItem -LiteralPath $FolderPath -Recurse:$Recursive) {
             try {
-                $PGP = [PgpCore.PGP]::new($EncryptionKeys)
                 if ($OutputFolderPath) {
                     $OutputFile = [io.Path]::Combine($OutputFolderPath, "$($File.Name).pgp")
                     $PGP.EncryptFile($File.FullName, $OutputFile)
@@ -36,7 +38,6 @@
         }
     } elseif ($FilePath) {
         try {
-            $PGP = [PgpCore.PGP]::new($EncryptionKeys)
             if ($OutFilePath) {
                 $PGP.EncryptFile($FilePath, "$OutFilePath")
             } else {
@@ -50,6 +51,7 @@
                 return
             }
         }
+    } elseif ($String) {
+        $PGP.EncryptArmoredString($String)
     }
-
 }
