@@ -14,6 +14,7 @@
         PSData = @{
             Tags       = @('pgp', 'gpg', 'encrypt', 'decrypt', 'windows', 'macos', 'linux')
             ProjectUri = 'https://github.com/EvotecIT/PSPGP'
+            IconUri    = 'https://evotec.xyz/wp-content/uploads/2021/08/PSPGP.png'
         }
     }
     RootModule           = 'PSPGP.psm1'
