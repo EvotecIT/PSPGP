@@ -15,9 +15,27 @@
         [Parameter(Mandatory, ParameterSetName = 'String')][string] $String
     )
 
-    $PublicKey = [System.IO.FileInfo]::new($FilePathPublic)
-    $EncryptionKeys = [PgpCore.EncryptionKeys]::new($PublicKey)
-    $PGP = [PgpCore.PGP]::new($EncryptionKeys)
+    if (Test-Path -LiteralPath $FilePathPublic) {
+        $PublicKey = [System.IO.FileInfo]::new($FilePathPublic)
+    } else {
+        if ($PSBoundParameters.ErrorAction -eq 'Stop') {
+            throw
+        } else {
+            Write-Warning -Message "Protect-PGP - Public key doesn't exists $($FilePathPublic): $($_.Exception.Message)"
+            return
+        }
+    }
+    try {
+        $EncryptionKeys = [PgpCore.EncryptionKeys]::new($PublicKey)
+        $PGP = [PgpCore.PGP]::new($EncryptionKeys)
+    } catch {
+        if ($PSBoundParameters.ErrorAction -eq 'Stop') {
+            throw
+        } else {
+            Write-Warning -Message "Protect-PGP - Can't encrypt files because: $($_.Exception.Message)"
+            return
+        }
+    }
     if ($FolderPath) {
         foreach ($File in Get-ChildItem -LiteralPath $FolderPath -Recurse:$Recursive) {
             try {
@@ -52,6 +70,14 @@
             }
         }
     } elseif ($String) {
-        $PGP.EncryptArmoredString($String)
+        try {
+            $PGP.EncryptArmoredString($String)
+        } catch {
+            if ($PSBoundParameters.ErrorAction -eq 'Stop') {
+                throw
+            } else {
+                Write-Warning -Message "Protect-PGP - Can't encrypt file $($File.FuleName): $($_.Exception.Message)"
+            }
+        }
     }
 }

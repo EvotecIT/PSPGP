@@ -52,10 +52,18 @@
         return
     }
     $PrivateKey = Get-Content -LiteralPath $FilePathPrivate -Raw
-    $EncryptionKeys = [PgpCore.EncryptionKeys]::new($PrivateKey, $Password)
+    try {
+        $EncryptionKeys = [PgpCore.EncryptionKeys]::new($PrivateKey, $Password)
 
-    $PGP = [PgpCore.PGP]::new($EncryptionKeys)
-
+        $PGP = [PgpCore.PGP]::new($EncryptionKeys)
+    } catch {
+        if ($PSBoundParameters.ErrorAction -eq 'Stop') {
+            throw
+        } else {
+            Write-Warning -Message "Protect-PGP - Can't encrypt files because: $($_.Exception.Message)"
+            return
+        }
+    }
     if ($FolderPath) {
         foreach ($File in Get-ChildItem -LiteralPath $FolderPath -Recurse:$Recursive) {
             try {
@@ -77,7 +85,7 @@
     } elseif ($FilePath) {
         try {
             if ($OutFilePath) {
-                $PGP.DecryptFile($FilePath, "$OutFilePath",$FilePathPrivate, $Password)
+                $PGP.DecryptFile($FilePath, "$OutFilePath", $FilePathPrivate, $Password)
             } else {
                 $PGP.DecryptFile($FilePath, "$($FilePath.Replace('.pgp',''))")
             }

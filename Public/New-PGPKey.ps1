@@ -30,7 +30,16 @@
         [parameter(ParameterSetName = 'StrengthCredential')]
         [switch] $EmitVersion
     )
-    $PGP = [PgpCore.PGP]::new()
+    try {
+        $PGP = [PgpCore.PGP]::new()
+    } catch {
+        if ($PSBoundParameters.ErrorAction -eq 'Stop') {
+            throw
+        } else {
+            Write-Warning -Message "New-PGPKey - Creating keys genarated erorr: $($_.Exception.Message)"
+            return
+        }
+    }
     if ($Credential) {
         $UserName = $Credential.UserName
         $Password = $Credential.GetNetworkCredential().Password
