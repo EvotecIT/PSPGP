@@ -37,7 +37,7 @@ $Configuration = @{
             # A URL to the main website for this project.
             ProjectUri           = 'https://github.com/EvotecIT/PSPGP'
 
-            #IconUri              = 'https://evotec.xyz/wp-content/uploads/2018/10/PSWriteWord.png'
+            IconUri              = 'https://evotec.xyz/wp-content/uploads/2021/08/PSPGP.png'
 
             #LicenseUri           = 'https://github.com/EvotecIT/PSWriteWord/blob/master/License'
 
@@ -144,6 +144,8 @@ $Configuration = @{
             Merge               = $true
             MergeMissing        = $true
             LibrarySeparateFile = $false
+            LibraryDotSource    = $true
+            ClassesDotSource    = $true
             SignMerged          = $true
             CreateFileCatalog   = $false # not working
             Releases            = $true
