@@ -81,5 +81,7 @@ Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -FolderPath $PSScriptR
 
 ### ChangeLog
 
+- 0.1.4 - 2021.08.28
+  - Updated library to higher version
 - 0.1.3 - 2021.05.09
   - First release
