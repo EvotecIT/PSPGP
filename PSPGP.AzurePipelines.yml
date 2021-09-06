@@ -16,9 +16,8 @@ jobs:
       vmImage: ubuntu-latest
     steps:
       - script: |
-          curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-          curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list | sudo tee /etc/apt/sources.list.d/microsoft.list
-          sudo apt-add-repository https://packages.microsoft.com/ubuntu/20.04/prod
+          curl -sSL https://packages.microsoft.com/config/ubuntu/20.04/prod.list | sudo tee /etc/apt/sources.list.d/microsoft-prod.list
+          curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
           sudo apt-get update
           sudo apt-get install -y powershell
         displayName: "Install PowerShell Core"
