@@ -1,6 +1,7 @@
 ﻿# PSPGP - PowerShell Module
 
 <p align="center">
+  <a href="https://dev.azure.com/evotecpl/PSPGP/_build/results?buildId=latest"><img src="https://dev.azure.com/evotecpl/PSPGP/_apis/build/status/EvotecIT.PSPGP"></a>
   <a href="https://www.powershellgallery.com/packages/PSPGP"><img src="https://img.shields.io/powershellgallery/v/PSPGP.svg?style=flat-square"></a>
   <a href="https://www.powershellgallery.com/packages/PSPGP"><img src="https://img.shields.io/powershellgallery/vpre/PSPGP.svg?label=powershell%20gallery%20preview&colorB=yellow&style=flat-square"></a>
   <a href="https://github.com/EvotecIT/PSPGP"><img src="https://img.shields.io/github/license/EvotecIT/PSPGP.svg?style=flat-square"></a>
