@@ -43,6 +43,10 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 **The essential thing** is if something works for you on production, keep using it till you test the new version on a test computer. I do changes that may not be big, but big enough that auto-update may break your code. For example, a small rename to a parameter, and your code stops working! Be responsible!
 
+## IMPORTANT
+
+This module works correctly on Windows/Linux and MacOS, but since it uses **.NET STANDARD 2.0** library it requires minimum of **.NET Framework 4.7.2** installed on a Windows machine when using PowerShell 5.1. Please make sure to keep your .NET Framework up to date on **Windows Client/Servers**.
+
 ## Using
 
 ### Create new PGP Public/Private Keys
