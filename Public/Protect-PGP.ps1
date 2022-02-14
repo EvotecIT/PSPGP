@@ -14,8 +14,6 @@
 
         [Parameter(Mandatory, ParameterSetName = 'String')][string] $String
     )
-    $FilePath = Resolve-Path $FilePath
-
     $PublicKeys = foreach ($FilePathPubc in $FilePathPublic) {
         if (Test-Path -LiteralPath $FilePathPubc) {
             [System.IO.FileInfo]::new($FilePathPubc)
