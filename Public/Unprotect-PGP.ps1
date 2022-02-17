@@ -1,5 +1,5 @@
 ﻿function Unprotect-PGP {
-    [cmdletBinding(DefaultParameterSetName = 'FolderCredential')]
+    [cmdletBinding(DefaultParameterSetName = 'FolderClearText')]
     param(
         [Parameter(Mandatory, ParameterSetName = 'FolderCredential')]
         [Parameter(Mandatory, ParameterSetName = 'FolderClearText')]
@@ -9,16 +9,15 @@
         [Parameter(Mandatory, ParameterSetName = 'StringCredential')]
         [string] $FilePathPrivate,
 
-        [Parameter(Mandatory, ParameterSetName = 'FolderClearText')]
-        [Parameter(Mandatory, ParameterSetName = 'FileClearText')]
-        [Parameter(Mandatory, ParameterSetName = 'StringClearText')]
+        [Parameter(ParameterSetName = 'FolderClearText')]
+        [Parameter(ParameterSetName = 'FileClearText')]
+        [Parameter(ParameterSetName = 'StringClearText')]
         [string] $Password,
 
         [Parameter(Mandatory, ParameterSetName = 'FileCredential')]
         [Parameter(Mandatory, ParameterSetName = 'FolderCredential')]
         [Parameter(Mandatory, ParameterSetName = 'StringCredential')]
         [pscredential] $Credential,
-
 
         [Parameter(Mandatory, ParameterSetName = 'FolderCredential')]
         [Parameter(Mandatory, ParameterSetName = 'FolderClearText')]
@@ -48,7 +47,7 @@
     }
 
     if (-not (Test-Path -LiteralPath $FilePathPrivate)) {
-        Write-Warning -Message "Unprotect-PGP - Remove PGP encryption failed because private key not given."
+        Write-Warning -Message "Unprotect-PGP - Remove PGP encryption failed because private key file doesn't exists."
         return
     }
     $PrivateKey = Get-Content -LiteralPath $FilePathPrivate -Raw

@@ -1,5 +1,5 @@
 ﻿function New-PGPKey {
-    [cmdletBinding(DefaultParameterSetName = 'Credential')]
+    [cmdletBinding(DefaultParameterSetName = 'ClearText')]
     param(
         [parameter(Mandatory, ParameterSetName = 'Strength')]
         [parameter(Mandatory, ParameterSetName = 'StrengthCredential')]
@@ -11,11 +11,11 @@
         [parameter(Mandatory, ParameterSetName = 'ClearText')]
         [parameter(Mandatory, ParameterSetName = 'Credential')]
         [string] $FilePathPrivate,
-        [parameter(Mandatory, ParameterSetName = 'Strength')]
-        [parameter(Mandatory, ParameterSetName = 'ClearText')]
+        [parameter(ParameterSetName = 'Strength')]
+        [parameter(ParameterSetName = 'ClearText')]
         [string] $UserName,
-        [parameter(Mandatory, ParameterSetName = 'Strength')]
-        [parameter(Mandatory, ParameterSetName = 'ClearText')]
+        [parameter(ParameterSetName = 'Strength')]
+        [parameter(ParameterSetName = 'ClearText')]
         [string] $Password,
         [parameter(Mandatory, ParameterSetName = 'StrengthCredential')]
         [parameter(Mandatory, ParameterSetName = 'Credential')]
