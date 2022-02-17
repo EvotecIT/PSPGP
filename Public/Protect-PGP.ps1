@@ -4,7 +4,7 @@
         [Parameter(Mandatory, ParameterSetName = 'Folder')]
         [Parameter(Mandatory, ParameterSetName = 'File')]
         [Parameter(Mandatory, ParameterSetName = 'String')]
-        [string] $FilePathPublic,
+        [string[]] $FilePathPublic,
 
         [Parameter(Mandatory, ParameterSetName = 'Folder')][string] $FolderPath,
         [Parameter(ParameterSetName = 'Folder')][string] $OutputFolderPath,
@@ -14,19 +14,21 @@
 
         [Parameter(Mandatory, ParameterSetName = 'String')][string] $String
     )
-
-    if (Test-Path -LiteralPath $FilePathPublic) {
-        $PublicKey = [System.IO.FileInfo]::new($FilePathPublic)
-    } else {
-        if ($PSBoundParameters.ErrorAction -eq 'Stop') {
-            throw
+    $PublicKeys =  [System.Collections.Generic.List[System.IO.FileInfo]]::new()
+    foreach ($FilePathPubc in $FilePathPublic) {
+        if (Test-Path -LiteralPath $FilePathPubc) {
+            $PublicKeys.Add([System.IO.FileInfo]::new($FilePathPubc))
         } else {
-            Write-Warning -Message "Protect-PGP - Public key doesn't exists $($FilePathPublic): $($_.Exception.Message)"
-            return
+            if ($PSBoundParameters.ErrorAction -eq 'Stop') {
+                throw
+            } else {
+                Write-Warning -Message "Protect-PGP - Public key doesn't exists $($FilePathPubc): $($_.Exception.Message)"
+                return
+            }
         }
     }
     try {
-        $EncryptionKeys = [PgpCore.EncryptionKeys]::new($PublicKey)
+        $EncryptionKeys = [PgpCore.EncryptionKeys]::new($PublicKeys)
         $PGP = [PgpCore.PGP]::new($EncryptionKeys)
     } catch {
         if ($PSBoundParameters.ErrorAction -eq 'Stop') {
