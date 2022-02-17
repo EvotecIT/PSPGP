@@ -39,10 +39,12 @@
         }
     }
     if ($FolderPath) {
-        foreach ($File in Get-ChildItem -LiteralPath $FolderPath -Recurse:$Recursive) {
+        $ResolvedFolderPath = Resolve-Path -Path $FolderPath
+        foreach ($File in Get-ChildItem -LiteralPath $ResolvedFolderPath.Path -Recurse:$Recursive) {
             try {
                 if ($OutputFolderPath) {
-                    $OutputFile = [io.Path]::Combine($OutputFolderPath, "$($File.Name).pgp")
+                    $ResolvedOutputFolder = Resolve-Path -Path $OutputFolderPath
+                    $OutputFile = [io.Path]::Combine($ResolvedOutputFolder.Path, "$($File.Name).pgp")
                     $PGP.EncryptFile($File.FullName, $OutputFile)
                 } else {
                     $PGP.EncryptFile($File.FullName, "$($File.FullName).pgp")
@@ -58,10 +60,12 @@
         }
     } elseif ($FilePath) {
         try {
+            $ResolvedFilePath = Resolve-Path -Path $FilePath
             if ($OutFilePath) {
-                $PGP.EncryptFile($FilePath, "$OutFilePath")
+                $ResolvedOutFilePath = Resolve-Path -Path $OutFilePath
+                $PGP.EncryptFile($ResolvedFilePath.Path, "$($ResolvedOutFilePath.Path)")
             } else {
-                $PGP.EncryptFile($FilePath, "$($FilePath).pgp")
+                $PGP.EncryptFile($ResolvedFilePath.Path, "$($ResolvedFilePath.Path).pgp")
             }
         } catch {
             if ($PSBoundParameters.ErrorAction -eq 'Stop') {
@@ -78,7 +82,7 @@
             if ($PSBoundParameters.ErrorAction -eq 'Stop') {
                 throw
             } else {
-                Write-Warning -Message "Protect-PGP - Can't encrypt file $($File.FuleName): $($_.Exception.Message)"
+                Write-Warning -Message "Protect-PGP - Can't encrypt string: $($_.Exception.Message)"
             }
         }
     }

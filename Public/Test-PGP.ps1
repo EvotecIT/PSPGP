@@ -20,7 +20,7 @@
         if ($PSBoundParameters.ErrorAction -eq 'Stop') {
             throw
         } else {
-            Write-Warning -Message "Protect-PGP - Public key doesn't exists $($FilePathPublic): $($_.Exception.Message)"
+            Write-Warning -Message "Test-PGP - Public key doesn't exists $($FilePathPublic): $($_.Exception.Message)"
             return
         }
     }
@@ -36,7 +36,8 @@
         }
     }
     if ($FolderPath) {
-        foreach ($File in Get-ChildItem -LiteralPath $FolderPath -Recurse:$Recursive) {
+        $ResolvedFolderPath = Resolve-Path -Path $FolderPath
+        foreach ($File in Get-ChildItem -LiteralPath $ResolvedFolderPath.Path -Recurse:$Recursive) {
             try {
                 $Output = $PGP.VerifyFile($File.FullName)
                 $ErrorMessage = ''
@@ -45,7 +46,7 @@
                 if ($PSBoundParameters.ErrorAction -eq 'Stop') {
                     throw
                 } else {
-                    Write-Warning -Message "Protect-PGP - Can't encrypt file $($File.FuleName): $($_.Exception.Message)"
+                    Write-Warning -Message "Test-PGP - Can't test file $($File.FuleName): $($_.Exception.Message)"
                     $ErrorMessage = $($_.Exception.Message)
                 }
             }
@@ -56,19 +57,20 @@
             }
         }
     } elseif ($FilePath) {
+        $ResolvedFilePath = Resolve-Path -Path $FilePath
         try {
-            $Output = $PGP.VerifyFile($FilePath)
+            $Output = $PGP.VerifyFile($ResolvedFilePath.Path)
         } catch {
             $Output = $false
             if ($PSBoundParameters.ErrorAction -eq 'Stop') {
                 throw
             } else {
-                Write-Warning -Message "Protect-PGP - Can't encrypt file $($File.FuleName): $($_.Exception.Message)"
+                Write-Warning -Message "Test-PGP - Can't test file $($ResolvedFilePath.Path): $($_.Exception.Message)"
                 $ErrorMessage = $($_.Exception.Message)
             }
         }
         [PSCustomObject] @{
-            FilePath = $FilePath
+            FilePath = $ResolvedFilePath.Path
             Status   = $Output
             Error    = $ErrorMessage
         }
@@ -79,7 +81,7 @@
             if ($PSBoundParameters.ErrorAction -eq 'Stop') {
                 throw
             } else {
-                Write-Warning -Message "Protect-PGP - Can't encrypt file $($File.FuleName): $($_.Exception.Message)"
+                Write-Warning -Message "Test-PGP - Can't test string: $($_.Exception.Message)"
             }
         }
     }
