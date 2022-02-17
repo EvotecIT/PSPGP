@@ -4,11 +4,11 @@
     CmdletsToExport      = @()
     CompanyName          = 'Evotec'
     CompatiblePSEditions = @('Desktop', 'Core')
-    Copyright            = '(c) 2011 - 2021 Przemyslaw Klys @ Evotec. All rights reserved.'
+    Copyright            = '(c) 2011 - 2022 Przemyslaw Klys @ Evotec. All rights reserved.'
     Description          = 'PSPGP is a PowerShell module that provides PGP functionality in PowerShell. It allows encrypting and decrypting files/folders and strings using PGP.'
     FunctionsToExport    = @('New-PGPKey', 'Protect-PGP', 'Test-PGP', 'Unprotect-PGP')
     GUID                 = 'edbf6d52-2d66-405e-a4d4-d4a95db8fb45'
-    ModuleVersion        = '0.1.6'
+    ModuleVersion        = '0.1.7'
     PowerShellVersion    = '5.1'
     PrivateData          = @{
         PSData = @{
