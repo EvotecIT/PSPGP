@@ -14,9 +14,10 @@
 
         [Parameter(Mandatory, ParameterSetName = 'String')][string] $String
     )
-    $PublicKeys = foreach ($FilePathPubc in $FilePathPublic) {
+    $PublicKeys =  [System.Collections.Generic.List[System.IO.FileInfo]]::new()
+    foreach ($FilePathPubc in $FilePathPublic) {
         if (Test-Path -LiteralPath $FilePathPubc) {
-            [System.IO.FileInfo]::new($FilePathPubc)
+            $PublicKeys.Add([System.IO.FileInfo]::new($FilePathPubc))
         } else {
             if ($PSBoundParameters.ErrorAction -eq 'Stop') {
                 throw
