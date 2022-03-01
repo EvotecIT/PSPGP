@@ -8,7 +8,7 @@
     Description          = 'PSPGP is a PowerShell module that provides PGP functionality in PowerShell. It allows encrypting and decrypting files/folders and strings using PGP.'
     FunctionsToExport    = @('New-PGPKey', 'Protect-PGP', 'Test-PGP', 'Unprotect-PGP')
     GUID                 = 'edbf6d52-2d66-405e-a4d4-d4a95db8fb45'
-    ModuleVersion        = '0.1.7'
+    ModuleVersion        = '0.1.8'
     PowerShellVersion    = '5.1'
     PrivateData          = @{
         PSData = @{
