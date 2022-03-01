@@ -68,8 +68,8 @@
         foreach ($File in Get-ChildItem -LiteralPath $ResolvedFolderPath.Path -Recurse:$Recursive) {
             try {
                 if ($OutputFolderPath) {
-                    $ResolvedOutputFolder = Resolve-Path -Path $OutputFolderPath
-                    $OutputFile = [io.Path]::Combine($ResolvedOutputFolder.Path, "$($File.Name.Replace('.pgp',''))")
+                    $ResolvedOutputFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputFolderPath)
+                    $OutputFile = [io.Path]::Combine($ResolvedOutputFolder, "$($File.Name.Replace('.pgp',''))")
                     $PGP.DecryptFile($File.FullName, $OutputFile)
                 } else {
                     $PGP.DecryptFile($File.FullName, "$($File.FullName)")
@@ -87,8 +87,8 @@
         try {
             $ResolvedFilePath = Resolve-Path -Path $FilePath
             if ($OutFilePath) {
-                $ResolvedOutFilePath = Resolve-Path -Path $OutFilePath
-                $PGP.DecryptFile($ResolvedFilePath.Path, "$($ResolvedOutFilePath.Path)", $FilePathPrivate, $Password)
+                $ResolvedOutFilePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutFilePath)
+                $PGP.DecryptFile($ResolvedFilePath.Path, "$($ResolvedOutFilePath)", $FilePathPrivate, $Password)
             } else {
                 $PGP.DecryptFile($ResolvedFilePath.Path, "$($FilePath.Replace('.pgp',''))")
             }

@@ -43,8 +43,8 @@
         foreach ($File in Get-ChildItem -LiteralPath $ResolvedFolderPath.Path -Recurse:$Recursive) {
             try {
                 if ($OutputFolderPath) {
-                    $ResolvedOutputFolder = Resolve-Path -Path $OutputFolderPath
-                    $OutputFile = [io.Path]::Combine($ResolvedOutputFolder.Path, "$($File.Name).pgp")
+                    $ResolvedOutputFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputFolderPath)
+                    $OutputFile = [io.Path]::Combine($ResolvedOutputFolder, "$($File.Name).pgp")
                     $PGP.EncryptFile($File.FullName, $OutputFile)
                 } else {
                     $PGP.EncryptFile($File.FullName, "$($File.FullName).pgp")
@@ -62,8 +62,8 @@
         try {
             $ResolvedFilePath = Resolve-Path -Path $FilePath
             if ($OutFilePath) {
-                $ResolvedOutFilePath = Resolve-Path -Path $OutFilePath
-                $PGP.EncryptFile($ResolvedFilePath.Path, "$($ResolvedOutFilePath.Path)")
+                $ResolvedOutFilePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutFilePath)
+                $PGP.EncryptFile($ResolvedFilePath.Path, "$($ResolvedOutFilePath)")
             } else {
                 $PGP.EncryptFile($ResolvedFilePath.Path, "$($ResolvedFilePath.Path).pgp")
             }
