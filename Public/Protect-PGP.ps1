@@ -53,7 +53,7 @@
                 if ($PSBoundParameters.ErrorAction -eq 'Stop') {
                     throw
                 } else {
-                    Write-Warning -Message "Protect-PGP - Can't encrypt file $($File.FuleName): $($_.Exception.Message)"
+                    Write-Warning -Message "Protect-PGP - Can't encrypt file $($File.FullName): $($_.Exception.Message)"
                     return
                 }
             }
@@ -71,7 +71,7 @@
             if ($PSBoundParameters.ErrorAction -eq 'Stop') {
                 throw
             } else {
-                Write-Warning -Message "Protect-PGP - Can't encrypt file $($File.FuleName): $($_.Exception.Message)"
+                Write-Warning -Message "Protect-PGP - Can't encrypt file $($FilePath): $($_.Exception.Message)"
                 return
             }
         }

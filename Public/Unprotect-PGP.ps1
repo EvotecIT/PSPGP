@@ -78,7 +78,7 @@
                 if ($PSBoundParameters.ErrorAction -eq 'Stop') {
                     throw
                 } else {
-                    Write-Warning -Message "Unprotect-PGP - Remove PGP encryption from $($File.FuleName) failed: $($_.Exception.Message)"
+                    Write-Warning -Message "Unprotect-PGP - Remove PGP encryption from $($File.FullName) failed: $($_.Exception.Message)"
                     return
                 }
             }
@@ -96,7 +96,7 @@
             if ($PSBoundParameters.ErrorAction -eq 'Stop') {
                 throw
             } else {
-                Write-Warning -Message "Unprotect-PGP - Remove PGP encryption from $($File.FuleName) failed: $($_.Exception.Message)"
+                Write-Warning -Message "Unprotect-PGP - Remove PGP encryption from $($FilePath) failed: $($_.Exception.Message)"
                 return
             }
         }
