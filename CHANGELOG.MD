@@ -1,5 +1,8 @@
 ﻿### ChangeLog
 
+#### 0.1.9 - 2022.03.01
+  - Fixes [Full Folder Decryption file path having incorrect property name](https://github.com/EvotecIT/PSPGP/issues/7) in `Write-Warning`
+
 #### 0.1.8 - 2022.03.01
   - Fixes [Protect-PGP does not create an encrypted file by specifying the path with -OutFilePath](https://github.com/EvotecIT/PSPGP/issues/6)
 
