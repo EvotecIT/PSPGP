@@ -1,5 +1,8 @@
 ﻿### ChangeLog
 
+#### 0.1.10
+  - Fixes warning message [#8](https://github.com/EvotecIT/PSPGP/pull/8) - tnx s0up2up
+
 #### 0.1.9 - 2022.03.01
   - Fixes [Full Folder Decryption file path having incorrect property name](https://github.com/EvotecIT/PSPGP/issues/7) in `Write-Warning`
 
