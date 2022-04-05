@@ -59,7 +59,7 @@
         if ($PSBoundParameters.ErrorAction -eq 'Stop') {
             throw
         } else {
-            Write-Warning -Message "Protect-PGP - Can't encrypt files because: $($_.Exception.Message)"
+            Write-Warning -Message "Unprotect-PGP - Can't decrypt files because: $($_.Exception.Message)"
             return
         }
     }
