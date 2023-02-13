@@ -64,8 +64,7 @@
                         $PGP.EncryptFile($File.FullName, "$($File.FullName).pgp")
                     }
                 }
-            }
-            catch {
+            } catch {
                 if ($PSBoundParameters.ErrorAction -eq 'Stop') {
                     throw
                 } else {
@@ -104,7 +103,7 @@
             if ($SignKey) {
                 $PGP.EncryptArmoredStringAndSign($String)
             } else {
-            $PGP.EncryptArmoredString($String)
+                $PGP.EncryptArmoredString($String)
             }
         } catch {
             if ($PSBoundParameters.ErrorAction -eq 'Stop') {
