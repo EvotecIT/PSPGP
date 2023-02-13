@@ -21,12 +21,10 @@
     foreach ($FilePathPubc in $FilePathPublic) {
         if (Test-Path -LiteralPath $FilePathPubc) {
             $PublicKeys.Add([System.IO.FileInfo]::new($FilePathPubc))
-        }
-        else {
+        } else {
             if ($PSBoundParameters.ErrorAction -eq 'Stop') {
                 throw
-            }
-            else {
+            } else {
                 Write-Warning -Message "Protect-PGP - Public key doesn't exists $($FilePathPubc): $($_.Exception.Message)"
                 return
             }
@@ -35,17 +33,14 @@
     try {
         if ($SignKey) {
             $EncryptionKeys = [PgpCore.EncryptionKeys]::new($PublicKeys, $SignKey, $SignPassword)
-        }
-        else {
+        } else {
             $EncryptionKeys = [PgpCore.EncryptionKeys]::new($PublicKeys)
         }
         $PGP = [PgpCore.PGP]::new($EncryptionKeys)
-    }
-    catch {
+    } catch {
         if ($PSBoundParameters.ErrorAction -eq 'Stop') {
             throw
-        }
-        else {
+        } else {
             Write-Warning -Message "Protect-PGP - Can't encrypt files because: $($_.Exception.Message)"
             return
         }
@@ -59,16 +54,13 @@
                     $OutputFile = [io.Path]::Combine($ResolvedOutputFolder, "$($File.Name).pgp")
                     if ($SignKey) {
                         $PGP.EncryptFileAndSign($File.FullName, $Outputfile)
-                    }
-                    else {
+                    } else {
                         $PGP.EncryptFile($File.FullName, $OutputFile)
                     }
-                }
-                else {
+                } else {
                     if ($SignKey) {
                         $PGP.EncryptFileAndSign($File.FullName, "$($File.FullName).pgp")
-                    }
-                    else {
+                    } else {
                         $PGP.EncryptFile($File.FullName, "$($File.FullName).pgp")
                     }
                 }
@@ -76,59 +68,48 @@
             catch {
                 if ($PSBoundParameters.ErrorAction -eq 'Stop') {
                     throw
-                }
-                else {
+                } else {
                     Write-Warning -Message "Protect-PGP - Can't encrypt file $($File.FullName): $($_.Exception.Message)"
                     return
                 }
             }
         }
-    }
-    elseif ($FilePath) {
+    } elseif ($FilePath) {
         try {
             $ResolvedFilePath = Resolve-Path -Path $FilePath
             if ($OutFilePath) {
                 $ResolvedOutFilePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutFilePath)
                 if ($SignKey) {
                     $PGP.EncryptFileAndSign($ResolvedFilePath.Path, "$($ResolvedOutFilePath)")
-                }
-                else {
+                } else {
                     $PGP.EncryptFile($ResolvedFilePath.Path, "$($ResolvedOutFilePath)")
                 }
-            }
-            else {
+            } else {
                 if ($SignKey) {
                     $PGP.EncryptFileAndSign($ResolvedFilePath.Path, "$($ResolvedFilePath.Path).pgp")
-                }
-                else {
+                } else {
                     $PGP.EncryptFile($ResolvedFilePath.Path, "$($ResolvedFilePath.Path).pgp")
                 }
             }
-        }
-        catch {
+        } catch {
             if ($PSBoundParameters.ErrorAction -eq 'Stop') {
                 throw
-            }
-            else {
+            } else {
                 Write-Warning -Message "Protect-PGP - Can't encrypt file $($FilePath): $($_.Exception.Message)"
                 return
             }
         }
-    }
-    elseif ($String) {
+    } elseif ($String) {
         try {
             if ($SignKey) {
                 $PGP.EncryptArmoredStringAndSign($String)
-            }
-            else {
+            } else {
             $PGP.EncryptArmoredString($String)
             }
-        }
-        catch {
+        } catch {
             if ($PSBoundParameters.ErrorAction -eq 'Stop') {
                 throw
-            }
-            else {
+            } else {
                 Write-Warning -Message "Protect-PGP - Can't encrypt string: $($_.Exception.Message)"
             }
         }
