@@ -1,15 +1,16 @@
 jobs:
-  - job: Build_PS_Win2016
+  - job: Build_Windows
     pool:
-      vmImage: vs2017-win2016
+      vmImage: windows-latest
     steps:
       - powershell: |
           Install-Module -Name Pester -Repository PSGallery -Force -SkipPublisherCheck
           .\PSPGP.Tests.ps1
         displayName: "Run Pester Tests - PowerShell 5"
-      #  - script: |
-      #        pwsh -c '.\PSPGP.Tests.ps1'
-      #    displayName: "Run Pester Tests - PowerShell 6+"
+      - script: |
+          Install-Module -Name Pester -Repository PSGallery -Force -SkipPublisherCheck
+          pwsh -c '.\PSPGP.Tests.ps1'
+        displayName: "Run Pester Tests - PowerShell 6+"
 
   - job: Build_PSCore_Ubuntu1604
     pool:
