@@ -12,8 +12,8 @@
         [Parameter(Mandatory, ParameterSetName = 'File')][string] $FilePath,
         [Parameter(ParameterSetName = 'File')][string] $OutFilePath,
 
-        [Parameter(Mandatory, ParameterSetName = 'String')][string] $String
-        
+        [Parameter(Mandatory, ParameterSetName = 'String')][string] $String,
+
         [Parameter()][System.IO.FileInfo] $SignKey,
         [Parameter()][string] $SignPassword
     )
