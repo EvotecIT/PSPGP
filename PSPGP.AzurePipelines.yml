@@ -3,12 +3,10 @@ jobs:
     pool:
       vmImage: windows-latest
     steps:
-      - powershell: |
-          Install-Module -Name Pester -Repository PSGallery -Force -SkipPublisherCheck
+      - powershell:
           .\PSPGP.Tests.ps1
         displayName: "Run Pester Tests - PowerShell 5"
       - script: |
-          Install-Module -Name Pester -Repository PSGallery -Force -SkipPublisherCheck
           pwsh -c '.\PSPGP.Tests.ps1'
         displayName: "Run Pester Tests - PowerShell 6+"
 
