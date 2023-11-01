@@ -1,3 +1,3 @@
 ﻿Import-Module .\PSPGP.psd1 -Force
 
-Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -String "This is string to encrypt"
+Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -String "This is string to encrypt" -HashAlgorithm Sha256 -CompressionAlgorithm Zip
