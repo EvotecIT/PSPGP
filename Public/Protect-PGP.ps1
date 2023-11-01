@@ -14,8 +14,15 @@
 
         [Parameter(Mandatory, ParameterSetName = 'String')][string] $String,
 
-        [Parameter()][System.IO.FileInfo] $SignKey,
-        [Parameter()][string] $SignPassword
+        [System.IO.FileInfo] $SignKey,
+        [string] $SignPassword,
+        [Org.BouncyCastle.Bcpg.HashAlgorithmTag] $HashAlgorithm,
+        [Org.BouncyCastle.Bcpg.CompressionAlgorithmTag] $CompressionAlgorithm,
+        [PgpCore.PGPFileType] $FileType,
+        [Int32] $PgpSignatureType,
+        [Org.BouncyCastle.Bcpg.PublicKeyAlgorithmTag] $PublicKeyAlgorithm,
+        [Org.BouncyCastle.Bcpg.SymmetricKeyAlgorithmTag] $SymmetricKeyAlgorithm
+
     )
     $PublicKeys = [System.Collections.Generic.List[System.IO.FileInfo]]::new()
     foreach ($FilePathPubc in $FilePathPublic) {
@@ -45,6 +52,26 @@
             return
         }
     }
+
+    if ($PSBoundParameters.ContainsKey('HashAlgorithm')) {
+        $PGP.HashAlgorithmTag = $HashAlgorithm
+    }
+    if ($PSBoundParameters.ContainsKey('CompressionAlgorithm')) {
+        $PGP.CompressionAlgorithm = $CompressionAlgorithm
+    }
+    if ($PSBoundParameters.ContainsKey('FileType')) {
+        $PGP.FileType = $FileType
+    }
+    if ($PSBoundParameters.ContainsKey('PgpSignatureType')) {
+        $PGP.PgpSignatureType = $PgpSignatureType
+    }
+    if ($PSBoundParameters.ContainsKey('PublicKeyAlgorithm')) {
+        $PGP.PublicKeyAlgorithm = $PublicKeyAlgorithm
+    }
+    if ($PSBoundParameters.ContainsKey('SymmetricKeyAlgorithm')) {
+        $PGP.SymmetricKeyAlgorithm = $SymmetricKeyAlgorithm
+    }
+
     if ($FolderPath) {
         $ResolvedFolderPath = Resolve-Path -Path $FolderPath
         foreach ($File in Get-ChildItem -LiteralPath $ResolvedFolderPath.Path -Recurse:$Recursive) {
