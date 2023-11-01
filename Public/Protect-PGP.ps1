@@ -16,7 +16,7 @@
 
         [System.IO.FileInfo] $SignKey,
         [string] $SignPassword,
-        [Org.BouncyCastle.Bcpg.HashAlgorithmTag] $HashAlgorithm,
+        [alias('HashAlgorithmTag')][Org.BouncyCastle.Bcpg.HashAlgorithmTag] $HashAlgorithm,
         [Org.BouncyCastle.Bcpg.CompressionAlgorithmTag] $CompressionAlgorithm,
         [PgpCore.PGPFileType] $FileType,
         [Int32] $PgpSignatureType,
