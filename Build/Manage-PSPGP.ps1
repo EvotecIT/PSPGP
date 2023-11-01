@@ -1,6 +1,4 @@
-﻿Clear-Host
-
-Build-Module -ModuleName 'PSPGP' {
+﻿Build-Module -ModuleName 'PSPGP' {
     # Usual defaults as per standard module
     $Manifest = [ordered] @{
         # Minimum version of the Windows PowerShell engine required by this module
@@ -89,9 +87,23 @@ Build-Module -ModuleName 'PSPGP' {
         MergeModuleOnBuild                = $true
         MergeFunctionsFromApprovedModules = $true
         CertificateThumbprint             = '483292C9E317AA13B07BB7A96AE9D1A5ED9E7703'
-        DotSourceLibraries                = $false
-        DotSourceClasses                  = $false
+        #DotSourceLibraries                = $false
+        #DotSourceClasses                  = $false
         SeparateFileLibraries             = $true
+        #DeleteTargetModuleBeforeBuild     = $true
+
+        #ResolveBinaryConflicts            = $true
+        #ResolveBinaryConflictsName        = 'PSPGP'
+        NETProjectName                    = 'PSPGP'
+        NETConfiguration                  = 'Release'
+        NETFramework                      = 'netstandard2.0'
+        NETExcludeMainLibrary             = $true
+        NETExcludeLibraryFilter           = @(
+            'System.Management.*.dll'
+        )
+        DotSourceLibraries                = $true
+        DotSourceClasses                  = $true
+        #SeparateFileLibraries             = $true
         DeleteTargetModuleBeforeBuild     = $true
     }
 
