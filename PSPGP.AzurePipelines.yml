@@ -4,10 +4,14 @@ jobs:
       vmImage: windows-latest
     steps:
       - powershell:
+            Set-PSRepository PSGallery -InstallationPolicy Trusted
+            Install-Module PSPublishModule -ErrorAction Stop -Force -Verbose
           .\Build\BuildModule.ps1
         displayName: "Run Pester Tests - PowerShell 5"
-      - script: |
-          pwsh -c '.\Build\BuildModule.ps1'
+      - pwsh:
+            Set-PSRepository PSGallery -InstallationPolicy Trusted
+            Install-Module PSPublishModule -ErrorAction Stop -Force -Verbose
+            '.\Build\BuildModule.ps1'
         displayName: "Run Pester Tests - PowerShell 7+"
 
   - job: Build_PSCore_Ubuntu1604
@@ -20,8 +24,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y powershell
         displayName: "Install PowerShell Core"
-      - script: |
-          pwsh -c '.\Build\BuildModule.ps1'
+      - pwsh: |
+            Set-PSRepository PSGallery -InstallationPolicy Trusted
+            Install-Module PSPublishModule -ErrorAction Stop -Force -Verbose
+            '.\Build\BuildModule.ps1s1'
         displayName: "Run Pester Tests"
 
   - job: Build_PSCore_MacOS1013
@@ -34,6 +40,8 @@ jobs:
           brew install mono-libgdiplus
           brew install --cask powershell
         displayName: "Install PowerShell Core"
-      - script: |
-          pwsh -c '.\Build\BuildModule.ps1'
+      - pwsh: |
+            Set-PSRepository PSGallery -InstallationPolicy Trusted
+            Install-Module PSPublishModule -ErrorAction Stop -Force -Verbose
+            '.\Build\BuildModule.ps1
         displayName: "Run Pester Tests"
