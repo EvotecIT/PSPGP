@@ -92,12 +92,12 @@
         SeparateFileLibraries             = $true
         #DeleteTargetModuleBeforeBuild     = $true
 
-        #ResolveBinaryConflicts            = $true
-        #ResolveBinaryConflictsName        = 'PSPGP'
+        ResolveBinaryConflicts            = $true
+        ResolveBinaryConflictsName        = 'PSPGP'
         NETProjectName                    = 'PSPGP'
         NETConfiguration                  = 'Release'
         NETFramework                      = 'netstandard2.0'
-        NETExcludeMainLibrary             = $true
+        #NETExcludeMainLibrary             = $true
         NETExcludeLibraryFilter           = @(
             'System.Management.*.dll'
         )
@@ -138,6 +138,6 @@
     New-ConfigurationTest -TestsPath "$PSScriptRoot\..\Tests" -Enable
 
     # global options for publishing to github/psgallery
-    #New-ConfigurationPublish -Type PowerShellGallery -FilePath 'C:\Support\Important\PowerShellGalleryAPI.txt' -Enabled:$true
-    #New-ConfigurationPublish -Type GitHub -FilePath 'C:\Support\Important\GitHubAPI.txt' -UserName 'EvotecIT' -Enabled:$true
+    New-ConfigurationPublish -Type PowerShellGallery -FilePath 'C:\Support\Important\PowerShellGalleryAPI.txt' -Enabled:$true
+    New-ConfigurationPublish -Type GitHub -FilePath 'C:\Support\Important\GitHubAPI.txt' -UserName 'EvotecIT' -Enabled:$true
 } -ExitCode
