@@ -4,11 +4,11 @@ jobs:
       vmImage: windows-latest
     steps:
       - powershell:
-          .\PSPGP.Tests.ps1
+          .\Build\BuildModule.ps1
         displayName: "Run Pester Tests - PowerShell 5"
       - script: |
-          pwsh -c '.\PSPGP.Tests.ps1'
-        displayName: "Run Pester Tests - PowerShell 6+"
+          pwsh -c '.\Build\BuildModule.ps1'
+        displayName: "Run Pester Tests - PowerShell 7+"
 
   - job: Build_PSCore_Ubuntu1604
     pool:
@@ -21,7 +21,7 @@ jobs:
           sudo apt-get install -y powershell
         displayName: "Install PowerShell Core"
       - script: |
-          pwsh -c '.\PSPGP.Tests.ps1'
+          pwsh -c '.\Build\BuildModule.ps1'
         displayName: "Run Pester Tests"
 
   - job: Build_PSCore_MacOS1013
@@ -35,5 +35,5 @@ jobs:
           brew install --cask powershell
         displayName: "Install PowerShell Core"
       - script: |
-          pwsh -c '.\PSPGP.Tests.ps1'
+          pwsh -c '.\Build\BuildModule.ps1'
         displayName: "Run Pester Tests"
