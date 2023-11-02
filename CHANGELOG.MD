@@ -1,5 +1,13 @@
 ﻿### ChangeLog
 
+#### 0.1.12 - 2023.11.02
+- Improve resolving files on SMB shares and other non direct paths
+- Added HashAlgorithm to `New-PGPKey` to allow for different hash algorithms
+
+#### 0.1.11 - 2023.11.02
+- Added HashAlgorithm to `Protect-PGP` to allow for different hash algorithms
+- Tries to resolve issue with Az.KeyVault conficts
+
 #### 0.1.10
   - Fixes warning message [#8](https://github.com/EvotecIT/PSPGP/pull/8) - tnx s0up2up
 
