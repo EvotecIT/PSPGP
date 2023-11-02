@@ -9,7 +9,7 @@
     DotNetFrameworkVersion = '4.7.2'
     FunctionsToExport      = @('New-PGPKey', 'Protect-PGP', 'Test-PGP', 'Unprotect-PGP')
     GUID                   = 'edbf6d52-2d66-405e-a4d4-d4a95db8fb45'
-    ModuleVersion          = '0.1.11'
+    ModuleVersion          = '0.1.12'
     PowerShellVersion      = '5.1'
     PrivateData            = @{
         PSData = @{
