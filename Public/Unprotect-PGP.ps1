@@ -46,11 +46,12 @@
         $Password = $Credential.GetNetworkCredential().Password
     }
 
-    if (-not (Test-Path -LiteralPath $FilePathPrivate)) {
+    $ResolvedPrivateFile = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($FilePathPrivate)
+    if (-not (Test-Path -LiteralPath $ResolvedPrivateFile)) {
         Write-Warning -Message "Unprotect-PGP - Remove PGP encryption failed because private key file doesn't exists."
         return
     }
-    $PrivateKey = Get-Content -LiteralPath $FilePathPrivate -Raw
+    $PrivateKey = Get-Content -LiteralPath $ResolvedPrivateFile -Raw
     try {
         $EncryptionKeys = [PgpCore.EncryptionKeys]::new($PrivateKey, $Password)
 
@@ -64,8 +65,8 @@
         }
     }
     if ($FolderPath) {
-        $ResolvedFolderPath = Resolve-Path -Path $FolderPath
-        foreach ($File in Get-ChildItem -LiteralPath $ResolvedFolderPath.Path -Recurse:$Recursive) {
+        $ResolvedFolderPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($FolderPath)
+        foreach ($File in Get-ChildItem -LiteralPath $ResolvedFolderPath -Recurse:$Recursive) {
             try {
                 if ($OutputFolderPath) {
                     $ResolvedOutputFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputFolderPath)
@@ -85,12 +86,12 @@
         }
     } elseif ($FilePath) {
         try {
-            $ResolvedFilePath = Resolve-Path -Path $FilePath
+            $ResolvedFilePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($FilePath)
             if ($OutFilePath) {
                 $ResolvedOutFilePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutFilePath)
-                $PGP.DecryptFile($ResolvedFilePath.Path, "$($ResolvedOutFilePath)", $FilePathPrivate, $Password)
+                $PGP.DecryptFile($ResolvedFilePath, $ResolvedOutFilePath, $ResolvedPrivateFile, $Password)
             } else {
-                $PGP.DecryptFile($ResolvedFilePath.Path, "$($FilePath.Replace('.pgp',''))")
+                $PGP.DecryptFile($ResolvedFilePath, "$($FilePath.Replace('.pgp',''))")
             }
         } catch {
             if ($PSBoundParameters.ErrorAction -eq 'Stop') {

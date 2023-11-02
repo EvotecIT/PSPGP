@@ -26,13 +26,14 @@
     )
     $PublicKeys = [System.Collections.Generic.List[System.IO.FileInfo]]::new()
     foreach ($FilePathPubc in $FilePathPublic) {
-        if (Test-Path -LiteralPath $FilePathPubc) {
-            $PublicKeys.Add([System.IO.FileInfo]::new($FilePathPubc))
+        $ResolvedPublicKey = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($FilePathPubc)
+        if (Test-Path -LiteralPath $ResolvedPublicKey) {
+            $PublicKeys.Add([System.IO.FileInfo]::new($ResolvedPublicKey))
         } else {
             if ($PSBoundParameters.ErrorAction -eq 'Stop') {
                 throw
             } else {
-                Write-Warning -Message "Protect-PGP - Public key doesn't exists $($FilePathPubc): $($_.Exception.Message)"
+                Write-Warning -Message "Protect-PGP - Public key doesn't exists $($ResolvedPublicKey): $($_.Exception.Message)"
                 return
             }
         }
@@ -73,8 +74,8 @@
     }
 
     if ($FolderPath) {
-        $ResolvedFolderPath = Resolve-Path -Path $FolderPath
-        foreach ($File in Get-ChildItem -LiteralPath $ResolvedFolderPath.Path -Recurse:$Recursive) {
+        $ResolvedFolderPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($FolderPath)
+        foreach ($File in Get-ChildItem -LiteralPath $ResolvedFolderPath -Recurse:$Recursive) {
             try {
                 if ($OutputFolderPath) {
                     $ResolvedOutputFolder = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputFolderPath)
@@ -102,19 +103,19 @@
         }
     } elseif ($FilePath) {
         try {
-            $ResolvedFilePath = Resolve-Path -Path $FilePath
+            $ResolvedFilePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($FilePath)
             if ($OutFilePath) {
                 $ResolvedOutFilePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutFilePath)
                 if ($SignKey) {
-                    $PGP.EncryptFileAndSign($ResolvedFilePath.Path, "$($ResolvedOutFilePath)")
+                    $PGP.EncryptFileAndSign($ResolvedFilePath, $ResolvedOutFilePath)
                 } else {
-                    $PGP.EncryptFile($ResolvedFilePath.Path, "$($ResolvedOutFilePath)")
+                    $PGP.EncryptFile($ResolvedFilePath, $ResolvedOutFilePath)
                 }
             } else {
                 if ($SignKey) {
-                    $PGP.EncryptFileAndSign($ResolvedFilePath.Path, "$($ResolvedFilePath.Path).pgp")
+                    $PGP.EncryptFileAndSign($ResolvedFilePath, "$($ResolvedFilePath).pgp")
                 } else {
-                    $PGP.EncryptFile($ResolvedFilePath.Path, "$($ResolvedFilePath.Path).pgp")
+                    $PGP.EncryptFile($ResolvedFilePath, "$($ResolvedFilePath).pgp")
                 }
             }
         } catch {

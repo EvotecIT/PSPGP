@@ -14,13 +14,15 @@
 
         [Parameter(Mandatory, ParameterSetName = 'String')][string] $String
     )
-    if (Test-Path -LiteralPath $FilePathPublic) {
-        $PublicKey = [System.IO.FileInfo]::new($FilePathPublic)
+
+    $ResolvedPublicKey = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($FilePathPublic)
+    if (Test-Path -LiteralPath $ResolvedPublicKey) {
+        $PublicKey = [System.IO.FileInfo]::new($ResolvedPublicKey)
     } else {
         if ($PSBoundParameters.ErrorAction -eq 'Stop') {
             throw
         } else {
-            Write-Warning -Message "Test-PGP - Public key doesn't exists $($FilePathPublic): $($_.Exception.Message)"
+            Write-Warning -Message "Test-PGP - Public key doesn't exists $($ResolvedPublicKey): $($_.Exception.Message)"
             return
         }
     }
@@ -36,8 +38,8 @@
         }
     }
     if ($FolderPath) {
-        $ResolvedFolderPath = Resolve-Path -Path $FolderPath
-        foreach ($File in Get-ChildItem -LiteralPath $ResolvedFolderPath.Path -Recurse:$Recursive) {
+        $ResolvedFolderPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($FolderPath)
+        foreach ($File in Get-ChildItem -LiteralPath $ResolvedFolderPath -Recurse:$Recursive) {
             try {
                 $Output = $PGP.VerifyFile($File.FullName)
                 $ErrorMessage = ''
@@ -57,20 +59,20 @@
             }
         }
     } elseif ($FilePath) {
-        $ResolvedFilePath = Resolve-Path -Path $FilePath
+        $ResolvedFilePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($FilePath)
         try {
-            $Output = $PGP.VerifyFile($ResolvedFilePath.Path)
+            $Output = $PGP.VerifyFile($ResolvedFilePath)
         } catch {
             $Output = $false
             if ($PSBoundParameters.ErrorAction -eq 'Stop') {
                 throw
             } else {
-                Write-Warning -Message "Test-PGP - Can't test file $($ResolvedFilePath.Path): $($_.Exception.Message)"
+                Write-Warning -Message "Test-PGP - Can't test file $($ResolvedFilePath): $($_.Exception.Message)"
                 $ErrorMessage = $($_.Exception.Message)
             }
         }
         [PSCustomObject] @{
-            FilePath = $ResolvedFilePath.Path
+            FilePath = $ResolvedFilePath
             Status   = $Output
             Error    = $ErrorMessage
         }

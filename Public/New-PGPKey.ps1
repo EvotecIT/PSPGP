@@ -28,7 +28,14 @@
         [int] $Certainty,
         [parameter(ParameterSetName = 'Strength')]
         [parameter(ParameterSetName = 'StrengthCredential')]
-        [switch] $EmitVersion
+        [switch] $EmitVersion,
+
+        [alias('HashAlgorithmTag')][Org.BouncyCastle.Bcpg.HashAlgorithmTag] $HashAlgorithm,
+        [Org.BouncyCastle.Bcpg.CompressionAlgorithmTag] $CompressionAlgorithm,
+        [PgpCore.PGPFileType] $FileType,
+        [Int32] $PgpSignatureType,
+        [Org.BouncyCastle.Bcpg.PublicKeyAlgorithmTag] $PublicKeyAlgorithm,
+        [Org.BouncyCastle.Bcpg.SymmetricKeyAlgorithmTag] $SymmetricKeyAlgorithm
     )
     try {
         $PGP = [PgpCore.PGP]::new()
@@ -44,11 +51,34 @@
         $UserName = $Credential.UserName
         $Password = $Credential.GetNetworkCredential().Password
     }
+
+    if ($PSBoundParameters.ContainsKey('HashAlgorithm')) {
+        $PGP.HashAlgorithmTag = $HashAlgorithm
+    }
+    if ($PSBoundParameters.ContainsKey('CompressionAlgorithm')) {
+        $PGP.CompressionAlgorithm = $CompressionAlgorithm
+    }
+    if ($PSBoundParameters.ContainsKey('FileType')) {
+        $PGP.FileType = $FileType
+    }
+    if ($PSBoundParameters.ContainsKey('PgpSignatureType')) {
+        $PGP.PgpSignatureType = $PgpSignatureType
+    }
+    if ($PSBoundParameters.ContainsKey('PublicKeyAlgorithm')) {
+        $PGP.PublicKeyAlgorithm = $PublicKeyAlgorithm
+    }
+    if ($PSBoundParameters.ContainsKey('SymmetricKeyAlgorithm')) {
+        $PGP.SymmetricKeyAlgorithm = $SymmetricKeyAlgorithm
+    }
+
+    $ResolvedPublicKey = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($FilePathPublic)
+    $ResolvedPrivateKey = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($FilePathPrivate)
+
     try {
         if ($Strength) {
-            $PGP.GenerateKey($FilePathPublic, $FilePathPrivate, $UserName, $Password, $Strength, $Certainty, $EmitVersion.IsPresent)
+            $PGP.GenerateKey($ResolvedPublicKey, $ResolvedPrivateKey, $UserName, $Password, $Strength, $Certainty, $EmitVersion.IsPresent)
         } else {
-            $PGP.GenerateKey($FilePathPublic, $FilePathPrivate, $UserName, $Password)
+            $PGP.GenerateKey($ResolvedPublicKey, $ResolvedPrivateKey, $UserName, $Password)
         }
     } catch {
         if ($PSBoundParameters.ErrorAction -eq 'Stop') {
