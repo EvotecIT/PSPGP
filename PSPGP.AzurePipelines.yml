@@ -11,7 +11,7 @@ jobs:
       - pwsh: |
             Set-PSRepository PSGallery -InstallationPolicy Trusted
             Install-Module PSPublishModule -ErrorAction Stop -Force -Verbose
-            '.\Build\BuildModule.ps1'
+            .\Build\BuildModule.ps1
         displayName: "Run Pester Tests - PowerShell 7+"
 
   - job: Build_PSCore_Ubuntu1604
@@ -27,7 +27,7 @@ jobs:
       - pwsh: |
             Set-PSRepository PSGallery -InstallationPolicy Trusted
             Install-Module PSPublishModule -ErrorAction Stop -Force -Verbose
-            '.\Build\BuildModule.ps1'
+            .\Build\BuildModule.ps1
         displayName: "Run Pester Tests"
 
   - job: Build_PSCore_MacOS1013
@@ -43,5 +43,5 @@ jobs:
       - pwsh: |
             Set-PSRepository PSGallery -InstallationPolicy Trusted
             Install-Module PSPublishModule -ErrorAction Stop -Force -Verbose
-            '.\Build\BuildModule.ps1'
+            .\Build\BuildModule.ps1
         displayName: "Run Pester Tests"
