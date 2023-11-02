@@ -3,12 +3,12 @@ jobs:
     pool:
       vmImage: windows-latest
     steps:
-      - powershell:
+      - powershell: |
             Set-PSRepository PSGallery -InstallationPolicy Trusted
             Install-Module PSPublishModule -ErrorAction Stop -Force -Verbose
-          .\Build\BuildModule.ps1
+            .\Build\BuildModule.ps1
         displayName: "Run Pester Tests - PowerShell 5"
-      - pwsh:
+      - pwsh: |
             Set-PSRepository PSGallery -InstallationPolicy Trusted
             Install-Module PSPublishModule -ErrorAction Stop -Force -Verbose
             '.\Build\BuildModule.ps1'
@@ -27,7 +27,7 @@ jobs:
       - pwsh: |
             Set-PSRepository PSGallery -InstallationPolicy Trusted
             Install-Module PSPublishModule -ErrorAction Stop -Force -Verbose
-            '.\Build\BuildModule.ps1s1'
+            '.\Build\BuildModule.ps1'
         displayName: "Run Pester Tests"
 
   - job: Build_PSCore_MacOS1013
@@ -43,5 +43,5 @@ jobs:
       - pwsh: |
             Set-PSRepository PSGallery -InstallationPolicy Trusted
             Install-Module PSPublishModule -ErrorAction Stop -Force -Verbose
-            '.\Build\BuildModule.ps1
+            '.\Build\BuildModule.ps1'
         displayName: "Run Pester Tests"
