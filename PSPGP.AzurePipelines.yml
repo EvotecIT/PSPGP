@@ -21,18 +21,14 @@ jobs:
       - task: UseDotNet@2
           inputs:
             version: '6.x'
-      - script: |
-          curl -sSL https://packages.microsoft.com/config/ubuntu/20.04/prod.list | sudo tee /etc/apt/sources.list.d/microsoft-prod.list
-          curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
-          sudo apt-get update
-          sudo apt-get install -y powershell
-        displayName: "Install PowerShell Core"
-      - pwsh: |
+      - task: PowerShell@2
+        inputs:
+          targetType: 'inline'
+          script: |
             Set-PSRepository PSGallery -InstallationPolicy Trusted
             Install-Module PSPublishModule -ErrorAction Stop -Force -Verbose
             .\Build\BuildModule.ps1
         displayName: "Run Pester Tests"
-
   - job: Build_PSCore_MacOS1013
     pool:
       vmImage: macOS-latest
