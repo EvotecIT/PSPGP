@@ -37,7 +37,7 @@
     New-ConfigurationModule -Type ApprovedModule -Name 'PSSharedGoods', 'PSWriteColor', 'Connectimo', 'PSUnifi', 'PSWebToolbox', 'PSMyPassword'
 
     $ConfigurationFormat = [ordered] @{
-        RemoveComments                              = $false
+        RemoveComments                              = $true
 
         PlaceOpenBraceEnable                        = $true
         PlaceOpenBraceOnSameLine                    = $true
