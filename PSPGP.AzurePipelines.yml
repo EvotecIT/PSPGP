@@ -18,27 +18,16 @@ jobs:
     pool:
       vmImage: ubuntu-latest
     steps:
-      - task: UseDotNet@2
-          inputs:
-            version: '6.x'
-      - task: PowerShell@2
-        inputs:
-          targetType: 'inline'
-          script: |
+      - pwsh: |
             Set-PSRepository PSGallery -InstallationPolicy Trusted
             Install-Module PSPublishModule -ErrorAction Stop -Force -Verbose
             .\Build\BuildModule.ps1
         displayName: "Run Pester Tests"
+
   - job: Build_PSCore_MacOS1013
     pool:
       vmImage: macOS-latest
     steps:
-      - script: |
-          brew update
-          brew tap caskroom/cask
-          brew install mono-libgdiplus
-          brew install --cask powershell
-        displayName: "Install PowerShell Core"
       - pwsh: |
             Set-PSRepository PSGallery -InstallationPolicy Trusted
             Install-Module PSPublishModule -ErrorAction Stop -Force -Verbose
