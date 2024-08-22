@@ -84,7 +84,7 @@
         if ($PSBoundParameters.ErrorAction -eq 'Stop') {
             throw
         } else {
-            Write-Warning -Message "New-PGPKey - Creating keys genarated erorr: $($_.Exception.Message)"
+            Write-Warning -Message "New-PGPKey - Creating keys genarated error: $($_.Exception.Message)"
             return
         }
     }
