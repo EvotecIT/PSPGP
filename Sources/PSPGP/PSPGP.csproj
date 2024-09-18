@@ -12,8 +12,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="PgpCore" Version="5.13.0" />
-    <PackageReference Include="PowerShellStandard.Library" Version="5.1.1" />
+    <PackageReference Include="PgpCore" Version="6.5.1" />
+    <PackageReference Include="PowerShellStandard.Library" Version="5.1.1" PrivateAssets="all" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net472' ">
