@@ -3,6 +3,12 @@
 #### 0.1.13 - 2024.09.18
 - Bump PgpCore version to 6.5.1
 - Small improvements
+- Update New-PGPKey.ps1 by @keteague in https://github.com/EvotecIT/PSPGP/pull/21
+
+##### New Contributors
+* @keteague made their first contribution in https://github.com/EvotecIT/PSPGP/pull/21
+
+**Full Changelog**: https://github.com/EvotecIT/PSPGP/compare/v0.1.12...v0.1.13
 
 #### 0.1.12 - 2023.11.02
 - Improve resolving files on SMB shares and other non direct paths
