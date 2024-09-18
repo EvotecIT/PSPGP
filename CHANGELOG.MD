@@ -1,5 +1,9 @@
 ﻿### ChangeLog
 
+#### 0.1.13 - 2024.09.18
+- Bump PgpCore version to 6.5.1
+- Small improvements
+
 #### 0.1.12 - 2023.11.02
 - Improve resolving files on SMB shares and other non direct paths
 - Added HashAlgorithm to `New-PGPKey` to allow for different hash algorithms
