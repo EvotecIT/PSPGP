@@ -89,7 +89,7 @@
             $ResolvedFilePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($FilePath)
             if ($OutFilePath) {
                 $ResolvedOutFilePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutFilePath)
-                $PGP.DecryptFile($ResolvedFilePath, $ResolvedOutFilePath, $ResolvedPrivateFile, $Password)
+                $PGP.DecryptFile($ResolvedFilePath, $ResolvedOutFilePath)
             } else {
                 $PGP.DecryptFile($ResolvedFilePath, "$($FilePath.Replace('.pgp',''))")
             }
