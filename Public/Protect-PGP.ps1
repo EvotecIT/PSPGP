@@ -18,7 +18,7 @@
         [string] $SignPassword,
         [alias('HashAlgorithmTag')][Org.BouncyCastle.Bcpg.HashAlgorithmTag] $HashAlgorithm,
         [Org.BouncyCastle.Bcpg.CompressionAlgorithmTag] $CompressionAlgorithm,
-        [PgpCore.PGPFileType] $FileType,
+        [PgpCore.Enums.PGPFileType] $FileType,
         [Int32] $PgpSignatureType,
         [Org.BouncyCastle.Bcpg.PublicKeyAlgorithmTag] $PublicKeyAlgorithm,
         [Org.BouncyCastle.Bcpg.SymmetricKeyAlgorithmTag] $SymmetricKeyAlgorithm
