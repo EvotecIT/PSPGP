@@ -1,9 +1,6 @@
-namespace PSPGP.Models
-{
-    public class VerificationResult
-    {
-        public string FilePath { get; set; }
-        public bool Status { get; set; }
-        public string Error { get; set; }
-    }
+namespace PSPGP.Models; 
+public class VerificationResult {
+    public string FilePath { get; set; }
+    public bool Status { get; set; }
+    public string Error { get; set; }
 }
