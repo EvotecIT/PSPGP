@@ -1,11 +1,10 @@
 using FluentAssertions;
 using PgpCore;
-using PSPGP.Helpers;
 using System;
 using System.IO;
 using Xunit;
 
-namespace PSPGP.Tests.Helpers;
+namespace PSPGP.Tests;
 
 /// <summary>
 /// Unit tests for PGPConfigurator helper class

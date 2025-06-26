@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace PSPGP.Tests.Helpers;
+namespace PSPGP.Tests;
 
 /// <summary>
 /// Helper class for managing test files and directories
