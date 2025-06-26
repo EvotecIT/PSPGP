@@ -54,6 +54,8 @@ public class CmdletTestPGP : PSCmdlet {
                 WriteError(new ErrorRecord(new FileNotFoundException($"Public key doesn't exist {resolvedPublicKey}"), "PublicKeyNotFound", ErrorCategory.InvalidArgument, resolvedPublicKey));
                 return;
             }
+            DateTime? expiration = KeyExpirationHelper.GetExpiration(resolvedPublicKey);
+            KeyExpirationHelper.WarnIfExpired(this, resolvedPublicKey, expiration);
 
             var encryptionKeys = new EncryptionKeys(new FileInfo(resolvedPublicKey));
             var pgp = new PGP(encryptionKeys);
