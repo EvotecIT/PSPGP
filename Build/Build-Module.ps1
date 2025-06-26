@@ -8,7 +8,7 @@
         # ID used to uniquely identify this module
         GUID                   = 'edbf6d52-2d66-405e-a4d4-d4a95db8fb45'
         # Version number of this module.
-        ModuleVersion          = '0.1.X'
+        ModuleVersion          = '1.0.X'
         # Author of this module
         Author                 = 'Przemyslaw Klys'
         # Company or vendor of this module
@@ -25,7 +25,10 @@
         IconUri                = 'https://evotec.xyz/wp-content/uploads/2021/08/PSPGP.png'
 
         LicenseUri             = 'https://github.com/EvotecIT/PSPGP/blob/master/License'
+
         DotNetFrameworkVersion = '4.7.2'
+
+        PreReleaseTag          = 'Preview1'
     }
     New-ConfigurationManifest @Manifest
     # Add external module dependencies, using loop for simplicity
@@ -82,30 +85,48 @@
     New-ConfigurationImportModule -ImportSelf #-ImportRequiredModules
 
     $newConfigurationBuildSplat = @{
+        # Enable                            = $true
+        # # lets sign module only on my machine for now
+        # SignModule                        = if ($Env:COMPUTERNAME -eq 'EVOMONSTER') { $true } else { $false }
+        # MergeModuleOnBuild                = $true
+        # MergeFunctionsFromApprovedModules = $true
+        # CertificateThumbprint             = '483292C9E317AA13B07BB7A96AE9D1A5ED9E7703'
+        # #DotSourceLibraries                = $false
+        # #DotSourceClasses                  = $false
+        # SeparateFileLibraries             = $true
+        # #DeleteTargetModuleBeforeBuild     = $true
+
+        # ResolveBinaryConflicts            = $true
+        # ResolveBinaryConflictsName        = 'PSPGP'
+        # NETProjectName                    = 'PSPGP'
+        # NETConfiguration                  = 'Release'
+        # NETFramework                      = 'netstandard2.0'
+        # #NETExcludeMainLibrary             = $true
+        # NETExcludeLibraryFilter           = @(
+        #     'System.Management.*.dll'
+        # )
+        # DotSourceLibraries                = $true
+        # DotSourceClasses                  = $true
+        # #SeparateFileLibraries             = $true
+        # DeleteTargetModuleBeforeBuild     = $true
+
         Enable                            = $true
-        # lets sign module only on my machine for now
-        SignModule                        = if ($Env:COMPUTERNAME -eq 'EVOMONSTER') { $true } else { $false }
+        SignModule                        = $true
         MergeModuleOnBuild                = $true
         MergeFunctionsFromApprovedModules = $true
         CertificateThumbprint             = '483292C9E317AA13B07BB7A96AE9D1A5ED9E7703'
-        #DotSourceLibraries                = $false
-        #DotSourceClasses                  = $false
-        SeparateFileLibraries             = $true
-        #DeleteTargetModuleBeforeBuild     = $true
-
         ResolveBinaryConflicts            = $true
         ResolveBinaryConflictsName        = 'PSPGP'
         NETProjectName                    = 'PSPGP'
         NETConfiguration                  = 'Release'
-        NETFramework                      = 'netstandard2.0'
-        #NETExcludeMainLibrary             = $true
-        NETExcludeLibraryFilter           = @(
-            'System.Management.*.dll'
-        )
+        NETFramework                      = 'net8.0', 'net472'
+        NETHandleAssemblyWithSameName     = $true
+        #NETMergeLibraryDebugging          = $true
         DotSourceLibraries                = $true
         DotSourceClasses                  = $true
-        #SeparateFileLibraries             = $true
         DeleteTargetModuleBeforeBuild     = $true
+        NETBinaryModuleDocumenation       = $true
+        RefreshPSD1Only                   = $true
     }
 
     New-ConfigurationBuild @newConfigurationBuildSplat  #-DotSourceLibraries -DotSourceClasses -MergeModuleOnBuild -Enable -SignModule -DeleteTargetModuleBeforeBuild -CertificateThumbprint '483292C9E317AA13B07BB7A96AE9D1A5ED9E7703' -MergeFunctionsFromApprovedModules
