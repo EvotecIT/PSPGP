@@ -67,6 +67,12 @@ Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -FolderPath $PSScri
 Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP.asc -Password 'ZielonaMila9!' -FolderPath $PSScriptRoot\Encoded -OutputFolderPath $PSScriptRoot\Decoded
 ```
 
+Decrypting can also be done using multiple private keys:
+
+```powershell
+Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP.asc,$PSScriptRoot\Keys\PrivatePGP1.asc -Password 'ZielonaMila9!' -String $ProtectedString
+```
+
 ### Encrypt / Decrypt String
 
 ```powershell

@@ -26,7 +26,7 @@ public class CmdletUnprotectPGP : PSCmdlet {
     [Parameter(Mandatory = true, ParameterSetName = "FileClearText")]
     [Parameter(Mandatory = true, ParameterSetName = "StringClearText")]
     [Parameter(Mandatory = true, ParameterSetName = "StringCredential")]
-    public string FilePathPrivate { get; set; }
+    public string[] FilePathPrivate { get; set; }
 
     /// <summary>Password protecting the private key.</summary>
     [Parameter(ParameterSetName = "FolderClearText")]
@@ -67,21 +67,22 @@ public class CmdletUnprotectPGP : PSCmdlet {
 
     protected override void ProcessRecord() {
         try {
-            string resolvedPrivate = PathResolver.Resolve(this, FilePathPrivate);
-            if (!File.Exists(resolvedPrivate)) {
-                WriteWarning("Unprotect-PGP - Remove PGP encryption failed because private key file doesn't exists.");
-                return;
+            var resolvedPrivates = new List<string>();
+            foreach (var path in FilePathPrivate) {
+                string resolved = PathResolver.Resolve(this, path);
+                if (!File.Exists(resolved)) {
+                    WriteWarning("Unprotect-PGP - Remove PGP encryption failed because private key file doesn't exists.");
+                    return;
+                }
+                DateTime? expiration = KeyExpirationHelper.GetExpiration(resolved);
+                KeyExpirationHelper.WarnIfExpired(this, resolved, expiration);
+                resolvedPrivates.Add(resolved);
             }
-            DateTime? expiration = KeyExpirationHelper.GetExpiration(resolvedPrivate);
-            KeyExpirationHelper.WarnIfExpired(this, resolvedPrivate, expiration);
-            string privateKey = File.ReadAllText(resolvedPrivate);
+
             string password = Password;
             if (Credential != null) {
                 password = Credential.GetNetworkCredential().Password;
             }
-
-            var encryptionKeys = new EncryptionKeys(privateKey, password);
-            var pgp = new PGP(encryptionKeys);
 
             if (ParameterSetName.StartsWith("Folder")) {
                 string resolvedFolder = PathResolver.Resolve(this, FolderPath);
@@ -94,7 +95,24 @@ public class CmdletUnprotectPGP : PSCmdlet {
                         } else {
                             outputFile = file.Replace(".pgp", string.Empty);
                         }
-                        pgp.DecryptFile(new FileInfo(file), new FileInfo(outputFile));
+
+                        bool decrypted = false;
+                        Exception lastError = null;
+                        foreach (var key in resolvedPrivates) {
+                            try {
+                                var encryptionKeys = new EncryptionKeys(File.ReadAllText(key), password);
+                                var pgp = new PGP(encryptionKeys);
+                                pgp.DecryptFile(new FileInfo(file), new FileInfo(outputFile));
+                                decrypted = true;
+                                break;
+                            } catch (Exception ex) {
+                                lastError = ex;
+                            }
+                        }
+
+                        if (!decrypted) {
+                            WriteError(new ErrorRecord(lastError, "DecryptFileFailed", ErrorCategory.NotSpecified, file));
+                        }
                     } catch (Exception ex) {
                         WriteError(new ErrorRecord(ex, "DecryptFileFailed", ErrorCategory.NotSpecified, file));
                         return;
@@ -104,15 +122,50 @@ public class CmdletUnprotectPGP : PSCmdlet {
                 try {
                     string resolvedFile = PathResolver.Resolve(this, FilePath);
                     string outputFile = !string.IsNullOrEmpty(OutFilePath) ? PathResolver.Resolve(this, OutFilePath) : resolvedFile.Replace(".pgp", string.Empty);
-                    pgp.DecryptFile(new FileInfo(resolvedFile), new FileInfo(outputFile));
+
+                    bool decrypted = false;
+                    Exception lastError = null;
+                    foreach (var key in resolvedPrivates) {
+                        try {
+                            var encryptionKeys = new EncryptionKeys(File.ReadAllText(key), password);
+                            var pgp = new PGP(encryptionKeys);
+                            pgp.DecryptFile(new FileInfo(resolvedFile), new FileInfo(outputFile));
+                            decrypted = true;
+                            break;
+                        } catch (Exception ex) {
+                            lastError = ex;
+                        }
+                    }
+
+                    if (!decrypted) {
+                        WriteError(new ErrorRecord(lastError, "DecryptFileFailed", ErrorCategory.NotSpecified, FilePath));
+                    }
                 } catch (Exception ex) {
                     WriteError(new ErrorRecord(ex, "DecryptFileFailed", ErrorCategory.NotSpecified, FilePath));
                     return;
                 }
             } else if (ParameterSetName.StartsWith("String")) {
                 try {
-                    string result = pgp.DecryptArmoredString(String);
-                    WriteObject(result);
+                    bool decrypted = false;
+                    string result = null;
+                    Exception lastError = null;
+                    foreach (var key in resolvedPrivates) {
+                        try {
+                            var encryptionKeys = new EncryptionKeys(File.ReadAllText(key), password);
+                            var pgp = new PGP(encryptionKeys);
+                            result = pgp.DecryptArmoredString(String);
+                            decrypted = true;
+                            break;
+                        } catch (Exception ex) {
+                            lastError = ex;
+                        }
+                    }
+
+                    if (decrypted) {
+                        WriteObject(result);
+                    } else {
+                        WriteError(new ErrorRecord(lastError, "DecryptStringFailed", ErrorCategory.NotSpecified, null));
+                    }
                 } catch (Exception ex) {
                     WriteError(new ErrorRecord(ex, "DecryptStringFailed", ErrorCategory.NotSpecified, null));
                 }
