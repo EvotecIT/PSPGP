@@ -25,6 +25,11 @@
         <Delete Files="$(OutDir)System.Management.dll" />
     </Target>
 
+    <!-- Make sure the output DLL's from library are included in the output -->
+    <PropertyGroup>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    </PropertyGroup>
+
     <PropertyGroup>
         <!-- This is needed for XmlDoc2CmdletDoc to generate a PowerShell documentation file. -->
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -41,7 +46,9 @@
 
     <!-- Copy help documentation to publish output after publish -->
     <Target Name="CopyHelpDocumentationToPublishOutput" AfterTargets="Publish">
-        <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll-Help.xml" DestinationFiles="$(PublishDir)$(AssemblyName).dll-Help.xml" Condition="Exists('$(OutputPath)$(AssemblyName).dll-Help.xml')" />
+        <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll-Help.xml"
+            DestinationFiles="$(PublishDir)$(AssemblyName).dll-Help.xml"
+            Condition="Exists('$(OutputPath)$(AssemblyName).dll-Help.xml')" />
     </Target>
 
 </Project>

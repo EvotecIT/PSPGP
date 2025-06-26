@@ -1,11 +1,10 @@
 using Org.BouncyCastle.Bcpg;
 using PgpCore;
-using PSPGP.Helpers;
 using System;
 using System.IO;
 using System.Management.Automation;
 
-namespace PSPGP.Cmdlets; 
+namespace PSPGP;
 [Cmdlet(VerbsCommon.New, "PGPKey", DefaultParameterSetName = "ClearText")]
 public class CmdletNewPGPKey : PSCmdlet {
     [Parameter(Mandatory = true, ParameterSetName = "Strength")]

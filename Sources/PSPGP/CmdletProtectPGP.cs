@@ -1,12 +1,11 @@
 using Org.BouncyCastle.Bcpg;
 using PgpCore;
-using PSPGP.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Management.Automation;
 
-namespace PSPGP.Cmdlets; 
+namespace PSPGP;
 [Cmdlet("Protect", "PGP", DefaultParameterSetName = "File")]
 public class CmdletProtectPGP : PSCmdlet {
     [Parameter(Mandatory = true, ParameterSetName = "Folder")]

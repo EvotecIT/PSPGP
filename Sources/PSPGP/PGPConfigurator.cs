@@ -1,7 +1,7 @@
 using Org.BouncyCastle.Bcpg;
 using PgpCore;
 
-namespace PSPGP.Helpers; 
+namespace PSPGP;
 public static class PGPConfigurator {
     public static void Configure(
         PGP pgp,

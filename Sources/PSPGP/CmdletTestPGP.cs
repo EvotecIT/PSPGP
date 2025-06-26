@@ -1,12 +1,10 @@
 using PgpCore;
-using PSPGP.Helpers;
-using PSPGP.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Management.Automation;
 
-namespace PSPGP.Cmdlets; 
+namespace PSPGP;
 [Cmdlet(VerbsDiagnostic.Test, "PGP", DefaultParameterSetName = "File")]
 [OutputType(typeof(VerificationResult))]
 public class CmdletTestPGP : PSCmdlet {

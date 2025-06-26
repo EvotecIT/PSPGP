@@ -1,10 +1,9 @@
 using PgpCore;
-using PSPGP.Helpers;
 using System;
 using System.IO;
 using System.Management.Automation;
 
-namespace PSPGP.Cmdlets; 
+namespace PSPGP;
 [Cmdlet("Unprotect", "PGP", DefaultParameterSetName = "FolderClearText")]
 public class CmdletUnprotectPGP : PSCmdlet {
     [Parameter(Mandatory = true, ParameterSetName = "FolderCredential")]
