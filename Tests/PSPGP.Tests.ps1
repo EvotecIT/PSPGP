@@ -48,6 +48,38 @@
         $String = Unprotect-PGP -FilePathPrivate $KeyPrivate, $KeyPrivate1 -Password 'ZielonaMila9!' -String $Script:ProtectedStringMultiple
         $String | Should -Be "This is string to encrypt with multiple keys"
     }
+
+    Context 'Error action preference' {
+        BeforeAll {
+            $Missing = [io.path]::Combine($env:TEMP, 'missing.asc')
+        }
+
+        $cmdlets = @(
+            @{ Name = 'Get-PGPKeyInfo'; Params = @{ FilePath = $Missing } },
+            @{ Name = 'Protect-PGP'; Params = @{ FilePathPublic = $Missing; String = 'text' } },
+            @{ Name = 'Test-PGP'; Params = @{ FilePathPublic = $Missing; String = 'text' } },
+            @{ Name = 'Unprotect-PGP'; Params = @{ FilePathPrivate = $Missing; Password = 'pass'; String = 'text' } }
+        )
+
+        foreach ($cmdlet in $cmdlets) {
+            It "$($cmdlet.Name) throws when -ErrorAction Stop" {
+                { & $cmdlet.Name @cmdlet.Params -ErrorAction Stop } | Should -Throw
+            }
+
+            It "$($cmdlet.Name) throws when $ErrorActionPreference is Stop" {
+                {
+                    $old = $ErrorActionPreference
+                    $ErrorActionPreference = 'Stop'
+                    & $cmdlet.Name @cmdlet.Params
+                } | Should -Throw
+                $ErrorActionPreference = $old
+            }
+
+            It "$($cmdlet.Name) warns when ErrorActionPreference is Continue" {
+                { & $cmdlet.Name @cmdlet.Params -WarningAction SilentlyContinue } | Should -Not -Throw
+            }
+        }
+    }
     # clean everything
     AfterAll {
         $KeysDirectory = [io.path]::Combine($env:TEMP, 'Keys')

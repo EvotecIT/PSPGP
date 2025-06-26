@@ -27,7 +27,13 @@ public class CmdletGetPGPKeyInfo : PSCmdlet {
             try {
                 string resolved = PathResolver.Resolve(this, path);
                 if (!File.Exists(resolved)) {
-                    WriteError(new ErrorRecord(new FileNotFoundException($"Key file doesn't exist {resolved}"), "KeyFileNotFound", ErrorCategory.InvalidArgument, resolved));
+                    ErrorActionHelper.WriteErrorOrWarning(
+                        this,
+                        new FileNotFoundException($"Key file doesn't exist {resolved}"),
+                        "KeyFileNotFound",
+                        ErrorCategory.InvalidArgument,
+                        resolved,
+                        $"Key file doesn't exist {resolved}");
                     continue;
                 }
 
