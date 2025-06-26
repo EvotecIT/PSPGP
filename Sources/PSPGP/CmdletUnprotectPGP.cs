@@ -1,4 +1,5 @@
 using PgpCore;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 using System;
 using System.IO;
 using System.Management.Automation;
@@ -93,6 +94,15 @@ public class CmdletUnprotectPGP : PSCmdlet {
                             outputFile = file.Replace(".pgp", string.Empty);
                         }
                         pgp.DecryptFile(new FileInfo(file), new FileInfo(outputFile));
+                    } catch (PgpException ex) {
+                        if (ex.Message?.Contains("unknown packet type", StringComparison.OrdinalIgnoreCase) == true) {
+                            WriteError(new ErrorRecord(ex, "DecryptFileUnknownPacketType", ErrorCategory.InvalidData, file) {
+                                ErrorDetails = new ErrorDetails("Unknown packet type encountered. This may be caused by an outdated key or unsupported encryption algorithm.")
+                            });
+                        } else {
+                            WriteError(new ErrorRecord(ex, "DecryptFileFailed", ErrorCategory.NotSpecified, file));
+                        }
+                        return;
                     } catch (Exception ex) {
                         WriteError(new ErrorRecord(ex, "DecryptFileFailed", ErrorCategory.NotSpecified, file));
                         return;
@@ -103,6 +113,15 @@ public class CmdletUnprotectPGP : PSCmdlet {
                     string resolvedFile = PathResolver.Resolve(this, FilePath);
                     string outputFile = !string.IsNullOrEmpty(OutFilePath) ? PathResolver.Resolve(this, OutFilePath) : resolvedFile.Replace(".pgp", string.Empty);
                     pgp.DecryptFile(new FileInfo(resolvedFile), new FileInfo(outputFile));
+                } catch (PgpException ex) {
+                    if (ex.Message?.Contains("unknown packet type", StringComparison.OrdinalIgnoreCase) == true) {
+                        WriteError(new ErrorRecord(ex, "DecryptFileUnknownPacketType", ErrorCategory.InvalidData, FilePath) {
+                            ErrorDetails = new ErrorDetails("Unknown packet type encountered. This may be caused by an outdated key or unsupported encryption algorithm.")
+                        });
+                    } else {
+                        WriteError(new ErrorRecord(ex, "DecryptFileFailed", ErrorCategory.NotSpecified, FilePath));
+                    }
+                    return;
                 } catch (Exception ex) {
                     WriteError(new ErrorRecord(ex, "DecryptFileFailed", ErrorCategory.NotSpecified, FilePath));
                     return;
