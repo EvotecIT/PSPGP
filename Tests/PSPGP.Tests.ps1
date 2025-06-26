@@ -43,6 +43,9 @@
 
 
     }
+    It ' Verify signature with multiple keys' -TestCases @{ ProtectedString = $ProtectedString; KeysDirectory = $KeysDirectory; KeyPublic = $KeyPublic; KeyPublic1 = $KeyPublic1 } {
+        Test-PGP -FilePathPublic $KeyPublic, $KeyPublic1 -String $Script:ProtectedString | Should -BeNullOrEmpty
+    }
     # clean everything
     AfterAll {
         $KeysDirectory = [io.path]::Combine($env:TEMP, 'Keys')

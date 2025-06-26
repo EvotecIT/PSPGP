@@ -21,11 +21,11 @@ namespace PSPGP;
 [Cmdlet(VerbsDiagnostic.Test, "PGP", DefaultParameterSetName = "File")]
 [OutputType(typeof(VerificationResult))]
 public class CmdletTestPGP : PSCmdlet {
-    /// <summary>Public key file used to verify signatures.</summary>
+    /// <summary>Public key files used to verify signatures.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "Folder")]
     [Parameter(Mandatory = true, ParameterSetName = "File")]
     [Parameter(Mandatory = true, ParameterSetName = "String")]
-    public string FilePathPublic { get; set; }
+    public string[] FilePathPublic { get; set; }
 
     /// <summary>Folder containing files to verify.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "Folder")]
@@ -49,13 +49,18 @@ public class CmdletTestPGP : PSCmdlet {
 
     protected override void ProcessRecord() {
         try {
-            string resolvedPublicKey = PathResolver.Resolve(this, FilePathPublic);
-            if (!File.Exists(resolvedPublicKey)) {
-                WriteError(new ErrorRecord(new FileNotFoundException($"Public key doesn't exist {resolvedPublicKey}"), "PublicKeyNotFound", ErrorCategory.InvalidArgument, resolvedPublicKey));
-                return;
+            var publicKeys = new List<FileInfo>();
+            foreach (var path in FilePathPublic) {
+                string resolved = PathResolver.Resolve(this, path);
+                if (File.Exists(resolved)) {
+                    publicKeys.Add(new FileInfo(resolved));
+                } else {
+                    WriteError(new ErrorRecord(new FileNotFoundException($"Public key doesn't exist {resolved}"), "PublicKeyNotFound", ErrorCategory.InvalidArgument, resolved));
+                    return;
+                }
             }
 
-            var encryptionKeys = new EncryptionKeys(new FileInfo(resolvedPublicKey));
+            var encryptionKeys = new EncryptionKeys(publicKeys);
             var pgp = new PGP(encryptionKeys);
 
             if (ParameterSetName == "Folder") {
