@@ -25,7 +25,7 @@ public class CmdletTestPGP : PSCmdlet {
     [Parameter(Mandatory = true, ParameterSetName = "Folder")]
     [Parameter(Mandatory = true, ParameterSetName = "File")]
     [Parameter(Mandatory = true, ParameterSetName = "String")]
-    public string FilePathPublic { get; set; }
+    public string[] FilePathPublic { get; set; }
 
     /// <summary>Folder containing files to verify.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "Folder")]
@@ -49,31 +49,42 @@ public class CmdletTestPGP : PSCmdlet {
 
     protected override void ProcessRecord() {
         try {
-            string resolvedPublicKey = PathResolver.Resolve(this, FilePathPublic);
-            if (!File.Exists(resolvedPublicKey)) {
-                WriteError(new ErrorRecord(new FileNotFoundException($"Public key doesn't exist {resolvedPublicKey}"), "PublicKeyNotFound", ErrorCategory.InvalidArgument, resolvedPublicKey));
-                return;
+            var publicKeys = new List<string>();
+            foreach (var path in FilePathPublic) {
+                var resolved = PathResolver.Resolve(this, path);
+                if (!File.Exists(resolved)) {
+                    WriteError(new ErrorRecord(new FileNotFoundException($"Public key doesn't exist {resolved}"), "PublicKeyNotFound", ErrorCategory.InvalidArgument, resolved));
+                    return;
+                }
+                publicKeys.Add(resolved);
             }
             DateTime? expiration = KeyExpirationHelper.GetExpiration(resolvedPublicKey);
             KeyExpirationHelper.WarnIfExpired(this, resolvedPublicKey, expiration);
-
-            var encryptionKeys = new EncryptionKeys(new FileInfo(resolvedPublicKey));
-            var pgp = new PGP(encryptionKeys);
 
             if (ParameterSetName == "Folder") {
                 string resolvedFolder = PathResolver.Resolve(this, FolderPath);
                 foreach (var file in Directory.GetFiles(resolvedFolder, "*", SearchOption.AllDirectories)) {
                     bool status = false;
                     string error = string.Empty;
-                    try {
-                        status = pgp.VerifyFile(new FileInfo(file));
-                    } catch (Exception ex) {
-                        error = ex.Message;
+                    string signer = null;
+                    foreach (var key in publicKeys) {
+                        var encryptionKeys = new EncryptionKeys(new FileInfo(key));
+                        var pgp = new PGP(encryptionKeys);
+                        try {
+                            status = pgp.VerifyFile(new FileInfo(file));
+                            if (status) {
+                                signer = key;
+                                break;
+                            }
+                        } catch (Exception ex) {
+                            error = ex.Message;
+                        }
                     }
                     var result = new VerificationResult {
                         FilePath = file,
                         Status = status,
-                        Error = error
+                        Error = status ? null : error,
+                        Signer = signer
                     };
                     WriteObject(result);
                 }
@@ -81,23 +92,49 @@ public class CmdletTestPGP : PSCmdlet {
                 string resolvedFile = PathResolver.Resolve(this, FilePath);
                 bool status = false;
                 string error = string.Empty;
-                try {
-                    status = pgp.VerifyFile(new FileInfo(resolvedFile));
-                } catch (Exception ex) {
-                    error = ex.Message;
+                string signer = null;
+                foreach (var key in publicKeys) {
+                    var encryptionKeys = new EncryptionKeys(new FileInfo(key));
+                    var pgp = new PGP(encryptionKeys);
+                    try {
+                        status = pgp.VerifyFile(new FileInfo(resolvedFile));
+                        if (status) {
+                            signer = key;
+                            break;
+                        }
+                    } catch (Exception ex) {
+                        error = ex.Message;
+                    }
                 }
                 var result = new VerificationResult {
                     FilePath = resolvedFile,
                     Status = status,
-                    Error = error
+                    Error = status ? null : error,
+                    Signer = signer
                 };
                 WriteObject(result);
             } else if (ParameterSetName == "String") {
-                try {
-                    pgp.VerifyArmoredString(String);
-                } catch (Exception ex) {
-                    WriteError(new ErrorRecord(ex, "VerifyStringFailed", ErrorCategory.NotSpecified, null));
+                bool status = false;
+                string error = string.Empty;
+                string signer = null;
+                foreach (var key in publicKeys) {
+                    var encryptionKeys = new EncryptionKeys(new FileInfo(key));
+                    var pgp = new PGP(encryptionKeys);
+                    try {
+                        pgp.VerifyArmoredString(String);
+                        status = true;
+                        signer = key;
+                        break;
+                    } catch (Exception ex) {
+                        error = ex.Message;
+                    }
                 }
+                var result = new VerificationResult {
+                    Status = status,
+                    Error = status ? null : error,
+                    Signer = signer
+                };
+                WriteObject(result);
             }
         } catch (Exception ex) {
             WriteError(new ErrorRecord(ex, "TestPGPFailed", ErrorCategory.NotSpecified, null));
