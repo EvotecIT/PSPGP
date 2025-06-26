@@ -72,6 +72,8 @@ public class CmdletUnprotectPGP : PSCmdlet {
                 WriteWarning("Unprotect-PGP - Remove PGP encryption failed because private key file doesn't exists.");
                 return;
             }
+            DateTime? expiration = KeyExpirationHelper.GetExpiration(resolvedPrivate);
+            KeyExpirationHelper.WarnIfExpired(this, resolvedPrivate, expiration);
             string privateKey = File.ReadAllText(resolvedPrivate);
             string password = Password;
             if (Credential != null) {

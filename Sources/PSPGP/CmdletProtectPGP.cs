@@ -91,11 +91,18 @@ public class CmdletProtectPGP : PSCmdlet {
             foreach (var path in FilePathPublic) {
                 string resolved = PathResolver.Resolve(this, path);
                 if (File.Exists(resolved)) {
+                    DateTime? expiration = KeyExpirationHelper.GetExpiration(resolved);
+                    KeyExpirationHelper.WarnIfExpired(this, resolved, expiration);
                     publicKeys.Add(new FileInfo(resolved));
                 } else {
                     WriteError(new ErrorRecord(new FileNotFoundException($"Public key doesn't exist {resolved}"), "PublicKeyNotFound", ErrorCategory.InvalidArgument, resolved));
                     return;
                 }
+            }
+
+            if (SignKey != null && SignKey.Exists) {
+                DateTime? expiration = KeyExpirationHelper.GetExpiration(SignKey.FullName);
+                KeyExpirationHelper.WarnIfExpired(this, SignKey.FullName, expiration);
             }
 
             EncryptionKeys encryptionKeys = SignKey != null ? new EncryptionKeys(publicKeys, SignKey, SignPassword) : new EncryptionKeys(publicKeys);
