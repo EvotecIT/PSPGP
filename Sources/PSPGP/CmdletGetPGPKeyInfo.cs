@@ -7,9 +7,18 @@ using System.Management.Automation;
 
 namespace PSPGP;
 
+/// <summary>
+/// <para>Returns information about a PGP key such as algorithm, expiration and user IDs.</para>
+/// <example>
+/// <code>
+/// Get-PGPKeyInfo -FilePath $PSScriptRoot\Keys\PublicPGP.asc
+/// </code>
+/// </example>
+/// </summary>
 [Cmdlet(VerbsCommon.Get, "PGPKeyInfo")]
 [OutputType(typeof(PGPKeyInfo))]
 public class CmdletGetPGPKeyInfo : PSCmdlet {
+    /// <summary>Paths to key files to inspect.</summary>
     [Parameter(Mandatory = true)]
     public string[] FilePath { get; set; }
 
