@@ -4,8 +4,22 @@ using System.IO;
 using System.Management.Automation;
 
 namespace PSPGP;
+/// <summary>
+/// <para>Removes PGP encryption from files or strings using a private key.</para>
+/// <example>
+/// <code>
+/// Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP.asc -Password 'secret' -FolderPath $PSScriptRoot\Encoded -OutputFolderPath $PSScriptRoot\Decoded
+/// </code>
+/// </example>
+/// <example>
+/// <code>
+/// Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP.asc -Password 'secret' -String $Encrypted
+/// </code>
+/// </example>
+/// </summary>
 [Cmdlet("Unprotect", "PGP", DefaultParameterSetName = "FolderClearText")]
 public class CmdletUnprotectPGP : PSCmdlet {
+    /// <summary>Private key file used to decrypt data.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "FolderCredential")]
     [Parameter(Mandatory = true, ParameterSetName = "FolderClearText")]
     [Parameter(Mandatory = true, ParameterSetName = "FileCredential")]
@@ -14,32 +28,39 @@ public class CmdletUnprotectPGP : PSCmdlet {
     [Parameter(Mandatory = true, ParameterSetName = "StringCredential")]
     public string FilePathPrivate { get; set; }
 
+    /// <summary>Password protecting the private key.</summary>
     [Parameter(ParameterSetName = "FolderClearText")]
     [Parameter(ParameterSetName = "FileClearText")]
     [Parameter(ParameterSetName = "StringClearText")]
     public string Password { get; set; }
 
+    /// <summary>Credential object with password for the private key.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "FileCredential")]
     [Parameter(Mandatory = true, ParameterSetName = "FolderCredential")]
     [Parameter(Mandatory = true, ParameterSetName = "StringCredential")]
     public PSCredential Credential { get; set; }
 
+    /// <summary>Folder containing encrypted files.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "FolderCredential")]
     [Parameter(Mandatory = true, ParameterSetName = "FolderClearText")]
     public string FolderPath { get; set; }
 
+    /// <summary>Destination folder for decrypted output.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "FolderCredential")]
     [Parameter(Mandatory = true, ParameterSetName = "FolderClearText")]
     public string OutputFolderPath { get; set; }
 
+    /// <summary>Encrypted file to decrypt.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "FileCredential")]
     [Parameter(Mandatory = true, ParameterSetName = "FileClearText")]
     public string FilePath { get; set; }
 
+    /// <summary>Output file path for decrypted data.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "FileCredential")]
     [Parameter(Mandatory = true, ParameterSetName = "FileClearText")]
     public string OutFilePath { get; set; }
 
+    /// <summary>Encrypted text to decrypt.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "StringClearText")]
     [Parameter(Mandatory = true, ParameterSetName = "StringCredential")]
     public string String { get; set; }

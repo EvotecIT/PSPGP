@@ -6,50 +6,82 @@ using System.IO;
 using System.Management.Automation;
 
 namespace PSPGP;
+/// <summary>
+/// <para>Encrypts files, folders or strings using one or more public keys.</para>
+/// <example>
+/// <code>
+/// Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -FolderPath $PSScriptRoot\Test -OutputFolderPath $PSScriptRoot\Encoded
+/// </code>
+/// </example>
+/// <example>
+/// <code>
+/// Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -FilePath $PSScriptRoot\Test\Test1.txt -OutFilePath $PSScriptRoot\Encoded\Test1.txt.pgp
+/// </code>
+/// </example>
+/// <example>
+/// <code>
+/// Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -String "Sensitive text"
+/// </code>
+/// </example>
+/// </summary>
 [Cmdlet("Protect", "PGP", DefaultParameterSetName = "File")]
 public class CmdletProtectPGP : PSCmdlet {
+    /// <summary>Public key files used for encryption.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "Folder")]
     [Parameter(Mandatory = true, ParameterSetName = "File")]
     [Parameter(Mandatory = true, ParameterSetName = "String")]
     public string[] FilePathPublic { get; set; }
 
+    /// <summary>Folder to encrypt when using the Folder parameter set.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "Folder")]
     public string FolderPath { get; set; }
 
+    /// <summary>Destination folder for encrypted files.</summary>
     [Parameter(ParameterSetName = "Folder")]
     public string OutputFolderPath { get; set; }
 
+    /// <summary>File to encrypt when using the File parameter set.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "File")]
     public string FilePath { get; set; }
 
+    /// <summary>Output file path for the encrypted file.</summary>
     [Parameter(ParameterSetName = "File")]
     public string OutFilePath { get; set; }
 
+    /// <summary>String content to encrypt.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "String")]
     public string String { get; set; }
 
+    /// <summary>Private key used for signing the encrypted data.</summary>
     [Parameter]
     public FileInfo SignKey { get; set; }
 
+    /// <summary>Password for the signing private key.</summary>
     [Parameter]
     public string SignPassword { get; set; }
 
+    /// <summary>Optional hash algorithm for encryption.</summary>
     [Parameter]
     [Alias("HashAlgorithmTag")]
     public HashAlgorithmTag? HashAlgorithm { get; set; }
 
+    /// <summary>Optional compression algorithm for encryption.</summary>
     [Parameter]
     public CompressionAlgorithmTag? CompressionAlgorithm { get; set; }
 
+    /// <summary>Type of data being encrypted.</summary>
     [Parameter]
     public PgpCore.Enums.PGPFileType? FileType { get; set; }
 
+    /// <summary>PGP signature type when signing data.</summary>
     [Parameter]
     public int? PgpSignatureType { get; set; }
 
+    /// <summary>Public key algorithm used during encryption.</summary>
     [Parameter]
     public PublicKeyAlgorithmTag? PublicKeyAlgorithm { get; set; }
 
+    /// <summary>Symmetric key algorithm used during encryption.</summary>
     [Parameter]
     public SymmetricKeyAlgorithmTag? SymmetricKeyAlgorithm { get; set; }
 
