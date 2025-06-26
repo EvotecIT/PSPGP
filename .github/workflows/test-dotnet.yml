@@ -99,7 +99,6 @@ jobs:
                   files: '**/coverage.cobertura.xml'
 
     test-macos:
-        if: false # Temporarily disabled
         name: 'macOS'
         runs-on: macos-latest
         steps:
