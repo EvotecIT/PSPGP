@@ -3,7 +3,6 @@ using Org.BouncyCastle.Bcpg.OpenPgp;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Management.Automation;
 
 namespace PSPGP;
@@ -26,7 +25,7 @@ public class CmdletGetPGPKeyInfo : PSCmdlet {
                 using FileStream keyStream = File.OpenRead(resolved);
                 using Stream decoderStream = PgpUtilities.GetDecoderStream(keyStream);
                 PgpObjectFactory factory = new(decoderStream);
-                PgpPublicKey? publicKey = null;
+                PgpPublicKey publicKey = null;
 
                 object pgpObject = factory.NextPgpObject();
                 switch (pgpObject) {
@@ -66,7 +65,9 @@ public class CmdletGetPGPKeyInfo : PSCmdlet {
                     foreach (string id in publicKey.GetUserIds()) {
                         userIds.Add(id);
                     }
-                    DateTime? expiration = publicKey.GetValidSeconds() == 0 ? null : publicKey.GetCreationTime().AddSeconds(publicKey.GetValidSeconds());
+                    DateTime? expiration = publicKey.GetValidSeconds() == 0
+                        ? null
+                        : publicKey.CreationTime.AddSeconds(publicKey.GetValidSeconds());
                     var info = new PGPKeyInfo {
                         FilePath = resolved,
                         UserIds = userIds.ToArray(),
