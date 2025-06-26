@@ -1,10 +1,9 @@
 using FluentAssertions;
-using PSPGP.Tests.Helpers;
 using System;
 using System.IO;
 using Xunit;
 
-namespace PSPGP.Tests.Helpers;
+namespace PSPGP.Tests;
 
 /// <summary>
 /// Unit tests for TestFileHelper utility class

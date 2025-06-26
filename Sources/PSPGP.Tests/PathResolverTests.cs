@@ -1,11 +1,11 @@
 using FluentAssertions;
-using PSPGP.Helpers;
 using System;
 using System.IO;
 using System.Management.Automation;
 using Xunit;
 
-namespace PSPGP.Tests.Helpers;
+
+namespace PSPGP.Tests;
 
 /// <summary>
 /// Unit tests for PathResolver helper class

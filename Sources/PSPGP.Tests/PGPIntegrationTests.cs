@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using Xunit;
 
-namespace PSPGP.Tests.Integration;
+namespace PSPGP.Tests;
 
 /// <summary>
 /// Integration tests for PGP operations using the PgpCore library directly
