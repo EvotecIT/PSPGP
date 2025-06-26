@@ -5,26 +5,45 @@ using System.IO;
 using System.Management.Automation;
 
 namespace PSPGP;
+/// <summary>
+/// <para>Verifies PGP signatures for files, folders or strings.</para>
+/// <example>
+/// <code>
+/// Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -String $ProtectedString
+/// </code>
+/// </example>
+/// <example>
+/// <code>
+/// Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -FolderPath $PSScriptRoot\Encoded
+/// </code>
+/// </example>
+/// </summary>
 [Cmdlet(VerbsDiagnostic.Test, "PGP", DefaultParameterSetName = "File")]
 [OutputType(typeof(VerificationResult))]
 public class CmdletTestPGP : PSCmdlet {
+    /// <summary>Public key file used to verify signatures.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "Folder")]
     [Parameter(Mandatory = true, ParameterSetName = "File")]
     [Parameter(Mandatory = true, ParameterSetName = "String")]
     public string FilePathPublic { get; set; }
 
+    /// <summary>Folder containing files to verify.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "Folder")]
     public string FolderPath { get; set; }
 
+    /// <summary>Destination folder for verification reports.</summary>
     [Parameter(ParameterSetName = "Folder")]
     public string OutputFolderPath { get; set; }
 
+    /// <summary>File path to verify.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "File")]
     public string FilePath { get; set; }
 
+    /// <summary>Output path for verification result.</summary>
     [Parameter(ParameterSetName = "File")]
     public string OutFilePath { get; set; }
 
+    /// <summary>Encrypted text to verify.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "String")]
     public string String { get; set; }
 
