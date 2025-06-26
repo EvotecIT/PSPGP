@@ -17,6 +17,7 @@ public class VerificationResultTests {
         result.FilePath.Should().BeNull("FilePath should be null by default");
         result.Status.Should().BeFalse("Status should be false by default");
         result.Error.Should().BeNull("Error should be null by default");
+        result.Signer.Should().BeNull("Signer should be null by default");
     }
 
     [Fact]
@@ -25,18 +26,21 @@ public class VerificationResultTests {
         var filePath = @"C:\test\file.pgp";
         var status = true;
         var error = "Test error message";
+        var signer = "signer.asc";
 
         // Act
         var result = new VerificationResult {
             FilePath = filePath,
             Status = status,
-            Error = error
+            Error = error,
+            Signer = signer
         };
 
         // Assert
         result.FilePath.Should().Be(filePath, "FilePath should be set correctly");
         result.Status.Should().Be(status, "Status should be set correctly");
         result.Error.Should().Be(error, "Error should be set correctly");
+        result.Signer.Should().Be(signer, "Signer should be set correctly");
     }
 
     [Fact]

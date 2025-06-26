@@ -79,7 +79,8 @@ Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP.asc -Password 'Ziel
 ```powershell
 $ProtectedString = Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -String "This is string to encrypt"
 
-Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -String $ProtectedString
+# Verify using one or more public keys
+Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc,$PSScriptRoot\Keys\Other.asc -String $ProtectedString
 
-Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -FolderPath $PSScriptRoot\Encoded
+Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc,$PSScriptRoot\Keys\Other.asc -FolderPath $PSScriptRoot\Encoded
 ```
