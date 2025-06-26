@@ -7,7 +7,6 @@
     $KeyPublic1 = [io.path]::Combine($KeysDirectory, 'PublicPGP1.asc')
     $KeyPrivate1 = [io.path]::Combine($KeysDirectory, 'PrivatePGP1.asc')
     [string] $Script:ProtectedString = ''
-    [string] $Script:ProtectedString = ''
 
     BeforeAll {
         $KeysDirectory = [io.path]::Combine($env:TEMP, 'Keys')
