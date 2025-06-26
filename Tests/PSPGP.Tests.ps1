@@ -43,6 +43,11 @@
 
 
     }
+
+    It ' Decrypt string using multiple keys at once' -TestCases @{ ProtectedStringMultiple = $ProtectedStringMultiple; KeyPrivate = $KeyPrivate; KeyPrivate1 = $KeyPrivate1 } {
+        $String = Unprotect-PGP -FilePathPrivate $KeyPrivate, $KeyPrivate1 -Password 'ZielonaMila9!' -String $Script:ProtectedStringMultiple
+        $String | Should -Be "This is string to encrypt with multiple keys"
+    }
     # clean everything
     AfterAll {
         $KeysDirectory = [io.path]::Combine($env:TEMP, 'Keys')

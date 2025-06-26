@@ -56,10 +56,10 @@ public class CmdletTestPGP : PSCmdlet {
                     WriteError(new ErrorRecord(new FileNotFoundException($"Public key doesn't exist {resolved}"), "PublicKeyNotFound", ErrorCategory.InvalidArgument, resolved));
                     return;
                 }
+                DateTime? expiration = KeyExpirationHelper.GetExpiration(resolved);
+                KeyExpirationHelper.WarnIfExpired(this, resolved, expiration);
                 publicKeys.Add(resolved);
             }
-            DateTime? expiration = KeyExpirationHelper.GetExpiration(resolvedPublicKey);
-            KeyExpirationHelper.WarnIfExpired(this, resolvedPublicKey, expiration);
 
             if (ParameterSetName == "Folder") {
                 string resolvedFolder = PathResolver.Resolve(this, FolderPath);
