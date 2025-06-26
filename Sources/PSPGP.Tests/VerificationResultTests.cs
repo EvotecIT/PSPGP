@@ -1,9 +1,8 @@
 using FluentAssertions;
-using PSPGP.Models;
 using System;
 using Xunit;
 
-namespace PSPGP.Tests.Models;
+namespace PSPGP.Tests;
 
 /// <summary>
 /// Unit tests for VerificationResult model

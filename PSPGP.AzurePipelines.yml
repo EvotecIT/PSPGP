@@ -1,3 +1,6 @@
+trigger: none
+pr: none
+
 jobs:
   - job: Build_Windows
     pool:
