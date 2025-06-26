@@ -95,7 +95,8 @@ public class CmdletUnprotectPGP : PSCmdlet {
                         }
                         pgp.DecryptFile(new FileInfo(file), new FileInfo(outputFile));
                     } catch (PgpException ex) {
-                        if (ex.Message?.Contains("unknown packet type", StringComparison.OrdinalIgnoreCase) == true) {
+                        if (ex.Message?.IndexOf("unknown packet type", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                            ex.Message?.IndexOf("packet 20", StringComparison.OrdinalIgnoreCase) >= 0) {
                             WriteError(new ErrorRecord(ex, "DecryptFileUnknownPacketType", ErrorCategory.InvalidData, file) {
                                 ErrorDetails = new ErrorDetails("Unknown packet type encountered. This may be caused by an outdated key or unsupported encryption algorithm.")
                             });
@@ -114,7 +115,8 @@ public class CmdletUnprotectPGP : PSCmdlet {
                     string outputFile = !string.IsNullOrEmpty(OutFilePath) ? PathResolver.Resolve(this, OutFilePath) : resolvedFile.Replace(".pgp", string.Empty);
                     pgp.DecryptFile(new FileInfo(resolvedFile), new FileInfo(outputFile));
                 } catch (PgpException ex) {
-                    if (ex.Message?.Contains("unknown packet type", StringComparison.OrdinalIgnoreCase) == true) {
+                    if (ex.Message?.IndexOf("unknown packet type", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                        ex.Message?.IndexOf("packet 20", StringComparison.OrdinalIgnoreCase) >= 0) {
                         WriteError(new ErrorRecord(ex, "DecryptFileUnknownPacketType", ErrorCategory.InvalidData, FilePath) {
                             ErrorDetails = new ErrorDetails("Unknown packet type encountered. This may be caused by an outdated key or unsupported encryption algorithm.")
                         });
