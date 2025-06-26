@@ -1,7 +1,7 @@
 ﻿@{
     AliasesToExport        = @()
     Author                 = 'Przemyslaw Klys'
-    CmdletsToExport        = @('New-PGPKey', 'Protect-PGP', 'Test-PGP', 'Unprotect-PGP')
+    CmdletsToExport        = @('New-PGPKey', 'Protect-PGP', 'Test-PGP', 'Unprotect-PGP', 'Get-PGPKeyInfo')
     CompanyName            = 'Evotec'
     CompatiblePSEditions   = @('Desktop', 'Core')
     Copyright              = '(c) 2011 - 2025 Przemyslaw Klys @ Evotec. All rights reserved.'
