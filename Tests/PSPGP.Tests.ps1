@@ -50,9 +50,7 @@
     }
 
     Context 'Error action preference' {
-        BeforeAll {
-            $Missing = [io.path]::Combine($env:TEMP, 'missing.asc')
-        }
+        $Missing = [io.path]::Combine($env:TEMP, 'missing.asc')
 
         $cmdlets = @(
             @{ Name = 'Get-PGPKeyInfo'; Params = @{ FilePath = $Missing } },
@@ -62,24 +60,26 @@
         )
 
         foreach ($cmdlet in $cmdlets) {
-            It "$($cmdlet.Name) throws when -ErrorAction Stop" {
-                $params = $cmdlet.Params
-                { & $cmdlet.Name @params -ErrorAction Stop } | Should -Throw
+            $current = $cmdlet
+
+            It "$($current.Name) throws when -ErrorAction Stop" {
+                $params = $current.Params
+                { & $current.Name @params -ErrorAction Stop } | Should -Throw
             }
 
-            It "$($cmdlet.Name) throws when $ErrorActionPreference is Stop" {
-                $params = $cmdlet.Params
+            It "$($current.Name) throws when $ErrorActionPreference is Stop" {
+                $params = $current.Params
                 {
                     $old = $ErrorActionPreference
                     $ErrorActionPreference = 'Stop'
-                    & $cmdlet.Name @params
+                    & $current.Name @params
                 } | Should -Throw
                 $ErrorActionPreference = $old
             }
 
-            It "$($cmdlet.Name) warns when ErrorActionPreference is Continue" {
-                $params = $cmdlet.Params
-                { & $cmdlet.Name @params -WarningAction SilentlyContinue } | Should -Not -Throw
+            It "$($current.Name) warns when ErrorActionPreference is Continue" {
+                $params = $current.Params
+                { & $current.Name @params -WarningAction SilentlyContinue } | Should -Not -Throw
             }
         }
     }
