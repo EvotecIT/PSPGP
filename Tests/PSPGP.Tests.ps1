@@ -11,6 +11,10 @@
     BeforeAll {
         $KeysDirectory = [io.path]::Combine($env:TEMP, 'Keys')
         New-Item -Path $KeysDirectory -Force -ItemType Directory
+        # Ensure the module is loaded in test context
+        if (-not (Get-Module PSPGP)) {
+            Import-Module $PSScriptRoot\..\PSPGP.psd1 -Force
+        }
     }
     It ' Running New-PGPKey with Username and password should create public and private keys' -TestCases @{ KeysDirectory = $KeysDirectory; KeyPublic = $KeyPublic; KeyPrivate = $KeyPrivate; KeyPublic1 = $KeyPublic1; KeyPrivate1 = $KeyPrivate1 } {
         New-PGPKey -FilePathPublic $KeyPublic -FilePathPrivate $KeyPrivate -UserName 'przemyslaw.klys' -Password 'ZielonaMila9!'
@@ -62,24 +66,34 @@
         foreach ($cmdlet in $cmdlets) {
             $current = $cmdlet
 
-            It "$($current.Name) throws when -ErrorAction Stop" {
-                $params = $current.Params
-                { & $current.Name @params -ErrorAction Stop } | Should -Throw
+            It "$($current.Name) throws when -ErrorAction Stop" -TestCases @{ CommandName = $current.Name; Params = $current.Params } {
+                param($CommandName, $Params)
+                {
+                    $paramString = ($Params.GetEnumerator() | ForEach-Object { "-$($_.Key) '$($_.Value)'" }) -join ' '
+                    Invoke-Expression "$CommandName $paramString -ErrorAction Stop"
+                } | Should -Throw
             }
 
-            It "$($current.Name) throws when $ErrorActionPreference is Stop" {
-                $params = $current.Params
+            It "$($current.Name) throws when `$ErrorActionPreference is Stop" -TestCases @{ CommandName = $current.Name; Params = $current.Params } {
+                param($CommandName, $Params)
                 {
                     $old = $ErrorActionPreference
-                    $ErrorActionPreference = 'Stop'
-                    & $current.Name @params
+                    try {
+                        $ErrorActionPreference = 'Stop'
+                        $paramString = ($Params.GetEnumerator() | ForEach-Object { "-$($_.Key) '$($_.Value)'" }) -join ' '
+                        Invoke-Expression "$CommandName $paramString"
+                    } finally {
+                        $ErrorActionPreference = $old
+                    }
                 } | Should -Throw
-                $ErrorActionPreference = $old
             }
 
-            It "$($current.Name) warns when ErrorActionPreference is Continue" {
-                $params = $current.Params
-                { & $current.Name @params -WarningAction SilentlyContinue } | Should -Not -Throw
+            It "$($current.Name) warns when ErrorActionPreference is Continue" -TestCases @{ CommandName = $current.Name; Params = $current.Params } {
+                param($CommandName, $Params)
+                {
+                    $paramString = ($Params.GetEnumerator() | ForEach-Object { "-$($_.Key) '$($_.Value)'" }) -join ' '
+                    Invoke-Expression "$CommandName $paramString -WarningAction SilentlyContinue"
+                } | Should -Not -Throw
             }
         }
     }
