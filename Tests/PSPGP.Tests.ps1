@@ -63,20 +63,23 @@
 
         foreach ($cmdlet in $cmdlets) {
             It "$($cmdlet.Name) throws when -ErrorAction Stop" {
-                { & $cmdlet.Name @cmdlet.Params -ErrorAction Stop } | Should -Throw
+                $params = $cmdlet.Params
+                { & $cmdlet.Name @params -ErrorAction Stop } | Should -Throw
             }
 
             It "$($cmdlet.Name) throws when $ErrorActionPreference is Stop" {
+                $params = $cmdlet.Params
                 {
                     $old = $ErrorActionPreference
                     $ErrorActionPreference = 'Stop'
-                    & $cmdlet.Name @cmdlet.Params
+                    & $cmdlet.Name @params
                 } | Should -Throw
                 $ErrorActionPreference = $old
             }
 
             It "$($cmdlet.Name) warns when ErrorActionPreference is Continue" {
-                { & $cmdlet.Name @cmdlet.Params -WarningAction SilentlyContinue } | Should -Not -Throw
+                $params = $cmdlet.Params
+                { & $cmdlet.Name @params -WarningAction SilentlyContinue } | Should -Not -Throw
             }
         }
     }
