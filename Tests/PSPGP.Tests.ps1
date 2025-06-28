@@ -53,6 +53,12 @@
         $String | Should -Be "This is string to encrypt with multiple keys"
     }
 
+    It ' Sign and verify string' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic } {
+        $signed = Protect-PGP -SignOnly -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -String 'Signed Text'
+        $result = Test-PGP -FilePathPublic $KeyPublic -String $signed
+        $result.Status | Should -Be $true
+    }
+
     Context 'Error action preference' {
         $Missing = [io.path]::Combine($env:TEMP, 'missing.asc')
 

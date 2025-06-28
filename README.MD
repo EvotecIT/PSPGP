@@ -90,3 +90,10 @@ Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc,$PSScriptRoot\Keys\Oth
 
 Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc,$PSScriptRoot\Keys\Other.asc -FolderPath $PSScriptRoot\Encoded
 ```
+
+### Sign string
+
+```powershell
+$Signature = Protect-PGP -SignOnly -SignKey $PSScriptRoot\Keys\PrivatePGP.asc -SignPassword 'ZielonaMila9!' -String 'Signed text'
+Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -String $Signature
+```
