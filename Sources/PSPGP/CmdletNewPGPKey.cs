@@ -34,6 +34,10 @@ public class CmdletNewPGPKey : PSCmdlet {
     [Parameter(Mandatory = true, ParameterSetName = "Credential")]
     public string FilePathPrivate { get; set; }
 
+    /// <summary>Key server URL to upload the generated public key.</summary>
+    [Parameter]
+    public string UploadKeyServer { get; set; }
+
     /// <summary>User name associated with the generated key.</summary>
     [Parameter(ParameterSetName = "Strength")]
     [Parameter(ParameterSetName = "ClearText")]
@@ -108,6 +112,11 @@ public class CmdletNewPGPKey : PSCmdlet {
                 pgp.GenerateKey(new FileInfo(resolvedPublic), new FileInfo(resolvedPrivate), user, pass, Strength, Certainty, EmitVersion.IsPresent);
             } else {
                 pgp.GenerateKey(new FileInfo(resolvedPublic), new FileInfo(resolvedPrivate), user, pass);
+            }
+
+            if (!string.IsNullOrEmpty(UploadKeyServer)) {
+                string keyData = File.ReadAllText(resolvedPublic);
+                KeyServerHelper.UploadKeyAsync(new Uri(UploadKeyServer), keyData).GetAwaiter().GetResult();
             }
         } catch (Exception ex) {
             WriteError(new ErrorRecord(ex, "NewPGPKeyFailed", ErrorCategory.NotSpecified, null));
