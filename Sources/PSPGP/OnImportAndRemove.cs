@@ -29,6 +29,9 @@ public class OnModuleImportAndRemove : IModuleAssemblyInitializer, IModuleAssemb
     /// <summary>
     /// Resolves assemblies for the module when running under .NET Framework.
     /// </summary>
+    /// <param name="sender">The event source.</param>
+    /// <param name="args">Arguments describing the assembly to resolve.</param>
+    /// <returns>The resolved <see cref="Assembly"/> instance, or <c>null</c> if none could be located.</returns>
     private static Assembly MyResolveEventHandler(object sender, ResolveEventArgs args) {
         //This code is used to resolve the assemblies
         //Console.WriteLine($"Resolving {args.Name}");
