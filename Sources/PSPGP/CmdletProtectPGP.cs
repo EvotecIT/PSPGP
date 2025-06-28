@@ -95,7 +95,13 @@ public class CmdletProtectPGP : PSCmdlet {
                     KeyExpirationHelper.WarnIfExpired(this, resolved, expiration);
                     publicKeys.Add(new FileInfo(resolved));
                 } else {
-                    WriteError(new ErrorRecord(new FileNotFoundException($"Public key doesn't exist {resolved}"), "PublicKeyNotFound", ErrorCategory.InvalidArgument, resolved));
+                    ErrorActionHelper.WriteErrorOrWarning(
+                        this,
+                        new FileNotFoundException($"Public key doesn't exist {resolved}"),
+                        "PublicKeyNotFound",
+                        ErrorCategory.InvalidArgument,
+                        resolved,
+                        $"Public key doesn't exist {resolved}");
                     return;
                 }
             }

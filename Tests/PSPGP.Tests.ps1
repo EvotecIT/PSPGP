@@ -11,6 +11,10 @@
     BeforeAll {
         $KeysDirectory = [io.path]::Combine($env:TEMP, 'Keys')
         New-Item -Path $KeysDirectory -Force -ItemType Directory
+        # Ensure the module is loaded in test context
+        if (-not (Get-Module PSPGP)) {
+            Import-Module $PSScriptRoot\..\PSPGP.psd1 -Force
+        }
     }
     It ' Running New-PGPKey with Username and password should create public and private keys' -TestCases @{ KeysDirectory = $KeysDirectory; KeyPublic = $KeyPublic; KeyPrivate = $KeyPrivate; KeyPublic1 = $KeyPublic1; KeyPrivate1 = $KeyPrivate1 } {
         New-PGPKey -FilePathPublic $KeyPublic -FilePathPrivate $KeyPrivate -UserName 'przemyslaw.klys' -Password 'ZielonaMila9!'
@@ -47,6 +51,58 @@
     It ' Decrypt string using multiple keys at once' -TestCases @{ ProtectedStringMultiple = $ProtectedStringMultiple; KeyPrivate = $KeyPrivate; KeyPrivate1 = $KeyPrivate1 } {
         $String = Unprotect-PGP -FilePathPrivate $KeyPrivate, $KeyPrivate1 -Password 'ZielonaMila9!' -String $Script:ProtectedStringMultiple
         $String | Should -Be "This is string to encrypt with multiple keys"
+    }
+
+    Context 'Error action preference' {
+        $Missing = [io.path]::Combine($env:TEMP, 'missing.asc')
+
+        $cmdlets = @(
+            @{ Name = 'Get-PGPKeyInfo'; Params = @{ FilePath = $Missing } },
+            @{ Name = 'Protect-PGP'; Params = @{ FilePathPublic = $Missing; String = 'text' } },
+            @{ Name = 'Test-PGP'; Params = @{ FilePathPublic = $Missing; String = 'text' } },
+            @{ Name = 'Unprotect-PGP'; Params = @{ FilePathPrivate = $Missing; Password = 'pass'; String = 'text' } }
+        )
+
+        foreach ($cmdlet in $cmdlets) {
+            $current = $cmdlet
+
+            It "$($current.Name) throws when -ErrorAction Stop" -TestCases @{ CommandName = $current.Name; Params = $current.Params } {
+                param($CommandName, $Params)
+                {
+                    $paramString = ($Params.GetEnumerator() | ForEach-Object { "-$($_.Key) '$($_.Value)'" }) -join ' '
+                    Invoke-Expression "$CommandName $paramString -ErrorAction Stop"
+                } | Should -Throw
+            }
+
+            It "$($current.Name) throws when `$ErrorActionPreference is Stop" -TestCases @{ CommandName = $current.Name; Params = $current.Params } {
+                param($CommandName, $Params)
+                {
+                    $old = $ErrorActionPreference
+                    try {
+                        $ErrorActionPreference = 'Stop'
+                        $paramString = ($Params.GetEnumerator() | ForEach-Object { "-$($_.Key) '$($_.Value)'" }) -join ' '
+                        Invoke-Expression "$CommandName $paramString"
+                    } finally {
+                        $ErrorActionPreference = $old
+                    }
+                } | Should -Throw
+            }
+
+            It "$($current.Name) warns when ErrorActionPreference is Continue" -TestCases @{ CommandName = $current.Name; Params = $current.Params } {
+                param($CommandName, $Params)
+                {
+                    $old = $ErrorActionPreference
+                    try {
+                        $ErrorActionPreference = 'Continue'
+                        $paramString = ($Params.GetEnumerator() | ForEach-Object { "-$($_.Key) '$($_.Value)'" }) -join ' '
+                        Invoke-Expression "$CommandName $paramString -WarningAction SilentlyContinue"
+                    }
+                    finally {
+                        $ErrorActionPreference = $old
+                    }
+                } | Should -Not -Throw
+            }
+        }
     }
     # clean everything
     AfterAll {
