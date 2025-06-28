@@ -91,8 +91,15 @@
             It "$($current.Name) warns when ErrorActionPreference is Continue" -TestCases @{ CommandName = $current.Name; Params = $current.Params } {
                 param($CommandName, $Params)
                 {
-                    $paramString = ($Params.GetEnumerator() | ForEach-Object { "-$($_.Key) '$($_.Value)'" }) -join ' '
-                    Invoke-Expression "$CommandName $paramString -WarningAction SilentlyContinue"
+                    $old = $ErrorActionPreference
+                    try {
+                        $ErrorActionPreference = 'Continue'
+                        $paramString = ($Params.GetEnumerator() | ForEach-Object { "-$($_.Key) '$($_.Value)'" }) -join ' '
+                        Invoke-Expression "$CommandName $paramString -WarningAction SilentlyContinue"
+                    }
+                    finally {
+                        $ErrorActionPreference = $old
+                    }
                 } | Should -Not -Throw
             }
         }
