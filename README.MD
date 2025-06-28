@@ -21,7 +21,7 @@
 </p>
 
 **PSPGP** is a PowerShell module that provides PGP functionality in PowerShell. It allows encrypting and decrypting files/folders and strings using PGP.
-**PSPGP** uses the following .NET library to deliver this functionality:
+**PSPGP** uses the following .NET library:
 
 - [PgpCore](https://github.com/mattosaurus/PgpCore) - licensed MIT
 
