@@ -19,7 +19,7 @@ namespace PSPGP;
 [OutputType(typeof(PGPKeyInfo))]
 public class CmdletGetPGPKeyInfo : PSCmdlet {
     /// <summary>Paths to key files to inspect.</summary>
-    [Parameter(Mandatory = true)]
+    [Parameter(Mandatory = true, ValueFromPipeline = true, ValueFromPipelineByPropertyName = true)]
     public string[] FilePath { get; set; }
 
     protected override void ProcessRecord() {
