@@ -3,19 +3,32 @@ using System.IO;
 using System.Management.Automation;
 using System.Reflection;
 
+/// <summary>
+/// Handles module import and removal events to resolve assemblies when running in PowerShell.
+/// </summary>
 public class OnModuleImportAndRemove : IModuleAssemblyInitializer, IModuleAssemblyCleanup {
+    /// <summary>
+    /// Invoked when the module is imported.
+    /// </summary>
     public void OnImport() {
         if (IsNetFramework()) {
             AppDomain.CurrentDomain.AssemblyResolve += MyResolveEventHandler;
         }
     }
 
+    /// <summary>
+    /// Invoked when the module is removed.
+    /// </summary>
+    /// <param name="module">Module being removed.</param>
     public void OnRemove(PSModuleInfo module) {
         if (IsNetFramework()) {
             AppDomain.CurrentDomain.AssemblyResolve -= MyResolveEventHandler;
         }
     }
 
+    /// <summary>
+    /// Resolves assemblies for the module when running under .NET Framework.
+    /// </summary>
     private static Assembly MyResolveEventHandler(object sender, ResolveEventArgs args) {
         //This code is used to resolve the assemblies
         //Console.WriteLine($"Resolving {args.Name}");
@@ -34,6 +47,9 @@ public class OnModuleImportAndRemove : IModuleAssemblyInitializer, IModuleAssemb
         return null;
     }
 
+    /// <summary>
+    /// Determines whether the current runtime is .NET Framework.
+    /// </summary>
     private bool IsNetFramework() {
         // Get the version of the CLR
         Version clrVersion = System.Environment.Version;
@@ -41,10 +57,16 @@ public class OnModuleImportAndRemove : IModuleAssemblyInitializer, IModuleAssemb
         return clrVersion.Major == 4;
     }
 
+    /// <summary>
+    /// Determines whether the current runtime is .NET Core.
+    /// </summary>
     private bool IsNetCore() {
         return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// Determines whether the current runtime is .NET 5 or higher.
+    /// </summary>
     private bool IsNet5OrHigher() {
         return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET 5", StringComparison.OrdinalIgnoreCase) ||
                System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET 6", StringComparison.OrdinalIgnoreCase) ||
@@ -52,3 +74,4 @@ public class OnModuleImportAndRemove : IModuleAssemblyInitializer, IModuleAssemb
                System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET 8", StringComparison.OrdinalIgnoreCase);
     }
 }
+

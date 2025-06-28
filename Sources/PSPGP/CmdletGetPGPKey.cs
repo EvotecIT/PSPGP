@@ -4,14 +4,20 @@ using System.Management.Automation;
 
 namespace PSPGP;
 
+/// <summary>
+/// Downloads a public key from a key server.
+/// </summary>
 [Cmdlet(VerbsCommon.Get, "PGPKey")]
 public class CmdletGetPGPKey : PSCmdlet {
+    /// <summary>URL of the key server.</summary>
     [Parameter(Mandatory = true)]
     public string KeyServer { get; set; }
 
+    /// <summary>Search string identifying the key.</summary>
     [Parameter(Mandatory = true)]
     public string Search { get; set; }
 
+    /// <summary>File path where the downloaded key is stored.</summary>
     [Parameter]
     public string OutFilePath { get; set; }
 
@@ -30,3 +36,4 @@ public class CmdletGetPGPKey : PSCmdlet {
         }
     }
 }
+
