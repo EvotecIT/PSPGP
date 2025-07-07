@@ -77,6 +77,9 @@ public class TestFileHelper : IDisposable {
         return File.ReadAllText(Path.Combine(_tempDirectory, filename));
     }
 
+    /// <summary>
+    /// Deletes any temporary files and directories created for the test.
+    /// </summary>
     public void Dispose() {
         try {
             if (Directory.Exists(_tempDirectory)) {

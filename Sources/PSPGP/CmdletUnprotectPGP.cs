@@ -66,6 +66,10 @@ public class CmdletUnprotectPGP : PSCmdlet {
     [Parameter(Mandatory = true, ParameterSetName = "StringCredential")]
     public string String { get; set; }
 
+    /// <summary>
+    /// Decrypts files or strings using the supplied private keys
+    /// and writes the decrypted data to disk or the pipeline.
+    /// </summary>
     protected override void ProcessRecord() {
         try {
             var resolvedPrivates = new List<string>();

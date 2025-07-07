@@ -47,6 +47,10 @@ public class CmdletTestPGP : PSCmdlet {
     [Parameter(Mandatory = true, ParameterSetName = "String")]
     public string String { get; set; }
 
+    /// <summary>
+    /// Validates signatures for files, folders or strings
+    /// using the provided public keys.
+    /// </summary>
     protected override void ProcessRecord() {
         try {
             var publicKeys = new List<string>();

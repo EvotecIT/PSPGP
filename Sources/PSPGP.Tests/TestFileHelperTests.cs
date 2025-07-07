@@ -86,6 +86,9 @@ public class TestFileHelperTests : IDisposable {
         path.Should().Be(Path.Combine(_fileHelper.TempDirectory, filename), "Should return correct path");
     }
 
+    /// <summary>
+    /// Performs cleanup of test resources.
+    /// </summary>
     public void Dispose() {
         _fileHelper?.Dispose();
     }
