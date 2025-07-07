@@ -7,6 +7,13 @@ namespace PSPGP;
 /// Utility methods for handling <c>-ErrorAction</c> related logic
 /// across cmdlets.
 /// </summary>
+/// <example>
+/// <code>
+/// if (ErrorActionHelper.IsStop(this)) {
+///     Write-Error "Terminating";
+/// }
+/// </code>
+/// </example>
 internal static class ErrorActionHelper {
     /// <summary>
     /// Determines whether the specified cmdlet should treat

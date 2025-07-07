@@ -6,6 +6,12 @@ namespace PSPGP;
 /// <summary>
 /// Applies optional configuration values to a <see cref="PgpCore.PGP"/> instance.
 /// </summary>
+/// <example>
+/// <code>
+/// var pgp = new PGP();
+/// PGPConfigurator.Configure(pgp, HashAlgorithmTag.Sha256, null, null, null, null, null);
+/// </code>
+/// </example>
 public static class PGPConfigurator {
     /// <summary>
     /// Sets optional configuration parameters on a <see cref="PgpCore.PGP"/> instance.

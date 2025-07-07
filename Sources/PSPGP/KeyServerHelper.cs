@@ -26,6 +26,7 @@ public static class KeyServerHelper {
     /// </summary>
     /// <param name="serverUri">Destination key server.</param>
     /// <param name="armoredKey">Armored public key text.</param>
+    /// <returns>A task representing the asynchronous upload operation.</returns>
     public static async Task UploadKeyAsync(Uri serverUri, string armoredKey) {
         using HttpClient client = new();
         var content = new StringContent($"keytext={Uri.EscapeDataString(armoredKey)}", Encoding.UTF8, "application/x-www-form-urlencoded");

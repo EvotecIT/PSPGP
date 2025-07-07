@@ -8,6 +8,10 @@ namespace PSPGP.Tests;
 /// Unit tests for VerificationResult model
 /// </summary>
 public class VerificationResultTests {
+    /// <summary>
+    /// Verifies default property values after
+    /// constructing <see cref="VerificationResult"/>.
+    /// </summary>
     [Fact]
     public void VerificationResult_DefaultConstructor_ShouldInitializeProperties() {
         // Act
@@ -20,6 +24,10 @@ public class VerificationResultTests {
         result.Signer.Should().BeNull("Signer should be null by default");
     }
 
+    /// <summary>
+    /// Ensures property setters correctly store values
+    /// provided to the <see cref="VerificationResult"/> instance.
+    /// </summary>
     [Fact]
     public void VerificationResult_WithValues_ShouldSetProperties() {
         // Arrange
@@ -43,6 +51,10 @@ public class VerificationResultTests {
         result.Signer.Should().Be(signer, "Signer should be set correctly");
     }
 
+    /// <summary>
+    /// Checks that a result with <c>Status</c> set to
+    /// <c>true</c> is considered successful.
+    /// </summary>
     [Fact]
     public void VerificationResult_StatusTrue_ShouldIndicateSuccess() {
         // Arrange & Act
@@ -57,6 +69,10 @@ public class VerificationResultTests {
         result.Error.Should().BeNull("Error should be null for successful verification");
     }
 
+    /// <summary>
+    /// Checks that a result with <c>Status</c> set to
+    /// <c>false</c> exposes the associated error.
+    /// </summary>
     [Fact]
     public void VerificationResult_StatusFalse_ShouldIndicateFailure() {
         // Arrange & Act

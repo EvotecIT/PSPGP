@@ -17,6 +17,11 @@ public class PGPCoreIntegrationTests : IDisposable {
         Directory.CreateDirectory(_tempDirectory);
     }
 
+    /// <summary>
+    /// Validates that keys can be created and used to
+    /// encrypt and decrypt string content using PgpCore
+    /// directly.
+    /// </summary>
     [Fact]
     public void PGPCore_CreateKeysEncryptDecrypt_ShouldWork() {
         // Arrange
@@ -59,6 +64,10 @@ public class PGPCoreIntegrationTests : IDisposable {
         decryptedText.Should().Be(originalText, "Decrypted text should match original");
     }
 
+    /// <summary>
+    /// Exercises file encryption and decryption workflows
+    /// with generated keys.
+    /// </summary>
     [Fact]
     public void PGPCore_FileEncryptionDecryption_ShouldWork() {
         // Arrange
@@ -104,6 +113,10 @@ public class PGPCoreIntegrationTests : IDisposable {
         decryptedContent.Should().Be(originalContent, "Decrypted content should match original");
     }
 
+    /// <summary>
+    /// Ensures key generation succeeds when passing
+    /// custom configuration options.
+    /// </summary>
     [Fact]
     public void PGPCore_KeyGeneration_WithCustomParameters_ShouldWork() {
         // Arrange
@@ -130,6 +143,10 @@ public class PGPCoreIntegrationTests : IDisposable {
         new FileInfo(privateKeyPath).Length.Should().BeGreaterThan(0, "Private key should not be empty");
     }
 
+    /// <summary>
+    /// Confirms decryption fails when using an incorrect
+    /// password for the private key.
+    /// </summary>
     [Fact]
     public void PGPCore_InvalidPassword_ShouldThrow() {
         // Arrange

@@ -53,6 +53,7 @@ public class OnModuleImportAndRemove : IModuleAssemblyInitializer, IModuleAssemb
     /// <summary>
     /// Determines whether the current runtime is .NET Framework.
     /// </summary>
+    /// <returns><c>true</c> when running on .NET Framework.</returns>
     private bool IsNetFramework() {
         // Get the version of the CLR
         Version clrVersion = System.Environment.Version;
@@ -63,6 +64,7 @@ public class OnModuleImportAndRemove : IModuleAssemblyInitializer, IModuleAssemb
     /// <summary>
     /// Determines whether the current runtime is .NET Core.
     /// </summary>
+    /// <returns><c>true</c> when running on .NET Core.</returns>
     private bool IsNetCore() {
         return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET Core", StringComparison.OrdinalIgnoreCase);
     }
@@ -70,6 +72,7 @@ public class OnModuleImportAndRemove : IModuleAssemblyInitializer, IModuleAssemb
     /// <summary>
     /// Determines whether the current runtime is .NET 5 or higher.
     /// </summary>
+    /// <returns><c>true</c> when running on .NET 5 or higher.</returns>
     private bool IsNet5OrHigher() {
         return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET 5", StringComparison.OrdinalIgnoreCase) ||
                System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription.StartsWith(".NET 6", StringComparison.OrdinalIgnoreCase) ||
