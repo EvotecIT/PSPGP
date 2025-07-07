@@ -15,12 +15,20 @@ public class TestFileHelperTests : IDisposable {
         _fileHelper = new TestFileHelper();
     }
 
+    /// <summary>
+    /// Ensures a temporary directory is created for use
+    /// in the tests.
+    /// </summary>
     [Fact]
     public void TempDirectory_ShouldExist() {
         // Act & Assert
         Directory.Exists(_fileHelper.TempDirectory).Should().BeTrue("Temp directory should be created");
     }
 
+    /// <summary>
+    /// Verifies temporary files are created with the
+    /// specified content.
+    /// </summary>
     [Fact]
     public void CreateTempFile_ShouldCreateFileWithContent() {
         // Arrange
@@ -36,6 +44,10 @@ public class TestFileHelperTests : IDisposable {
         filePath.Should().Be(_fileHelper.GetTempFilePath(filename), "Path should match expected location");
     }
 
+    /// <summary>
+    /// Checks that creating a temporary directory returns
+    /// the expected path on disk.
+    /// </summary>
     [Fact]
     public void CreateTempDirectory_ShouldCreateDirectory() {
         // Arrange
@@ -49,6 +61,10 @@ public class TestFileHelperTests : IDisposable {
         dirPath.Should().Be(Path.Combine(_fileHelper.TempDirectory, dirName), "Path should match expected location");
     }
 
+    /// <summary>
+    /// Validates the FileExists helper correctly reports
+    /// on file presence.
+    /// </summary>
     [Fact]
     public void FileExists_ShouldReturnCorrectStatus() {
         // Arrange
@@ -60,6 +76,10 @@ public class TestFileHelperTests : IDisposable {
         _fileHelper.FileExists("nonexistent.txt").Should().BeFalse("Should return false for non-existing file");
     }
 
+    /// <summary>
+    /// Confirms that ReadFile returns the contents of the
+    /// specified file.
+    /// </summary>
     [Fact]
     public void ReadFile_ShouldReturnContent() {
         // Arrange
@@ -74,6 +94,10 @@ public class TestFileHelperTests : IDisposable {
         readContent.Should().Be(content, "Should return the file content");
     }
 
+    /// <summary>
+    /// Ensures GetTempFilePath builds a path within the
+    /// temporary directory.
+    /// </summary>
     [Fact]
     public void GetTempFilePath_ShouldReturnCorrectPath() {
         // Arrange

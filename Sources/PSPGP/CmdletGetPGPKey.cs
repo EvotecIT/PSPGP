@@ -6,6 +6,11 @@ namespace PSPGP;
 
 /// <summary>
 /// Downloads a public key from a key server.
+/// <example>
+/// <code>
+/// Get-PGPKey -KeyServer "https://keys.example.com" -Search "user@example.com" -OutFilePath "key.asc"
+/// </code>
+/// </example>
 /// </summary>
 [Cmdlet(VerbsCommon.Get, "PGPKey")]
 public class CmdletGetPGPKey : PSCmdlet {

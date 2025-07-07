@@ -10,6 +10,10 @@ namespace PSPGP.Tests;
 /// Unit tests for PGPConfigurator helper class
 /// </summary>
 public class PGPConfiguratorTests {
+    /// <summary>
+    /// Ensures Configure does not throw when all optional
+    /// parameters are null.
+    /// </summary>
     [Fact]
     public void Configure_WithAllNullParameters_ShouldNotThrow() {
         // Arrange
@@ -22,6 +26,10 @@ public class PGPConfiguratorTests {
         exception.Should().BeNull("Configuration with null parameters should not throw");
     }
 
+    /// <summary>
+    /// Verifies Configure accepts a full set of valid
+    /// configuration values.
+    /// </summary>
     [Fact]
     public void Configure_WithValidParameters_ShouldNotThrow() {
         // Arrange
@@ -41,6 +49,10 @@ public class PGPConfiguratorTests {
         exception.Should().BeNull("Configuration with valid parameters should not throw");
     }
 
+    /// <summary>
+    /// Confirms Configure throws when the provided
+    /// <see cref="PgpCore.PGP"/> instance is <c>null</c>.
+    /// </summary>
     [Fact]
     public void Configure_WithNullPGP_ShouldThrow() {
         // Act & Assert

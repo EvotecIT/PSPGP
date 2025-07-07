@@ -14,6 +14,10 @@ namespace PSPGP.Tests;
 /// Full path resolution testing should be done in PowerShell integration tests.
 /// </summary>
 public class PathResolverTests {
+    /// <summary>
+    /// Validates that passing a null cmdlet results
+    /// in a <see cref="NullReferenceException"/>.
+    /// </summary>
     [Fact]
     public void Resolve_WithNullCmdlet_ShouldThrowNullReference() {
         // Arrange
@@ -25,6 +29,10 @@ public class PathResolverTests {
             .WithMessage("Object reference not set to an instance of an object.");
     }
 
+    /// <summary>
+    /// Ensures the Resolve method exists with the
+    /// expected signature and return type.
+    /// </summary>
     [Fact]
     public void PathResolver_ClassExists_ShouldHaveCorrectSignature() {
         // Arrange & Act
@@ -41,6 +49,10 @@ public class PathResolverTests {
         parameters[1].ParameterType.Should().Be(typeof(string));
     }
 
+    /// <summary>
+    /// Confirms the PathResolver type is implemented as
+    /// a public static class.
+    /// </summary>
     [Fact]
     public void PathResolver_IsPublicStaticClass() {
         // Arrange & Act
