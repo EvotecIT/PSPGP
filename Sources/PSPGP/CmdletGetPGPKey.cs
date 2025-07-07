@@ -21,6 +21,10 @@ public class CmdletGetPGPKey : PSCmdlet {
     [Parameter]
     public string OutFilePath { get; set; }
 
+    /// <summary>
+    /// Executes the cmdlet logic to download the specified public key
+    /// and optionally writes it to a file.
+    /// </summary>
     protected override void ProcessRecord() {
         try {
             Uri serverUri = new(KeyServer);
@@ -36,4 +40,3 @@ public class CmdletGetPGPKey : PSCmdlet {
         }
     }
 }
-

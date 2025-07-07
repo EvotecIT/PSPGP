@@ -22,6 +22,10 @@ public class CmdletGetPGPKeyInfo : PSCmdlet {
     [Parameter(Mandatory = true, ValueFromPipeline = true, ValueFromPipelineByPropertyName = true)]
     public string[] FilePath { get; set; }
 
+    /// <summary>
+    /// Processes each provided key file and emits
+    /// <see cref="PGPKeyInfo"/> objects describing the contents.
+    /// </summary>
     protected override void ProcessRecord() {
         foreach (var path in FilePath) {
             try {

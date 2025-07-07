@@ -93,6 +93,10 @@ public class CmdletNewPGPKey : PSCmdlet {
     [Parameter]
     public SymmetricKeyAlgorithmTag? SymmetricKeyAlgorithm { get; set; }
 
+    /// <summary>
+    /// Generates a new key pair based on the provided
+    /// parameters and optionally uploads the public key.
+    /// </summary>
     protected override void ProcessRecord() {
         try {
             var pgp = new PGP();

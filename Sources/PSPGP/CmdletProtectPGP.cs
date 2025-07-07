@@ -125,6 +125,10 @@ public class CmdletProtectPGP : PSCmdlet {
     [Parameter(Mandatory = true, ParameterSetName = "SignString")]
     public SwitchParameter SignOnly { get; set; }
 
+    /// <summary>
+    /// Encrypts or signs input data based on the selected
+    /// parameter set and writes results to files or the pipeline.
+    /// </summary>
     protected override void ProcessRecord() {
         try {
             bool signOnlyMode = SignOnly.IsPresent || ParameterSetName.StartsWith("Sign", System.StringComparison.OrdinalIgnoreCase);
