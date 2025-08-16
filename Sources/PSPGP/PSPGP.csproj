@@ -15,9 +15,6 @@
         <PackageReference Include="PowerShellStandard.Library" Version="5.1.1" PrivateAssets="all" />
     </ItemGroup>
 
-    <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
-        <Reference Include="System.Net.Http" />
-    </ItemGroup>
 
     <PropertyGroup Condition=" '$(TargetFramework)' == 'net472' ">
         <DefineConstants>$(DefineConstants);FRAMEWORK</DefineConstants>
