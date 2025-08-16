@@ -16,17 +16,19 @@ namespace PSPGP.Tests;
 public class PathResolverTests {
     /// <summary>
     /// Validates that passing a null cmdlet results
-    /// in a <see cref="NullReferenceException"/>.
+    /// in an <see cref="ArgumentNullException"/>.
     /// </summary>
     [Fact]
-    public void Resolve_WithNullCmdlet_ShouldThrowNullReference() {
+    public void Resolve_WithNullCmdlet_ShouldThrowArgumentNull() {
         // Arrange
         var testPath = @"test.txt";
 
-        // Act & Assert
+        // Act
         var action = () => PathResolver.Resolve(null, testPath);
-        action.Should().Throw<NullReferenceException>()
-            .WithMessage("Object reference not set to an instance of an object.");
+
+        // Assert
+        action.Should().Throw<ArgumentNullException>()
+            .WithParameterName("cmdlet");
     }
 
     /// <summary>
