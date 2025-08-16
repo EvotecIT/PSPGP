@@ -1,3 +1,4 @@
+using System;
 using System.Management.Automation;
 
 namespace PSPGP;
@@ -13,10 +14,14 @@ public static class PathResolver {
     /// <param name="cmdlet">Cmdlet whose session state is used for resolution.</param>
     /// <param name="path">PowerShell path to resolve.</param>
     /// <returns>Absolute file system path.</returns>
-    /// <exception cref="NullReferenceException">
+    /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="cmdlet"/> is <c>null</c>.
     /// </exception>
     public static string Resolve(PSCmdlet cmdlet, string path) {
+        if (cmdlet is null) {
+            throw new ArgumentNullException(nameof(cmdlet));
+        }
+
         return cmdlet.SessionState.Path.GetUnresolvedProviderPathFromPSPath(path);
     }
 }

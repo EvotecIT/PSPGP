@@ -19,7 +19,7 @@ internal static class KeyExpirationHelper {
         using FileStream keyStream = File.OpenRead(filePath);
         using Stream decoderStream = PgpUtilities.GetDecoderStream(keyStream);
         PgpObjectFactory factory = new(decoderStream);
-        PgpPublicKey? publicKey = null;
+        PgpPublicKey publicKey = null;
 
         object pgpObject = factory.NextPgpObject();
         switch (pgpObject) {
