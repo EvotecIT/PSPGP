@@ -4,7 +4,7 @@
     CmdletsToExport        = @('Get-PGPKey', 'Get-PGPKeyInfo', 'New-PGPKey', 'Protect-PGP', 'Test-PGP', 'Unprotect-PGP')
     CompanyName            = 'Evotec'
     CompatiblePSEditions   = @('Desktop', 'Core')
-    Copyright              = '(c) 2011 - 2025 Przemyslaw Klys @ Evotec. All rights reserved.'
+    Copyright              = '(c) 2011 - 2026 Przemyslaw Klys @ Evotec. All rights reserved.'
     Description            = 'PSPGP is a PowerShell module that provides PGP functionality in PowerShell. It allows encrypting and decrypting files/folders and strings using PGP.'
     DotNetFrameworkVersion = '4.7.2'
     FunctionsToExport      = @()
@@ -18,6 +18,7 @@
             LicenseUri                 = 'https://github.com/EvotecIT/PSPGP/blob/master/License'
             Prerelease                 = 'Preview1'
             ProjectUri                 = 'https://github.com/EvotecIT/PSPGP'
+            RequireLicenseAcceptance   = $false
             Tags                       = @('pgp', 'gpg', 'encrypt', 'decrypt', 'windows', 'macos', 'linux')
         }
     }
