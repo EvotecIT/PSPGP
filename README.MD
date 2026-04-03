@@ -26,6 +26,8 @@
 
 - [PgpCore](https://github.com/mattosaurus/PgpCore) - licensed MIT
 
+## Module surface
+
 Exported cmdlets:
 
 - `Get-PGPInspect`
@@ -35,6 +37,18 @@ Exported cmdlets:
 - `Protect-PGP`
 - `Test-PGP`
 - `Unprotect-PGP`
+
+No script functions or aliases are exported.
+
+Current capabilities:
+
+- Encrypt and decrypt files, folders, and strings with public/private keys
+- Encrypt and decrypt strings, files, and folders symmetrically with a passphrase
+- Create detached signatures and verify them with one or more public keys
+- Create clear-signed content and verify it
+- Inspect signed and armored message metadata with `Get-PGPInspect`
+- Download public keys from a key server and inspect local key material
+- Generate new key pairs and optionally upload the public key
 
 The checked-in sample assets under `Examples\Keys` use the `PublicPGP1.asc` / `PrivatePGP1.asc` naming pattern.
 
@@ -58,7 +72,9 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## IMPORTANT
 
-This module works correctly on Windows/Linux and MacOS, but since it uses **.NET STANDARD 2.0** library it requires minimum of **.NET Framework 4.7.2** installed on a Windows machine when using PowerShell 5.1. Please make sure to keep your .NET Framework up to date on **Windows Client/Servers**.
+PSPGP supports Windows PowerShell 5.1 and PowerShell 7+.
+
+On Windows PowerShell 5.1, the module requires **.NET Framework 4.7.2** or newer. On PowerShell 7+, the module works cross-platform on Windows, Linux, and macOS.
 
 ## Using
 
@@ -123,6 +139,8 @@ $Signature = Protect-PGP -SignOnly -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -
 Get-PGPInspect -String $Signature
 ```
 
+`Get-PGPInspect` works well for signed content and general armored metadata. Inspection of some encrypted payloads is still limited by upstream `PgpCore` behavior, and PSPGP reports that limitation clearly instead of surfacing a raw crash.
+
 ### Sign string
 
 ```powershell
@@ -130,14 +148,15 @@ $Signature = Protect-PGP -SignOnly -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -
 Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String $Signature
 ```
 
-### Signed-and-encrypted verification
+### Signed-and-encrypted verification status
 
-```powershell
-$ProtectedString = Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -SignPassword 'ZielonaMila9!' -String 'Signed and encrypted'
-Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -Password 'ZielonaMila9!' -String $ProtectedString -Verify
-```
+`Unprotect-PGP -Verify` is currently disabled on purpose. `PgpCore` 7.0.0 does not perform trustworthy cryptographic verification in its `DecryptAndVerify` methods, so PSPGP fails closed instead of reporting potentially forged content as verified.
 
-`Unprotect-PGP -Verify` is currently disabled on purpose. PgpCore 7.0.0 does not perform trustworthy cryptographic verification in its `DecryptAndVerify` methods, so PSPGP fails closed instead of reporting potentially forged content as verified.
+You can still:
+
+- encrypt and sign with `Protect-PGP`
+- verify detached or clear-signed content with `Test-PGP`
+- decrypt signed-and-encrypted content with `Unprotect-PGP` when you do not request `-Verify`
 
 ### Download and inspect public keys
 
@@ -149,11 +168,20 @@ New-PGPKey -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -FilePathPrivate $P
 
 ### Runnable examples
 
-See the `Examples` folder for runnable scripts covering:
+See the `Examples` folder for runnable scripts:
 
-- basic encrypt/decrypt flows
-- symmetric encryption/decryption
-- detached signatures
-- clear-sign and verify
-- message inspection
-- key inspection
+- `Examples\Example-GeneratePGP.ps1`
+- `Examples\Example-EncryptString.ps1`
+- `Examples\Example-EncryptStringMultipleKeys.ps1`
+- `Examples\Example-EncryptStringNoPassword.ps1`
+- `Examples\Example-DecryptString.ps1`
+- `Examples\Example-EncryptFolder.ps1`
+- `Examples\Example-EncryptFolderMultipleKeys.ps1`
+- `Examples\Example-DecryptFolder.ps1`
+- `Examples\Example-DecryptFile.ps1`
+- `Examples\Example-SignString.ps1`
+- `Examples\Example-VerifySignature.ps1`
+- `Examples\Example-ClearSignString.ps1`
+- `Examples\Example-SymmetricString.ps1`
+- `Examples\Example-InspectSignedString.ps1`
+- `Examples\Example-GetPGPKeyInfo.ps1`
