@@ -20,10 +20,30 @@
   <a href="https://www.linkedin.com/in/pklys"><img src="https://img.shields.io/badge/LinkedIn-pklys-0077B5.svg?logo=LinkedIn&style=flat-square"></a>
 </p>
 
-**PSPGP** is a PowerShell module that provides PGP functionality in PowerShell. It allows encrypting and decrypting files/folders and strings using PGP.
-**PSGPG** uses following .NET library to deliver this functionality:
+**PSPGP** is a PowerShell module that provides PGP functionality in PowerShell. It allows encrypting and decrypting files, folders, and strings using PGP.
+**PSPGP** uses the following .NET library to deliver this functionality:
 
 - [PgpCore](https://github.com/mattosaurus/PgpCore) - licensed MIT
+
+## Module surface
+
+Exported functions:
+
+- `New-PGPKey`
+- `Protect-PGP`
+- `Test-PGP`
+- `Unprotect-PGP`
+
+No compiled cmdlets or aliases are exported on `master`.
+
+Current capabilities:
+
+- Encrypt and decrypt files, folders, and strings with public/private keys
+- Encrypt to one or more public keys
+- Verify signatures for files, folders, and strings
+- Generate new key pairs for testing or automation scenarios
+
+The checked-in sample assets under `Examples\Keys` use the `PublicPGP.asc` / `PrivatePGP.asc` naming pattern.
 
 ## To install
 
@@ -45,7 +65,9 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## IMPORTANT
 
-This module works correctly on Windows/Linux and MacOS, but since it uses **.NET STANDARD 2.0** library it requires minimum of **.NET Framework 4.7.2** installed on a Windows machine when using PowerShell 5.1. Please make sure to keep your .NET Framework up to date on **Windows Client/Servers**.
+PSPGP supports Windows PowerShell 5.1 and PowerShell 7+.
+
+On Windows PowerShell 5.1, the module requires **.NET Framework 4.7.2** or newer. On PowerShell 7+, the module works cross-platform on Windows, Linux, and macOS.
 
 ## Using
 
@@ -83,3 +105,18 @@ Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -String $ProtectedStri
 
 Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -FolderPath $PSScriptRoot\Encoded
 ```
+
+### Runnable examples
+
+See the `Examples` folder for runnable scripts:
+
+- `Examples\Example-GeneratePGP.ps1`
+- `Examples\Example-EncryptString.ps1`
+- `Examples\Example-EncryptStringMultipleKeys.ps1`
+- `Examples\Example-EncryptStringNoPassword.ps1`
+- `Examples\Example-DecryptString.ps1`
+- `Examples\Example-EncryptFolder.ps1`
+- `Examples\Example-EncryptFolderMultipleKeys.ps1`
+- `Examples\Example-DecryptFolder.ps1`
+- `Examples\Example-DecryptFile.ps1`
+- `Examples\Example-VerifySignature.ps1`
