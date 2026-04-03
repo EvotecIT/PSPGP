@@ -1,9 +1,9 @@
-﻿Import-Module .\PSPGP.psd1 -Force
+Import-Module (Join-Path $PSScriptRoot '..\PSPGP.psd1') -Force
 
-$ProtectedString = Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -String "This is string to encrypt"
+$SignedString = Protect-PGP -SignOnly -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -SignPassword 'ZielonaMila9!' -String 'This is signed text'
 
-Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -String $ProtectedString
-# Expected to produce no output when signature is valid
+Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String $SignedString
+# Returns a VerificationResult object with Status $true when the signature is valid
 
-Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -FolderPath $PSScriptRoot\Encoded
-# Returns objects with Status $true for valid signatures
+$ClearSigned = Protect-PGP -ClearSign -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -SignPassword 'ZielonaMila9!' -String 'This is clear-signed text'
+Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String $ClearSigned -ClearSigned

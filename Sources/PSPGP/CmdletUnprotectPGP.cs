@@ -7,15 +7,25 @@ using System.Text;
 
 namespace PSPGP;
 /// <summary>
-/// <para>Removes PGP encryption from files or strings using a private key.</para>
+/// <para>Removes PGP encryption from files or strings using a private key or symmetric passphrase.</para>
 /// <example>
 /// <code>
-/// Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP.asc -Password 'secret' -FolderPath $PSScriptRoot\Encoded -OutputFolderPath $PSScriptRoot\Decoded
+/// Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -Password 'secret' -FolderPath $PSScriptRoot\Encoded -OutputFolderPath $PSScriptRoot\Decoded
 /// </code>
 /// </example>
 /// <example>
 /// <code>
-/// Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP.asc -Password 'secret' -String $Encrypted
+/// Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -Password 'secret' -String $Encrypted
+/// </code>
+/// </example>
+/// <example>
+/// <code>
+/// Unprotect-PGP -SymmetricPassphrase 'SymmetricPass123!' -String $Encrypted
+/// </code>
+/// </example>
+/// <example>
+/// <code>
+/// Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -Password 'secret' -String $Encrypted -Verify
 /// </code>
 /// </example>
 /// </summary>

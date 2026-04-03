@@ -9,12 +9,22 @@ namespace PSPGP;
 /// <para>Verifies PGP signatures for files, folders or strings.</para>
 /// <example>
 /// <code>
-/// Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -String $ProtectedString
+/// Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String $ProtectedString
 /// </code>
 /// </example>
 /// <example>
 /// <code>
-/// Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -FolderPath $PSScriptRoot\Encoded
+/// Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -FolderPath $PSScriptRoot\Encoded
+/// </code>
+/// </example>
+/// <example>
+/// <code>
+/// Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String $ClearSigned -ClearSigned
+/// </code>
+/// </example>
+/// <example>
+/// <code>
+/// Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String $ProtectedString -ThrowIfEncrypted
 /// </code>
 /// </example>
 /// </summary>

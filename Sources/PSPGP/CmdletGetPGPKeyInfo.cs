@@ -11,7 +11,7 @@ namespace PSPGP;
 /// <para>Returns information about a PGP key such as algorithm, expiration and user IDs.</para>
 /// <example>
 /// <code>
-/// Get-PGPKeyInfo -FilePath $PSScriptRoot\Keys\PublicPGP.asc
+/// Get-PGPKeyInfo -FilePath $PSScriptRoot\Keys\PublicPGP1.asc
 /// </code>
 /// </example>
 /// </summary>

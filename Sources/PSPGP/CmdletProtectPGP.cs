@@ -16,22 +16,32 @@ namespace PSPGP;
 /// </para>
 /// <example>
 /// <code>
-/// Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -FolderPath $PSScriptRoot\Test -OutputFolderPath $PSScriptRoot\Encoded
+/// Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -FolderPath $PSScriptRoot\Test -OutputFolderPath $PSScriptRoot\Encoded
 /// </code>
 /// </example>
 /// <example>
 /// <code>
-/// Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -FilePath $PSScriptRoot\Test\Test1.txt -OutFilePath $PSScriptRoot\Encoded\Test1.txt.pgp
+/// Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -FilePath $PSScriptRoot\Test\Test1.txt -OutFilePath $PSScriptRoot\Encoded\Test1.txt.pgp
 /// </code>
 /// </example>
 /// <example>
 /// <code>
-/// Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -String "Sensitive text"
+/// Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String "Sensitive text"
 /// </code>
 /// </example>
 /// <example>
 /// <code>
-/// Protect-PGP -SignOnly -SignKey $PSScriptRoot\Keys\PrivatePGP.asc -SignPassword 'secret' -String "Signed content"
+/// Protect-PGP -SymmetricPassphrase 'SymmetricPass123!' -String 'Sensitive text'
+/// </code>
+/// </example>
+/// <example>
+/// <code>
+/// Protect-PGP -SignOnly -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -SignPassword 'secret' -String "Signed content"
+/// </code>
+/// </example>
+/// <example>
+/// <code>
+/// Protect-PGP -ClearSign -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -SignPassword 'secret' -String "Human readable signed content"
 /// </code>
 /// </example>
 /// </summary>
