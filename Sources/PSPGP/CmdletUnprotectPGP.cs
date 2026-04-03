@@ -24,11 +24,6 @@ namespace PSPGP;
 /// Unprotect-PGP -SymmetricPassphrase 'SymmetricPass123!' -String $Encrypted
 /// </code>
 /// </example>
-/// <example>
-/// <code>
-/// Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -Password 'secret' -String $Encrypted -Verify
-/// </code>
-/// </example>
 [Cmdlet("Unprotect", "PGP", DefaultParameterSetName = "FolderClearText")]
 public class CmdletUnprotectPGP : PSCmdlet {
     /// <summary>Private key file used to decrypt data.</summary>
@@ -46,7 +41,7 @@ public class CmdletUnprotectPGP : PSCmdlet {
     [Parameter(Mandatory = true, ParameterSetName = "StringVerifyCredential")]
     public string[] FilePathPrivate { get; set; }
 
-    /// <summary>Public key files used when verifying signed encrypted content.</summary>
+    /// <summary>Public key files reserved for signed-and-encrypted verification workflows.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "FolderVerifyCredential")]
     [Parameter(Mandatory = true, ParameterSetName = "FolderVerifyClearText")]
     [Parameter(Mandatory = true, ParameterSetName = "FileVerifyCredential")]
@@ -119,7 +114,7 @@ public class CmdletUnprotectPGP : PSCmdlet {
     [Parameter(Mandatory = true, ParameterSetName = "StringVerifyCredential")]
     public string String { get; set; }
 
-    /// <summary>Decrypts and verifies encrypted signed content.</summary>
+    /// <summary>Reserved for future signed-and-encrypted verification support.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "FolderVerifyCredential")]
     [Parameter(Mandatory = true, ParameterSetName = "FolderVerifyClearText")]
     [Parameter(Mandatory = true, ParameterSetName = "FileVerifyCredential")]
@@ -133,11 +128,17 @@ public class CmdletUnprotectPGP : PSCmdlet {
     /// and writes the decrypted data to disk or the pipeline.
     /// </summary>
     protected override void ProcessRecord() {
+        bool verifyMode = ParameterSetName.IndexOf("Verify", System.StringComparison.OrdinalIgnoreCase) >= 0;
+        if (verifyMode) {
+            var exception = new NotSupportedException(
+                "Unprotect-PGP -Verify is temporarily disabled. PgpCore 7.0.0 does not perform trustworthy cryptographic verification in its DecryptAndVerify methods, so PSPGP fails closed rather than report a potentially forged message as verified.");
+            ThrowTerminatingError(new ErrorRecord(exception, "DecryptVerifyUnsupported", ErrorCategory.NotImplemented, null));
+            return;
+        }
+
         try {
             var resolvedPrivates = new List<string>();
             bool symmetricMode = ParameterSetName.EndsWith("Symmetric", System.StringComparison.OrdinalIgnoreCase);
-            bool verifyMode = ParameterSetName.IndexOf("Verify", System.StringComparison.OrdinalIgnoreCase) >= 0;
-            var resolvedPublics = new List<string>();
             if (!symmetricMode) {
                 foreach (var path in FilePathPrivate) {
                     string resolved = PathResolver.Resolve(this, path);
@@ -154,25 +155,6 @@ public class CmdletUnprotectPGP : PSCmdlet {
                     DateTime? expiration = KeyExpirationHelper.GetExpiration(resolved);
                     KeyExpirationHelper.WarnIfExpired(this, resolved, expiration);
                     resolvedPrivates.Add(resolved);
-                }
-            }
-
-            if (verifyMode) {
-                foreach (var path in FilePathPublic) {
-                    string resolved = PathResolver.Resolve(this, path);
-                    if (!File.Exists(resolved)) {
-                        ErrorActionHelper.WriteErrorOrWarning(
-                            this,
-                            new FileNotFoundException($"Public key doesn't exist {resolved}"),
-                            "PublicKeyNotFound",
-                            ErrorCategory.InvalidArgument,
-                            resolved,
-                            $"Public key doesn't exist {resolved}");
-                        return;
-                    }
-                    DateTime? expiration = KeyExpirationHelper.GetExpiration(resolved);
-                    KeyExpirationHelper.WarnIfExpired(this, resolved, expiration);
-                    resolvedPublics.Add(resolved);
                 }
             }
 
@@ -208,28 +190,11 @@ public class CmdletUnprotectPGP : PSCmdlet {
                             foreach (var key in resolvedPrivates) {
                                 try {
                                     using var privateKeyStream = KeyMaterialHelper.OpenRead(key);
-                                    List<Stream> publicKeyStreams = new();
-                                    try {
-                                        foreach (string publicKey in resolvedPublics) {
-                                            publicKeyStreams.Add(KeyMaterialHelper.OpenRead(publicKey));
-                                        }
-
-                                        var encryptionKeys = verifyMode
-                                            ? new EncryptionKeys(publicKeyStreams, privateKeyStream, password)
-                                            : new EncryptionKeys(privateKeyStream, password);
-                                        var pgp = new PGP(encryptionKeys);
-                                        if (verifyMode) {
-                                            pgp.DecryptFileAndVerify(new FileInfo(file), new FileInfo(outputFile));
-                                        } else {
-                                            pgp.DecryptFile(new FileInfo(file), new FileInfo(outputFile));
-                                        }
-                                        decrypted = true;
-                                        break;
-                                    } finally {
-                                        foreach (Stream publicKeyStream in publicKeyStreams) {
-                                            publicKeyStream.Dispose();
-                                        }
-                                    }
+                                    var encryptionKeys = new EncryptionKeys(privateKeyStream, password);
+                                    var pgp = new PGP(encryptionKeys);
+                                    pgp.DecryptFile(new FileInfo(file), new FileInfo(outputFile));
+                                    decrypted = true;
+                                    break;
                                 } catch (Exception ex) {
                                     lastError = PgpExceptionHelper.Normalize(ex, key);
                                 }
@@ -264,28 +229,11 @@ public class CmdletUnprotectPGP : PSCmdlet {
                         foreach (var key in resolvedPrivates) {
                             try {
                                 using var privateKeyStream = KeyMaterialHelper.OpenRead(key);
-                                List<Stream> publicKeyStreams = new();
-                                try {
-                                    foreach (string publicKey in resolvedPublics) {
-                                        publicKeyStreams.Add(KeyMaterialHelper.OpenRead(publicKey));
-                                    }
-
-                                    var encryptionKeys = verifyMode
-                                        ? new EncryptionKeys(publicKeyStreams, privateKeyStream, password)
-                                        : new EncryptionKeys(privateKeyStream, password);
-                                    var pgp = new PGP(encryptionKeys);
-                                    if (verifyMode) {
-                                        pgp.DecryptFileAndVerify(new FileInfo(resolvedFile), new FileInfo(outputFile));
-                                    } else {
-                                        pgp.DecryptFile(new FileInfo(resolvedFile), new FileInfo(outputFile));
-                                    }
-                                    decrypted = true;
-                                    break;
-                                } finally {
-                                    foreach (Stream publicKeyStream in publicKeyStreams) {
-                                        publicKeyStream.Dispose();
-                                    }
-                                }
+                                var encryptionKeys = new EncryptionKeys(privateKeyStream, password);
+                                var pgp = new PGP(encryptionKeys);
+                                pgp.DecryptFile(new FileInfo(resolvedFile), new FileInfo(outputFile));
+                                decrypted = true;
+                                break;
                             } catch (Exception ex) {
                                 lastError = PgpExceptionHelper.Normalize(ex, key);
                             }
@@ -317,26 +265,11 @@ public class CmdletUnprotectPGP : PSCmdlet {
                         foreach (var key in resolvedPrivates) {
                             try {
                                 using var privateKeyStream = KeyMaterialHelper.OpenRead(key);
-                                List<Stream> publicKeyStreams = new();
-                                try {
-                                    foreach (string publicKey in resolvedPublics) {
-                                        publicKeyStreams.Add(KeyMaterialHelper.OpenRead(publicKey));
-                                    }
-
-                                    var encryptionKeys = verifyMode
-                                        ? new EncryptionKeys(publicKeyStreams, privateKeyStream, password)
-                                        : new EncryptionKeys(privateKeyStream, password);
-                                    var pgp = new PGP(encryptionKeys);
-                                    result = verifyMode
-                                        ? pgp.DecryptArmoredStringAndVerify(String)
-                                        : pgp.DecryptArmoredString(String);
-                                    decrypted = true;
-                                    break;
-                                } finally {
-                                    foreach (Stream publicKeyStream in publicKeyStreams) {
-                                        publicKeyStream.Dispose();
-                                    }
-                                }
+                                var encryptionKeys = new EncryptionKeys(privateKeyStream, password);
+                                var pgp = new PGP(encryptionKeys);
+                                result = pgp.DecryptArmoredString(String);
+                                decrypted = true;
+                                break;
                             } catch (Exception ex) {
                                 lastError = PgpExceptionHelper.Normalize(ex, key);
                             }

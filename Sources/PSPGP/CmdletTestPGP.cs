@@ -156,14 +156,13 @@ public class CmdletTestPGP : PSCmdlet {
                         using var publicKeyStream = KeyMaterialHelper.OpenRead(key);
                         var encryptionKeys = new EncryptionKeys(publicKeyStream);
                         var pgp = new PGP(encryptionKeys);
-                        if (ClearSigned.IsPresent) {
-                            pgp.VerifyClearArmoredString(String);
-                        } else {
-                            pgp.VerifyArmoredString(String, ThrowIfEncrypted.IsPresent);
+                        status = ClearSigned.IsPresent
+                            ? pgp.VerifyClearArmoredString(String)
+                            : pgp.VerifyArmoredString(String, ThrowIfEncrypted.IsPresent);
+                        if (status) {
+                            signer = key;
+                            break;
                         }
-                        status = true;
-                        signer = key;
-                        break;
                     } catch (Exception ex) {
                         error = PgpExceptionHelper.Normalize(ex, key).Message;
                     }

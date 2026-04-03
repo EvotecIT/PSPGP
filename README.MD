@@ -130,12 +130,14 @@ $Signature = Protect-PGP -SignOnly -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -
 Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String $Signature
 ```
 
-### Encrypt, sign, decrypt and verify
+### Signed-and-encrypted verification
 
 ```powershell
 $ProtectedString = Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -SignPassword 'ZielonaMila9!' -String 'Signed and encrypted'
 Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -Password 'ZielonaMila9!' -String $ProtectedString -Verify
 ```
+
+`Unprotect-PGP -Verify` is currently disabled on purpose. PgpCore 7.0.0 does not perform trustworthy cryptographic verification in its `DecryptAndVerify` methods, so PSPGP fails closed instead of reporting potentially forged content as verified.
 
 ### Download and inspect public keys
 
@@ -153,6 +155,5 @@ See the `Examples` folder for runnable scripts covering:
 - symmetric encryption/decryption
 - detached signatures
 - clear-sign and verify
-- decrypt and verify
 - message inspection
 - key inspection
