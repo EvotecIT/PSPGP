@@ -26,6 +26,18 @@
 
 - [PgpCore](https://github.com/mattosaurus/PgpCore) - licensed MIT
 
+Exported cmdlets:
+
+- `Get-PGPInspect`
+- `Get-PGPKey`
+- `Get-PGPKeyInfo`
+- `New-PGPKey`
+- `Protect-PGP`
+- `Test-PGP`
+- `Unprotect-PGP`
+
+The checked-in sample assets under `Examples\Keys` use the `PublicPGP1.asc` / `PrivatePGP1.asc` naming pattern.
+
 ## To install
 
 ```powershell
@@ -53,48 +65,95 @@ This module works correctly on Windows/Linux and MacOS, but since it uses **.NET
 ### Create new PGP Public/Private Keys
 
 ```powershell
-New-PGPKey -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP.asc -UserName 'przemyslaw.klys' -Password 'ZielonaMila9!'
+New-PGPKey -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -UserName 'przemyslaw.klys' -Password 'ZielonaMila9!'
 ```
 
 ### Encrypt Folder
 
 ```powershell
-Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -FolderPath $PSScriptRoot\Test -OutputFolderPath $PSScriptRoot\Encoded
+Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -FolderPath $PSScriptRoot\Test -OutputFolderPath $PSScriptRoot\Encoded
 ```
 
 ### Decrypt Folder
 
 ```powershell
-Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP.asc -Password 'ZielonaMila9!' -FolderPath $PSScriptRoot\Encoded -OutputFolderPath $PSScriptRoot\Decoded
+Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -Password 'ZielonaMila9!' -FolderPath $PSScriptRoot\Encoded -OutputFolderPath $PSScriptRoot\Decoded
 ```
 
 Decrypting can also be done using multiple private keys:
 
 ```powershell
-Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP.asc,$PSScriptRoot\Keys\PrivatePGP1.asc -Password 'ZielonaMila9!' -String $ProtectedString
+Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc,$PSScriptRoot\Keys\PrivatePGP2.asc -Password 'ZielonaMila9!' -String $ProtectedString
 ```
 
 ### Encrypt / Decrypt String
 
 ```powershell
-$ProtectedString = Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -String "This is string to encrypt"
-Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP.asc -Password 'ZielonaMila9!' -String $ProtectedString
+$ProtectedString = Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String "This is string to encrypt"
+Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -Password 'ZielonaMila9!' -String $ProtectedString
+```
+
+### Encrypt / Decrypt String Symmetrically
+
+```powershell
+$ProtectedString = Protect-PGP -SymmetricPassphrase 'SymmetricPass123!' -String 'This is string to encrypt'
+Unprotect-PGP -SymmetricPassphrase 'SymmetricPass123!' -String $ProtectedString
 ```
 
 ### Verify signature
 
 ```powershell
-$ProtectedString = Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -String "This is string to encrypt"
+$Signature = Protect-PGP -SignOnly -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -SignPassword 'ZielonaMila9!' -String 'Signed text'
 
 # Verify using one or more public keys
-Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc,$PSScriptRoot\Keys\Other.asc -String $ProtectedString
+Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc,$PSScriptRoot\Keys\PublicPGP2.asc -String $Signature
+```
 
-Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc,$PSScriptRoot\Keys\Other.asc -FolderPath $PSScriptRoot\Encoded
+### Clear sign and verify clear-signed content
+
+```powershell
+$ClearSigned = Protect-PGP -ClearSign -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -SignPassword 'ZielonaMila9!' -String 'Signed text'
+Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String $ClearSigned -ClearSigned
+```
+
+### Inspect message metadata
+
+```powershell
+$Signature = Protect-PGP -SignOnly -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -SignPassword 'ZielonaMila9!' -String 'Signed text'
+Get-PGPInspect -String $Signature
 ```
 
 ### Sign string
 
 ```powershell
-$Signature = Protect-PGP -SignOnly -SignKey $PSScriptRoot\Keys\PrivatePGP.asc -SignPassword 'ZielonaMila9!' -String 'Signed text'
-Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -String $Signature
+$Signature = Protect-PGP -SignOnly -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -SignPassword 'ZielonaMila9!' -String 'Signed text'
+Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String $Signature
 ```
+
+### Signed-and-encrypted verification
+
+```powershell
+$ProtectedString = Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -SignPassword 'ZielonaMila9!' -String 'Signed and encrypted'
+Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -Password 'ZielonaMila9!' -String $ProtectedString -Verify
+```
+
+`Unprotect-PGP -Verify` is currently disabled on purpose. PgpCore 7.0.0 does not perform trustworthy cryptographic verification in its `DecryptAndVerify` methods, so PSPGP fails closed instead of reporting potentially forged content as verified.
+
+### Download and inspect public keys
+
+```powershell
+Get-PGPKey -KeyServer 'https://keys.openpgp.org' -Search 'user@example.com'
+Get-PGPKeyInfo -FilePath $PSScriptRoot\Keys\PublicPGP1.asc
+New-PGPKey -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -UserName 'user@example.com' -Password 'secret' -UploadKeyServer 'https://keys.openpgp.org'
+```
+
+### Runnable examples
+
+See the `Examples` folder for runnable scripts covering:
+
+- basic encrypt/decrypt flows
+- symmetric encryption/decryption
+- detached signatures
+- clear-sign and verify
+- message inspection
+- key inspection

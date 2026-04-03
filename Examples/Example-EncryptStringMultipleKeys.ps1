@@ -1,8 +1,7 @@
-﻿Import-Module .\PSPGP.psd1 -Force
+Import-Module (Join-Path $PSScriptRoot '..\PSPGP.psd1') -Force
 
-$String = Protect-PGP -FilePathPublic @("$PSScriptRoot\Keys\PublicPGP1.asc", "$PSScriptRoot\Keys\PublicPGP2.asc") -String "This is string to encrypt"
+$String = Protect-PGP -FilePathPublic @("$PSScriptRoot\Keys\PublicPGP1.asc", "$PSScriptRoot\Keys\PublicPGP2.asc") -String 'This is string to encrypt'
 $String
-
 
 Unprotect-PGP -String $String -FilePathPrivate "$PSScriptRoot\Keys\PrivatePGP1.asc" -Password 'ZielonaMila9!'
 

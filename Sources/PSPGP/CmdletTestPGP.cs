@@ -7,17 +7,27 @@ using System.Management.Automation;
 namespace PSPGP;
 /// <summary>
 /// <para>Verifies PGP signatures for files, folders or strings.</para>
-/// <example>
-/// <code>
-/// Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -String $ProtectedString
-/// </code>
-/// </example>
-/// <example>
-/// <code>
-/// Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -FolderPath $PSScriptRoot\Encoded
-/// </code>
-/// </example>
 /// </summary>
+/// <example>
+/// <code>
+/// Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String $ProtectedString
+/// </code>
+/// </example>
+/// <example>
+/// <code>
+/// Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -FolderPath $PSScriptRoot\Encoded
+/// </code>
+/// </example>
+/// <example>
+/// <code>
+/// Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String $ClearSigned -ClearSigned
+/// </code>
+/// </example>
+/// <example>
+/// <code>
+/// Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String $ProtectedString -ThrowIfEncrypted
+/// </code>
+/// </example>
 [Cmdlet(VerbsDiagnostic.Test, "PGP", DefaultParameterSetName = "File")]
 [OutputType(typeof(VerificationResult))]
 public class CmdletTestPGP : PSCmdlet {
@@ -46,6 +56,14 @@ public class CmdletTestPGP : PSCmdlet {
     /// <summary>Encrypted text to verify.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "String")]
     public string String { get; set; }
+
+    /// <summary>Throws when encrypted content is passed to verify methods.</summary>
+    [Parameter]
+    public SwitchParameter ThrowIfEncrypted { get; set; }
+
+    /// <summary>Verifies clear-signed content instead of detached/regular signatures.</summary>
+    [Parameter]
+    public SwitchParameter ClearSigned { get; set; }
 
     /// <summary>
     /// Validates signatures for files, folders or strings
@@ -78,16 +96,19 @@ public class CmdletTestPGP : PSCmdlet {
                     string error = string.Empty;
                     string signer = null;
                     foreach (var key in publicKeys) {
-                        var encryptionKeys = new EncryptionKeys(new FileInfo(key));
-                        var pgp = new PGP(encryptionKeys);
                         try {
-                            status = pgp.VerifyFile(new FileInfo(file));
+                            using var publicKeyStream = KeyMaterialHelper.OpenRead(key);
+                            var encryptionKeys = new EncryptionKeys(publicKeyStream);
+                            var pgp = new PGP(encryptionKeys);
+                            status = ClearSigned.IsPresent
+                                ? pgp.VerifyClearFile(new FileInfo(file))
+                                : pgp.VerifyFile(new FileInfo(file), ThrowIfEncrypted.IsPresent);
                             if (status) {
                                 signer = key;
                                 break;
                             }
                         } catch (Exception ex) {
-                            error = ex.Message;
+                            error = PgpExceptionHelper.Normalize(ex, key).Message;
                         }
                     }
                     var result = new VerificationResult {
@@ -104,16 +125,19 @@ public class CmdletTestPGP : PSCmdlet {
                 string error = string.Empty;
                 string signer = null;
                 foreach (var key in publicKeys) {
-                    var encryptionKeys = new EncryptionKeys(new FileInfo(key));
-                    var pgp = new PGP(encryptionKeys);
                     try {
-                        status = pgp.VerifyFile(new FileInfo(resolvedFile));
+                        using var publicKeyStream = KeyMaterialHelper.OpenRead(key);
+                        var encryptionKeys = new EncryptionKeys(publicKeyStream);
+                        var pgp = new PGP(encryptionKeys);
+                        status = ClearSigned.IsPresent
+                            ? pgp.VerifyClearFile(new FileInfo(resolvedFile))
+                            : pgp.VerifyFile(new FileInfo(resolvedFile), ThrowIfEncrypted.IsPresent);
                         if (status) {
                             signer = key;
                             break;
                         }
                     } catch (Exception ex) {
-                        error = ex.Message;
+                        error = PgpExceptionHelper.Normalize(ex, key).Message;
                     }
                 }
                 var result = new VerificationResult {
@@ -128,15 +152,19 @@ public class CmdletTestPGP : PSCmdlet {
                 string error = string.Empty;
                 string signer = null;
                 foreach (var key in publicKeys) {
-                    var encryptionKeys = new EncryptionKeys(new FileInfo(key));
-                    var pgp = new PGP(encryptionKeys);
                     try {
-                        pgp.VerifyArmoredString(String);
-                        status = true;
-                        signer = key;
-                        break;
+                        using var publicKeyStream = KeyMaterialHelper.OpenRead(key);
+                        var encryptionKeys = new EncryptionKeys(publicKeyStream);
+                        var pgp = new PGP(encryptionKeys);
+                        status = ClearSigned.IsPresent
+                            ? pgp.VerifyClearArmoredString(String)
+                            : pgp.VerifyArmoredString(String, ThrowIfEncrypted.IsPresent);
+                        if (status) {
+                            signer = key;
+                            break;
+                        }
                     } catch (Exception ex) {
-                        error = ex.Message;
+                        error = PgpExceptionHelper.Normalize(ex, key).Message;
                     }
                 }
                 var result = new VerificationResult {

@@ -9,12 +9,12 @@ namespace PSPGP;
 
 /// <summary>
 /// <para>Returns information about a PGP key such as algorithm, expiration and user IDs.</para>
+/// </summary>
 /// <example>
 /// <code>
-/// Get-PGPKeyInfo -FilePath $PSScriptRoot\Keys\PublicPGP.asc
+/// Get-PGPKeyInfo -FilePath $PSScriptRoot\Keys\PublicPGP1.asc
 /// </code>
 /// </example>
-/// </summary>
 [Cmdlet(VerbsCommon.Get, "PGPKeyInfo")]
 [OutputType(typeof(PGPKeyInfo))]
 public class CmdletGetPGPKeyInfo : PSCmdlet {
@@ -41,7 +41,7 @@ public class CmdletGetPGPKeyInfo : PSCmdlet {
                     continue;
                 }
 
-                using FileStream keyStream = File.OpenRead(resolved);
+                using Stream keyStream = KeyMaterialHelper.OpenRead(resolved);
                 using Stream decoderStream = PgpUtilities.GetDecoderStream(keyStream);
                 PgpObjectFactory factory = new(decoderStream);
                 PgpPublicKey publicKey = null;

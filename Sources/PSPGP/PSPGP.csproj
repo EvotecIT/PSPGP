@@ -11,7 +11,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="PgpCore" Version="6.5.2" />
+        <PackageReference Include="BouncyCastle.Cryptography" Version="2.6.2" />
+        <PackageReference Include="PgpCore" Version="7.0.0" />
         <PackageReference Include="PowerShellStandard.Library" Version="5.1.1" PrivateAssets="all" />
     </ItemGroup>
 
@@ -40,13 +41,12 @@
     </PropertyGroup>
 
     <!-- This is needed for XmlDoc2CmdletDoc to generate a PowerShell documentation file. -->
-    <!-- <ItemGroup>
-
+    <ItemGroup>
         <PackageReference Include="MatejKafka.XmlDoc2CmdletDoc" Version="0.6.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-    </ItemGroup> -->
+    </ItemGroup>
 
     <!-- Copy help documentation to publish output after publish -->
     <Target Name="CopyHelpDocumentationToPublishOutput" AfterTargets="Publish">

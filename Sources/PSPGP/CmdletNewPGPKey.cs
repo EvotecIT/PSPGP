@@ -7,17 +7,17 @@ using System.Management.Automation;
 namespace PSPGP;
 /// <summary>
 /// <para>Generates a new PGP key pair.</para>
-/// <example>
-/// <code>
-/// New-PGPKey -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP.asc -UserName 'user' -Password 'secret'
-/// </code>
-/// </example>
-/// <example>
-/// <code>
-/// New-PGPKey -FilePathPublic $PSScriptRoot\Keys\PublicPGP.asc -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP.asc -Strength 4096 -Certainty 8 -EmitVersion
-/// </code>
-/// </example>
 /// </summary>
+/// <example>
+/// <code>
+/// New-PGPKey -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -UserName 'user' -Password 'secret'
+/// </code>
+/// </example>
+/// <example>
+/// <code>
+/// New-PGPKey -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -Strength 4096 -Certainty 8 -EmitVersion
+/// </code>
+/// </example>
 [Cmdlet(VerbsCommon.New, "PGPKey", DefaultParameterSetName = "ClearText")]
 public class CmdletNewPGPKey : PSCmdlet {
     /// <summary>Path to the public key file to create.</summary>

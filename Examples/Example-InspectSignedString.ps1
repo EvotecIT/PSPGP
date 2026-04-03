@@ -2,4 +2,4 @@ Import-Module (Join-Path $PSScriptRoot '..\PSPGP.psd1') -Force
 
 $Signature = Protect-PGP -SignOnly -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -SignPassword 'ZielonaMila9!' -String 'This is signed text'
 
-Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String $Signature
+Get-PGPInspect -String $Signature

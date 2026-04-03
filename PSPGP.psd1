@@ -1,7 +1,7 @@
 ﻿@{
     AliasesToExport        = @()
     Author                 = 'Przemyslaw Klys'
-    CmdletsToExport        = @('Get-PGPKey', 'Get-PGPKeyInfo', 'New-PGPKey', 'Protect-PGP', 'Test-PGP', 'Unprotect-PGP')
+    CmdletsToExport        = @('Get-PGPInspect', 'Get-PGPKey', 'Get-PGPKeyInfo', 'New-PGPKey', 'Protect-PGP', 'Test-PGP', 'Unprotect-PGP')
     CompanyName            = 'Evotec'
     CompatiblePSEditions   = @('Desktop', 'Core')
     Copyright              = '(c) 2011 - 2026 Przemyslaw Klys @ Evotec. All rights reserved.'
@@ -13,7 +13,7 @@
     PowerShellVersion      = '5.1'
     PrivateData            = @{
         PSData = @{
-            ExternalModuleDependencies = @('Microsoft.PowerShell.Management', 'Microsoft.PowerShell.Utility')
+            ExternalModuleDependencies = @()
             IconUri                    = 'https://evotec.xyz/wp-content/uploads/2021/08/PSPGP.png'
             LicenseUri                 = 'https://github.com/EvotecIT/PSPGP/blob/master/License'
             Prerelease                 = 'Preview1'
@@ -22,6 +22,7 @@
             Tags                       = @('pgp', 'gpg', 'encrypt', 'decrypt', 'windows', 'macos', 'linux')
         }
     }
-    RequiredModules        = @('Microsoft.PowerShell.Management', 'Microsoft.PowerShell.Utility')
+    RequiredModules        = @()
     RootModule             = 'PSPGP.psm1'
+    ScriptsToProcess       = @()
 }
