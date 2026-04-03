@@ -111,6 +111,26 @@
         $inspection.IsArmored | Should -Be $true
     }
 
+    It ' Inspect folder continues when one file cannot be inspected' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic; KeysDirectory = $KeysDirectory } {
+        $inspectFolder = [io.path]::Combine($KeysDirectory, 'inspect-folder')
+        $sourceFile = [io.path]::Combine($KeysDirectory, 'inspect-input.txt')
+        $signedFile = [io.path]::Combine($inspectFolder, 'signed.asc')
+        $encryptedFile = [io.path]::Combine($inspectFolder, 'encrypted.pgp')
+        New-Item -ItemType Directory -Path $inspectFolder -Force | Out-Null
+        Set-Content -Path $sourceFile -Value 'Inspect folder content' -NoNewline
+        Protect-PGP -SignOnly -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -FilePath $sourceFile -OutFilePath $signedFile -ErrorAction Stop
+        Protect-PGP -FilePathPublic $KeyPublic -FilePath $sourceFile -OutFilePath $encryptedFile -ErrorAction Stop
+
+        $inspectErrors = @()
+        $results = Get-PGPInspect -FolderPath $inspectFolder -ErrorAction Continue -ErrorVariable +inspectErrors
+
+        $results.Count | Should -Be 1
+        $results[0].SourcePath | Should -Be $signedFile
+        $results[0].IsSigned | Should -Be $true
+        $inspectErrors.Count | Should -Be 1
+        $inspectErrors[0].Exception.Message | Should -Match 'Signed content inspection works'
+    }
+
     It ' Test-PGP can flag encrypted content when ThrowIfEncrypted is used' -TestCases @{ KeyPublic = $KeyPublic } {
         $protected = Protect-PGP -FilePathPublic $KeyPublic -String 'Encrypted but unsigned'
         $result = Test-PGP -FilePathPublic $KeyPublic -String $protected -ThrowIfEncrypted

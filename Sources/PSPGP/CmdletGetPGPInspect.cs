@@ -33,13 +33,16 @@ public class CmdletGetPGPInspect : PSCmdlet {
     /// Inspects the selected input and writes message metadata.
     /// </summary>
     protected override void ProcessRecord() {
+        var pgp = new PGP();
         try {
-            var pgp = new PGP();
-
             if (ParameterSetName == "Folder") {
                 string resolvedFolder = PathResolver.Resolve(this, FolderPath);
                 foreach (string file in Directory.GetFiles(resolvedFolder, "*", SearchOption.AllDirectories)) {
-                    WriteObject(ToInfo(file, pgp.Inspect(new FileInfo(file))));
+                    try {
+                        WriteObject(ToInfo(file, pgp.Inspect(new FileInfo(file))));
+                    } catch (System.Exception ex) {
+                        WriteError(new ErrorRecord(NormalizeInspectException(ex), "GetPGPInspectFailed", ErrorCategory.NotSpecified, file));
+                    }
                 }
             } else if (ParameterSetName == "File") {
                 string resolvedFile = PathResolver.Resolve(this, FilePath);
@@ -48,14 +51,18 @@ public class CmdletGetPGPInspect : PSCmdlet {
                 WriteObject(ToInfo(null, pgp.Inspect(String)));
             }
         } catch (System.Exception ex) {
-            if (ex is System.NullReferenceException) {
-                ex = new System.NotSupportedException(
-                    "PgpCore inspect currently fails for some encrypted messages. Signed content inspection works, but encrypted-message inspection is limited by the upstream library.",
-                    ex);
-            }
-
-            WriteError(new ErrorRecord(ex, "GetPGPInspectFailed", ErrorCategory.NotSpecified, null));
+            WriteError(new ErrorRecord(NormalizeInspectException(ex), "GetPGPInspectFailed", ErrorCategory.NotSpecified, null));
         }
+    }
+
+    private static System.Exception NormalizeInspectException(System.Exception exception) {
+        if (exception is System.NullReferenceException) {
+            return new System.NotSupportedException(
+                "PgpCore inspect currently fails for some encrypted messages. Signed content inspection works, but encrypted-message inspection is limited by the upstream library.",
+                exception);
+        }
+
+        return exception;
     }
 
     private static PGPInspectInfo ToInfo(string sourcePath, PgpInspectResult result) {
