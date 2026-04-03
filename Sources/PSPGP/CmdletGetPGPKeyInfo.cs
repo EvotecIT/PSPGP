@@ -41,7 +41,7 @@ public class CmdletGetPGPKeyInfo : PSCmdlet {
                     continue;
                 }
 
-                using FileStream keyStream = File.OpenRead(resolved);
+                using Stream keyStream = KeyMaterialHelper.OpenRead(resolved);
                 using Stream decoderStream = PgpUtilities.GetDecoderStream(keyStream);
                 PgpObjectFactory factory = new(decoderStream);
                 PgpPublicKey publicKey = null;

@@ -16,7 +16,7 @@ internal static class KeyExpirationHelper {
     /// <param name="filePath">Path to the PGP key.</param>
     /// <returns>The expiration date if available.</returns>
     internal static DateTime? GetExpiration(string filePath) {
-        using FileStream keyStream = File.OpenRead(filePath);
+        using Stream keyStream = KeyMaterialHelper.OpenRead(filePath);
         using Stream decoderStream = PgpUtilities.GetDecoderStream(keyStream);
         PgpObjectFactory factory = new(decoderStream);
         PgpPublicKey publicKey = null;
