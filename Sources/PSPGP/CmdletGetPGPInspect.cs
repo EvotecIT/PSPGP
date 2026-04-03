@@ -7,13 +7,13 @@ namespace PSPGP;
 
 /// <summary>
 /// Inspects PGP content and returns message metadata.
+/// </summary>
 /// <example>
 /// <code>
 /// $Signature = Protect-PGP -SignOnly -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -SignPassword 'secret' -String 'Signed text'
 /// Get-PGPInspect -String $Signature
 /// </code>
 /// </example>
-/// </summary>
 [Cmdlet(VerbsCommon.Get, "PGPInspect", DefaultParameterSetName = "File")]
 [OutputType(typeof(PGPInspectInfo))]
 public class CmdletGetPGPInspect : PSCmdlet {

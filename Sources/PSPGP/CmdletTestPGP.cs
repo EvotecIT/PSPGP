@@ -7,6 +7,7 @@ using System.Management.Automation;
 namespace PSPGP;
 /// <summary>
 /// <para>Verifies PGP signatures for files, folders or strings.</para>
+/// </summary>
 /// <example>
 /// <code>
 /// Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String $ProtectedString
@@ -27,7 +28,6 @@ namespace PSPGP;
 /// Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String $ProtectedString -ThrowIfEncrypted
 /// </code>
 /// </example>
-/// </summary>
 [Cmdlet(VerbsDiagnostic.Test, "PGP", DefaultParameterSetName = "File")]
 [OutputType(typeof(VerificationResult))]
 public class CmdletTestPGP : PSCmdlet {

@@ -8,6 +8,7 @@ using System.Text;
 namespace PSPGP;
 /// <summary>
 /// <para>Removes PGP encryption from files or strings using a private key or symmetric passphrase.</para>
+/// </summary>
 /// <example>
 /// <code>
 /// Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -Password 'secret' -FolderPath $PSScriptRoot\Encoded -OutputFolderPath $PSScriptRoot\Decoded
@@ -28,7 +29,6 @@ namespace PSPGP;
 /// Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -Password 'secret' -String $Encrypted -Verify
 /// </code>
 /// </example>
-/// </summary>
 [Cmdlet("Unprotect", "PGP", DefaultParameterSetName = "FolderClearText")]
 public class CmdletUnprotectPGP : PSCmdlet {
     /// <summary>Private key file used to decrypt data.</summary>

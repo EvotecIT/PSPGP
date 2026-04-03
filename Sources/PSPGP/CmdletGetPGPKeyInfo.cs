@@ -9,12 +9,12 @@ namespace PSPGP;
 
 /// <summary>
 /// <para>Returns information about a PGP key such as algorithm, expiration and user IDs.</para>
+/// </summary>
 /// <example>
 /// <code>
 /// Get-PGPKeyInfo -FilePath $PSScriptRoot\Keys\PublicPGP1.asc
 /// </code>
 /// </example>
-/// </summary>
 [Cmdlet(VerbsCommon.Get, "PGPKeyInfo")]
 [OutputType(typeof(PGPKeyInfo))]
 public class CmdletGetPGPKeyInfo : PSCmdlet {

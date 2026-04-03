@@ -14,6 +14,7 @@ namespace PSPGP;
 /// Use <c>-SignOnly</c> or the <c>Sign*</c> parameter sets to create detached
 /// signatures without encryption.
 /// </para>
+/// </summary>
 /// <example>
 /// <code>
 /// Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -FolderPath $PSScriptRoot\Test -OutputFolderPath $PSScriptRoot\Encoded
@@ -44,7 +45,6 @@ namespace PSPGP;
 /// Protect-PGP -ClearSign -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -SignPassword 'secret' -String "Human readable signed content"
 /// </code>
 /// </example>
-/// </summary>
 [Cmdlet("Protect", "PGP", DefaultParameterSetName = "File")]
 public class CmdletProtectPGP : PSCmdlet {
     /// <summary>Public key files used for encryption.</summary>
