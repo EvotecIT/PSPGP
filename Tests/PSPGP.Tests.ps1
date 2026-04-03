@@ -125,7 +125,7 @@
         $results = Get-PGPInspect -FolderPath $inspectFolder -ErrorAction Continue -ErrorVariable +inspectErrors
 
         $results.Count | Should -Be 1
-        $results[0].SourcePath | Should -Be $signedFile
+        [IO.Path]::GetFullPath($results[0].SourcePath) | Should -Be ([IO.Path]::GetFullPath($signedFile))
         $results[0].IsSigned | Should -Be $true
         $inspectErrors.Count | Should -Be 1
         $inspectErrors[0].Exception.Message | Should -Match 'Signed content inspection works'
