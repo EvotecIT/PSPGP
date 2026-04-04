@@ -16,7 +16,6 @@
             ExternalModuleDependencies = @()
             IconUri                    = 'https://evotec.xyz/wp-content/uploads/2021/08/PSPGP.png'
             LicenseUri                 = 'https://github.com/EvotecIT/PSPGP/blob/master/License'
-            Prerelease                 = 'Preview1'
             ProjectUri                 = 'https://github.com/EvotecIT/PSPGP'
             RequireLicenseAcceptance   = $false
             Tags                       = @('pgp', 'gpg', 'encrypt', 'decrypt', 'windows', 'macos', 'linux')
