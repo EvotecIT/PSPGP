@@ -1,7 +1,8 @@
 ﻿# PSPGP - PowerShell Module
 
 <p align="center">
-  <a href="https://dev.azure.com/evotecpl/PSPGP/_build/results?buildId=latest"><img src="https://dev.azure.com/evotecpl/PSPGP/_apis/build/status/EvotecIT.PSPGP"></a>
+  <a href="https://github.com/EvotecIT/PSPGP/actions/workflows/test-dotnet.yml"><img src="https://github.com/EvotecIT/PSPGP/actions/workflows/test-dotnet.yml/badge.svg?branch=v2-speedygonzales" alt="Test .NET"></a>
+  <a href="https://github.com/EvotecIT/PSPGP/actions/workflows/test-powershell.yml"><img src="https://github.com/EvotecIT/PSPGP/actions/workflows/test-powershell.yml/badge.svg?branch=v2-speedygonzales" alt="Test PowerShell"></a>
   <a href="https://www.powershellgallery.com/packages/PSPGP"><img src="https://img.shields.io/powershellgallery/v/PSPGP.svg?style=flat-square"></a>
   <a href="https://www.powershellgallery.com/packages/PSPGP"><img src="https://img.shields.io/powershellgallery/v/PSPGP.svg?label=powershell%20gallery%20preview&colorB=yellow&style=flat-square&include_prereleases"></a>
   <a href="https://github.com/EvotecIT/PSPGP"><img src="https://img.shields.io/github/license/EvotecIT/PSPGP.svg?style=flat-square"></a>
@@ -25,6 +26,8 @@
 **PSPGP** uses the following .NET library:
 
 - [PgpCore](https://github.com/mattosaurus/PgpCore) - licensed MIT
+
+CI for this branch runs in GitHub Actions via the `.github/workflows/test-dotnet.yml` and `.github/workflows/test-powershell.yml` workflows.
 
 ## Module surface
 
