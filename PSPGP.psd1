@@ -19,8 +19,7 @@
             ProjectUri                 = 'https://github.com/EvotecIT/PSPGP'
             RequireLicenseAcceptance   = $false
             Tags                       = @('pgp', 'gpg', 'encrypt', 'decrypt', 'windows', 'macos', 'linux')
-            Prerelease                 = 'Preview1'
-}
+        }
     }
     RequiredModules        = @()
     RootModule             = 'PSPGP.psm1'

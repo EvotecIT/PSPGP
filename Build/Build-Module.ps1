@@ -27,17 +27,8 @@
         LicenseUri             = 'https://github.com/EvotecIT/PSPGP/blob/master/License'
 
         DotNetFrameworkVersion = '4.7.2'
-
-        PreReleaseTag          = 'Preview1'
     }
     New-ConfigurationManifest @Manifest
-    # Add external module dependencies, using loop for simplicity
-    New-ConfigurationModule -Type ExternalModule -Name 'Microsoft.PowerShell.Management', 'Microsoft.PowerShell.Utility'
-
-    # Add approved modules, that can be used as a dependency, but only when specific function from those modules is used
-    # And on that time only that function and dependant functions will be copied over
-    # Keep in mind it has it's limits when "copying" functions such as it should not depend on DLLs or other external files
-    New-ConfigurationModule -Type ApprovedModule -Name 'PSSharedGoods', 'PSWriteColor', 'Connectimo', 'PSUnifi', 'PSWebToolbox', 'PSMyPassword'
 
     $ConfigurationFormat = [ordered] @{
         RemoveComments                              = $false
@@ -85,31 +76,6 @@
     New-ConfigurationImportModule -ImportSelf #-ImportRequiredModules
 
     $newConfigurationBuildSplat = @{
-        # Enable                            = $true
-        # # lets sign module only on my machine for now
-        # SignModule                        = if ($Env:COMPUTERNAME -eq 'EVOMONSTER') { $true } else { $false }
-        # MergeModuleOnBuild                = $true
-        # MergeFunctionsFromApprovedModules = $true
-        # CertificateThumbprint             = '483292C9E317AA13B07BB7A96AE9D1A5ED9E7703'
-        # #DotSourceLibraries                = $false
-        # #DotSourceClasses                  = $false
-        # SeparateFileLibraries             = $true
-        # #DeleteTargetModuleBeforeBuild     = $true
-
-        # ResolveBinaryConflicts            = $true
-        # ResolveBinaryConflictsName        = 'PSPGP'
-        # NETProjectName                    = 'PSPGP'
-        # NETConfiguration                  = 'Release'
-        # NETFramework                      = 'netstandard2.0'
-        # #NETExcludeMainLibrary             = $true
-        # NETExcludeLibraryFilter           = @(
-        #     'System.Management.*.dll'
-        # )
-        # DotSourceLibraries                = $true
-        # DotSourceClasses                  = $true
-        # #SeparateFileLibraries             = $true
-        # DeleteTargetModuleBeforeBuild     = $true
-
         Enable                            = $true
         SignModule                        = $true
         MergeModuleOnBuild                = $true
@@ -117,7 +83,9 @@
         CertificateThumbprint             = '483292C9E317AA13B07BB7A96AE9D1A5ED9E7703'
         ResolveBinaryConflicts            = $true
         ResolveBinaryConflictsName        = 'PSPGP'
+        NETProjectPath                    = "$PSScriptRoot\..\Sources\PSPGP"
         NETProjectName                    = 'PSPGP'
+        NETBinaryModule                   = 'PSPGP.dll'
         NETConfiguration                  = 'Release'
         NETFramework                      = 'net8.0', 'net472'
         NETHandleAssemblyWithSameName     = $true
@@ -129,7 +97,7 @@
         RefreshPSD1Only                   = $true
     }
 
-    New-ConfigurationBuild @newConfigurationBuildSplat  #-DotSourceLibraries -DotSourceClasses -MergeModuleOnBuild -Enable -SignModule -DeleteTargetModuleBeforeBuild -CertificateThumbprint '483292C9E317AA13B07BB7A96AE9D1A5ED9E7703' -MergeFunctionsFromApprovedModules
+    New-ConfigurationBuild @newConfigurationBuildSplat
 
     $newConfigurationArtefactSplat = @{
         Type                = 'Unpacked'
@@ -138,9 +106,6 @@
         ModulesPath         = "$PSScriptRoot\..\Artefacts\Unpacked\Modules"
         RequiredModulesPath = "$PSScriptRoot\..\Artefacts\Unpacked\Modules"
         AddRequiredModules  = $true
-        CopyFiles           = @{
-            #"Examples\PublishingExample\Example-ExchangeEssentials.ps1" = "RunMe.ps1"
-        }
     }
     New-ConfigurationArtefact @newConfigurationArtefactSplat -CopyFilesRelative
     $newConfigurationArtefactSplat = @{
@@ -150,9 +115,6 @@
         ModulesPath         = "$PSScriptRoot\..\Artefacts\Packed\Modules"
         RequiredModulesPath = "$PSScriptRoot\..\Artefacts\Packed\Modules"
         AddRequiredModules  = $true
-        CopyFiles           = @{
-            #"Examples\PublishingExample\Example-ExchangeEssentials.ps1" = "RunMe.ps1"
-        }
         ArtefactName        = '<ModuleName>.v<ModuleVersion>.zip'
     }
     New-ConfigurationArtefact @newConfigurationArtefactSplat
