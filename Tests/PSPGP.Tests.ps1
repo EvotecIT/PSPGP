@@ -89,18 +89,34 @@
         $plain | Should -Be 'Symmetric Text'
     }
 
-    It ' Encrypt, sign, decrypt and verify string is blocked until upstream verification is trustworthy' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic } {
+    It ' Encrypt, sign, decrypt and verify string' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic } {
         $protected = Protect-PGP -FilePathPublic $KeyPublic -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -String 'Decrypt and verify text'
-        { Unprotect-PGP -FilePathPrivate $KeyPrivate -FilePathPublic $KeyPublic -Password 'ZielonaMila9!' -String $protected -Verify -ErrorAction Stop } | Should -Throw -ExpectedMessage '*temporarily disabled*'
+        $plain = Unprotect-PGP -FilePathPrivate $KeyPrivate -FilePathPublic $KeyPublic -Password 'ZielonaMila9!' -String $protected -Verify -ErrorAction Stop
+        $plain | Should -Be 'Decrypt and verify text'
     }
 
-    It ' Encrypt, sign, decrypt and verify file is blocked until upstream verification is trustworthy' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic; KeysDirectory = $KeysDirectory } {
+    It ' Encrypt, sign, decrypt and verify string rejects the wrong public key' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic; KeyPublic1 = $KeyPublic1 } {
+        $protected = Protect-PGP -FilePathPublic $KeyPublic -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -String 'Decrypt and verify text'
+        { Unprotect-PGP -FilePathPrivate $KeyPrivate -FilePathPublic $KeyPublic1 -Password 'ZielonaMila9!' -String $protected -Verify -ErrorAction Stop } | Should -Throw -ExpectedMessage '*Failed to verify file*'
+    }
+
+    It ' Encrypt, sign, decrypt and verify file' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic; KeysDirectory = $KeysDirectory } {
         $sourceFile = [io.path]::Combine($KeysDirectory, 'decrypt-verify-input.txt')
         $protectedFile = [io.path]::Combine($KeysDirectory, 'decrypt-verify-input.txt.pgp')
         $outputFile = [io.path]::Combine($KeysDirectory, 'decrypt-verify-output.txt')
         Set-Content -Path $sourceFile -Value 'Decrypt and verify file content' -NoNewline
         Protect-PGP -FilePathPublic $KeyPublic -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -FilePath $sourceFile -OutFilePath $protectedFile -ErrorAction Stop
-        { Unprotect-PGP -FilePathPrivate $KeyPrivate -FilePathPublic $KeyPublic -Password 'ZielonaMila9!' -FilePath $protectedFile -OutFilePath $outputFile -Verify -ErrorAction Stop } | Should -Throw -ExpectedMessage '*temporarily disabled*'
+        Unprotect-PGP -FilePathPrivate $KeyPrivate -FilePathPublic $KeyPublic -Password 'ZielonaMila9!' -FilePath $protectedFile -OutFilePath $outputFile -Verify -ErrorAction Stop
+        Get-Content -LiteralPath $outputFile -Raw | Should -Be 'Decrypt and verify file content'
+    }
+
+    It ' Encrypt, sign, decrypt and verify file rejects the wrong public key without writing output' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic; KeyPublic1 = $KeyPublic1; KeysDirectory = $KeysDirectory } {
+        $sourceFile = [io.path]::Combine($KeysDirectory, 'decrypt-verify-wrong-key-input.txt')
+        $protectedFile = [io.path]::Combine($KeysDirectory, 'decrypt-verify-wrong-key-input.txt.pgp')
+        $outputFile = [io.path]::Combine($KeysDirectory, 'decrypt-verify-wrong-key-output.txt')
+        Set-Content -Path $sourceFile -Value 'Decrypt and verify wrong key file content' -NoNewline
+        Protect-PGP -FilePathPublic $KeyPublic -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -FilePath $sourceFile -OutFilePath $protectedFile -ErrorAction Stop
+        { Unprotect-PGP -FilePathPrivate $KeyPrivate -FilePathPublic $KeyPublic1 -Password 'ZielonaMila9!' -FilePath $protectedFile -OutFilePath $outputFile -Verify -ErrorAction Stop } | Should -Throw -ExpectedMessage '*Failed to verify file*'
         Test-Path -LiteralPath $outputFile | Should -Be $false
     }
 

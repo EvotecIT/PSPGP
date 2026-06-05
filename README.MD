@@ -151,15 +151,14 @@ $Signature = Protect-PGP -SignOnly -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -
 Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String $Signature
 ```
 
-### Signed-and-encrypted verification status
+### Decrypt and verify signed-and-encrypted content
 
-`Unprotect-PGP -Verify` is currently disabled on purpose. `PgpCore` 7.0.0 does not perform trustworthy cryptographic verification in its `DecryptAndVerify` methods, so PSPGP fails closed instead of reporting potentially forged content as verified.
+```powershell
+$Protected = Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -SignPassword 'ZielonaMila9!' -String 'Signed and encrypted text'
+Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -Password 'ZielonaMila9!' -String $Protected -Verify
+```
 
-You can still:
-
-- encrypt and sign with `Protect-PGP`
-- verify detached or clear-signed content with `Test-PGP`
-- decrypt signed-and-encrypted content with `Unprotect-PGP` when you do not request `-Verify`
+When `-Verify` is used with file output, PSPGP writes decrypted content through a temporary file and only moves it to the requested output path after signature verification succeeds.
 
 ### Download and inspect public keys
 
