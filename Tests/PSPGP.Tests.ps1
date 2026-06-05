@@ -100,6 +100,12 @@
         { Unprotect-PGP -FilePathPrivate $KeyPrivate -FilePathPublic $KeyPublic1 -Password 'ZielonaMila9!' -String $protected -Verify -ErrorAction Stop } | Should -Throw -ExpectedMessage '*Failed to verify file*'
     }
 
+    It ' Decrypts normally when Verify is explicitly false' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic; KeyPublic1 = $KeyPublic1 } {
+        $protected = Protect-PGP -FilePathPublic $KeyPublic -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -String 'Explicit false verify text'
+        $plain = Unprotect-PGP -FilePathPrivate $KeyPrivate -FilePathPublic $KeyPublic1 -Password 'ZielonaMila9!' -String $protected -Verify:$false -ErrorAction Stop
+        $plain | Should -Be 'Explicit false verify text'
+    }
+
     It ' Encrypt, sign, decrypt and verify file' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic; KeysDirectory = $KeysDirectory } {
         $sourceFile = [io.path]::Combine($KeysDirectory, 'decrypt-verify-input.txt')
         $protectedFile = [io.path]::Combine($KeysDirectory, 'decrypt-verify-input.txt.pgp')

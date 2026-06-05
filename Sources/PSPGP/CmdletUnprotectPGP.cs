@@ -128,7 +128,7 @@ public class CmdletUnprotectPGP : PSCmdlet {
     /// and writes the decrypted data to disk or the pipeline.
     /// </summary>
     protected override void ProcessRecord() {
-        bool verifyMode = ParameterSetName.IndexOf("Verify", System.StringComparison.OrdinalIgnoreCase) >= 0;
+        bool verifyMode = Verify.IsPresent;
 
         try {
             var resolvedPrivates = new List<string>();
