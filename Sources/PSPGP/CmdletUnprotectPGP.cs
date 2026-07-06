@@ -123,6 +123,10 @@ public class CmdletUnprotectPGP : PSCmdlet {
     [Parameter(Mandatory = true, ParameterSetName = "StringVerifyCredential")]
     public SwitchParameter Verify { get; set; }
 
+    /// <summary>Ignores modification-detection/integrity-check failures during decryption.</summary>
+    [Parameter]
+    public SwitchParameter IgnoreIntegrityCheckFailure { get; set; }
+
     /// <summary>
     /// Decrypts files or strings using the supplied private keys
     /// and writes the decrypted data to disk or the pipeline.
@@ -195,6 +199,7 @@ public class CmdletUnprotectPGP : PSCmdlet {
                             try {
                                 var encryptionKeys = new EncryptionKeys(Encoding.UTF8.GetBytes(SymmetricPassphrase));
                                 var pgp = new PGP(encryptionKeys);
+                                ConfigureDecryption(pgp);
                                 pgp.DecryptFile(new FileInfo(file), new FileInfo(outputFile));
                                 decrypted = true;
                             } catch (Exception ex) {
@@ -208,6 +213,7 @@ public class CmdletUnprotectPGP : PSCmdlet {
                                     try {
                                         var encryptionKeys = CreateEncryptionKeys(privateKeyStream, password, resolvedPublics, verifyMode, out publicKeyStreams);
                                         var pgp = new PGP(encryptionKeys);
+                                        ConfigureDecryption(pgp);
                                         if (verifyMode) {
                                             DecryptFileAndVerifyToOutput(pgp, file, outputFile);
                                         } else {
@@ -243,6 +249,7 @@ public class CmdletUnprotectPGP : PSCmdlet {
                         try {
                             var encryptionKeys = new EncryptionKeys(Encoding.UTF8.GetBytes(SymmetricPassphrase));
                             var pgp = new PGP(encryptionKeys);
+                            ConfigureDecryption(pgp);
                             pgp.DecryptFile(new FileInfo(resolvedFile), new FileInfo(outputFile));
                             decrypted = true;
                         } catch (Exception ex) {
@@ -256,6 +263,7 @@ public class CmdletUnprotectPGP : PSCmdlet {
                                 try {
                                     var encryptionKeys = CreateEncryptionKeys(privateKeyStream, password, resolvedPublics, verifyMode, out publicKeyStreams);
                                     var pgp = new PGP(encryptionKeys);
+                                    ConfigureDecryption(pgp);
                                     if (verifyMode) {
                                         DecryptFileAndVerifyToOutput(pgp, resolvedFile, outputFile);
                                     } else {
@@ -288,6 +296,7 @@ public class CmdletUnprotectPGP : PSCmdlet {
                         try {
                             var encryptionKeys = new EncryptionKeys(Encoding.UTF8.GetBytes(SymmetricPassphrase));
                             var pgp = new PGP(encryptionKeys);
+                            ConfigureDecryption(pgp);
                             result = pgp.DecryptArmoredString(String);
                             decrypted = true;
                         } catch (Exception ex) {
@@ -301,6 +310,7 @@ public class CmdletUnprotectPGP : PSCmdlet {
                                 try {
                                     var encryptionKeys = CreateEncryptionKeys(privateKeyStream, password, resolvedPublics, verifyMode, out publicKeyStreams);
                                     var pgp = new PGP(encryptionKeys);
+                                    ConfigureDecryption(pgp);
                                     result = verifyMode
                                         ? pgp.DecryptArmoredStringAndVerify(String)
                                         : pgp.DecryptArmoredString(String);
@@ -326,6 +336,12 @@ public class CmdletUnprotectPGP : PSCmdlet {
             }
         } catch (Exception ex) {
             WriteError(new ErrorRecord(ex, "UnprotectPGPFailed", ErrorCategory.NotSpecified, null));
+        }
+    }
+
+    private void ConfigureDecryption(PGP pgp) {
+        if (IgnoreIntegrityCheckFailure.IsPresent) {
+            pgp.IgnoreIntegrityCheckFailure = true;
         }
     }
 

@@ -47,9 +47,9 @@ Current capabilities:
 
 - Encrypt and decrypt files, folders, and strings with public/private keys
 - Encrypt and decrypt strings, files, and folders symmetrically with a passphrase
-- Create detached signatures and verify them with one or more public keys
-- Create clear-signed content and verify it
-- Inspect signed and armored message metadata with `Get-PGPInspect`
+- Create signed, detached-signature, and clear-signed content and verify it with one or more public keys
+- Write verified clear content from signed files to an output path
+- Inspect signed, encrypted, and armored message metadata with `Get-PGPInspect`, including encrypted recipient key IDs when available
 - Download public keys from a key server and inspect local key material
 - Generate new key pairs and optionally upload the public key
 
@@ -85,6 +85,8 @@ On Windows PowerShell 5.1, the module requires **.NET Framework 4.7.2** or newer
 
 ```powershell
 New-PGPKey -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -UserName 'przemyslaw.klys' -Password 'ZielonaMila9!'
+
+New-PGPKey -FilePathPublic $PSScriptRoot\Keys\ExpiringPublic.asc -FilePathPrivate $PSScriptRoot\Keys\ExpiringPrivate.asc -UserName 'user@example.com' -Password 'secret' -Strength 4096 -Certainty 8 -KeyExpirationInSeconds 31536000 -PreferredHashAlgorithm Sha256,Sha512 -PreferredSymmetricKeyAlgorithm Aes256
 ```
 
 ### Encrypt Folder
@@ -125,7 +127,18 @@ Unprotect-PGP -SymmetricPassphrase 'SymmetricPass123!' -String $ProtectedString
 $Signature = Protect-PGP -SignOnly -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -SignPassword 'ZielonaMila9!' -String 'Signed text'
 
 # Verify using one or more public keys
-Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc,$PSScriptRoot\Keys\PublicPGP2.asc -String $Signature
+$Result = Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc,$PSScriptRoot\Keys\PublicPGP2.asc -String $Signature
+$Result.ClearText
+```
+
+### Detached signatures
+
+```powershell
+$Signature = Protect-PGP -SignOnly -Detached -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -SignPassword 'ZielonaMila9!' -String 'Detached signed text'
+Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String 'Detached signed text' -Signature $Signature
+
+Protect-PGP -SignOnly -Detached -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -SignPassword 'ZielonaMila9!' -FilePath $PSScriptRoot\Test\Test1.txt -OutFilePath $PSScriptRoot\Test\Test1.txt.sig
+Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -FilePath $PSScriptRoot\Test\Test1.txt -SignaturePath $PSScriptRoot\Test\Test1.txt.sig
 ```
 
 ### Clear sign and verify clear-signed content
@@ -142,7 +155,7 @@ $Signature = Protect-PGP -SignOnly -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -
 Get-PGPInspect -String $Signature
 ```
 
-`Get-PGPInspect` returns metadata for signed content, armored messages, and encrypted messages that can be inspected without decrypting the payload.
+`Get-PGPInspect` returns metadata for signed content, armored messages, and encrypted messages that can be inspected without decrypting the payload. For encrypted content it also reports recipient key IDs when the packet exposes them.
 
 ### Sign string
 
@@ -183,6 +196,7 @@ See the `Examples` folder for runnable scripts:
 - `Examples\Example-DecryptFile.ps1`
 - `Examples\Example-SignString.ps1`
 - `Examples\Example-VerifySignature.ps1`
+- `Examples\Example-DetachedSignature.ps1`
 - `Examples\Example-ClearSignString.ps1`
 - `Examples\Example-SymmetricString.ps1`
 - `Examples\Example-InspectSignedString.ps1`

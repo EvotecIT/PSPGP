@@ -20,6 +20,11 @@ namespace PSPGP;
 /// </example>
 /// <example>
 /// <code>
+/// Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -FilePath $PSScriptRoot\Test\Test1.txt -SignaturePath $PSScriptRoot\Test\Test1.txt.sig
+/// </code>
+/// </example>
+/// <example>
+/// <code>
 /// Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String $ClearSigned -ClearSigned
 /// </code>
 /// </example>
@@ -41,7 +46,7 @@ public class CmdletTestPGP : PSCmdlet {
     [Parameter(Mandatory = true, ParameterSetName = "Folder")]
     public string FolderPath { get; set; }
 
-    /// <summary>Destination folder for verification reports.</summary>
+    /// <summary>Destination folder for verified clear content.</summary>
     [Parameter(ParameterSetName = "Folder")]
     public string OutputFolderPath { get; set; }
 
@@ -49,19 +54,27 @@ public class CmdletTestPGP : PSCmdlet {
     [Parameter(Mandatory = true, ParameterSetName = "File")]
     public string FilePath { get; set; }
 
-    /// <summary>Output path for verification result.</summary>
+    /// <summary>Detached signature file for the input file.</summary>
+    [Parameter(ParameterSetName = "File")]
+    public string SignaturePath { get; set; }
+
+    /// <summary>Output path for verified clear content.</summary>
     [Parameter(ParameterSetName = "File")]
     public string OutFilePath { get; set; }
 
-    /// <summary>Encrypted text to verify.</summary>
+    /// <summary>Signed text or original text when Signature is provided.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "String")]
     public string String { get; set; }
+
+    /// <summary>Detached signature for the string input.</summary>
+    [Parameter(ParameterSetName = "String")]
+    public string Signature { get; set; }
 
     /// <summary>Throws when encrypted content is passed to verify methods.</summary>
     [Parameter]
     public SwitchParameter ThrowIfEncrypted { get; set; }
 
-    /// <summary>Verifies clear-signed content instead of detached/regular signatures.</summary>
+    /// <summary>Verifies clear-signed content instead of regular signed content.</summary>
     [Parameter]
     public SwitchParameter ClearSigned { get; set; }
 
@@ -71,111 +84,193 @@ public class CmdletTestPGP : PSCmdlet {
     /// </summary>
     protected override void ProcessRecord() {
         try {
-            var publicKeys = new List<string>();
-            foreach (var path in FilePathPublic) {
-                var resolved = PathResolver.Resolve(this, path);
-                if (!File.Exists(resolved)) {
-                    ErrorActionHelper.WriteErrorOrWarning(
-                        this,
-                        new FileNotFoundException($"Public key doesn't exist {resolved}"),
-                        "PublicKeyNotFound",
-                        ErrorCategory.InvalidArgument,
-                        resolved,
-                        $"Public key doesn't exist {resolved}");
-                    return;
-                }
-                DateTime? expiration = KeyExpirationHelper.GetExpiration(resolved);
-                KeyExpirationHelper.WarnIfExpired(this, resolved, expiration);
-                publicKeys.Add(resolved);
+            List<string> publicKeys = ResolvePublicKeys();
+            if (publicKeys.Count == 0) {
+                return;
             }
 
             if (ParameterSetName == "Folder") {
                 string resolvedFolder = PathResolver.Resolve(this, FolderPath);
-                foreach (var file in Directory.GetFiles(resolvedFolder, "*", SearchOption.AllDirectories)) {
-                    bool status = false;
-                    string error = string.Empty;
-                    string signer = null;
-                    foreach (var key in publicKeys) {
-                        try {
-                            using var publicKeyStream = KeyMaterialHelper.OpenRead(key);
-                            var encryptionKeys = new EncryptionKeys(publicKeyStream);
-                            var pgp = new PGP(encryptionKeys);
-                            status = ClearSigned.IsPresent
-                                ? pgp.VerifyClearFile(new FileInfo(file))
-                                : pgp.VerifyFile(new FileInfo(file), ThrowIfEncrypted.IsPresent);
-                            if (status) {
-                                signer = key;
-                                break;
-                            }
-                        } catch (Exception ex) {
-                            error = PgpExceptionHelper.Normalize(ex, key).Message;
-                        }
-                    }
-                    var result = new VerificationResult {
-                        FilePath = file,
-                        Status = status,
-                        Error = status ? null : error,
-                        Signer = signer
-                    };
-                    WriteObject(result);
+                string resolvedOutputFolder = !string.IsNullOrEmpty(OutputFolderPath)
+                    ? PathResolver.Resolve(this, OutputFolderPath)
+                    : null;
+                if (!string.IsNullOrEmpty(resolvedOutputFolder)) {
+                    Directory.CreateDirectory(resolvedOutputFolder);
+                }
+
+                foreach (string file in Directory.GetFiles(resolvedFolder, "*", SearchOption.AllDirectories)) {
+                    string outputPath = !string.IsNullOrEmpty(resolvedOutputFolder)
+                        ? Path.Combine(resolvedOutputFolder, GetVerifiedOutputFileName(file))
+                        : null;
+                    WriteObject(VerifyFileWithAnyKey(file, null, outputPath, publicKeys));
                 }
             } else if (ParameterSetName == "File") {
                 string resolvedFile = PathResolver.Resolve(this, FilePath);
-                bool status = false;
-                string error = string.Empty;
-                string signer = null;
-                foreach (var key in publicKeys) {
-                    try {
-                        using var publicKeyStream = KeyMaterialHelper.OpenRead(key);
-                        var encryptionKeys = new EncryptionKeys(publicKeyStream);
-                        var pgp = new PGP(encryptionKeys);
-                        status = ClearSigned.IsPresent
-                            ? pgp.VerifyClearFile(new FileInfo(resolvedFile))
-                            : pgp.VerifyFile(new FileInfo(resolvedFile), ThrowIfEncrypted.IsPresent);
-                        if (status) {
-                            signer = key;
-                            break;
-                        }
-                    } catch (Exception ex) {
-                        error = PgpExceptionHelper.Normalize(ex, key).Message;
-                    }
-                }
-                var result = new VerificationResult {
-                    FilePath = resolvedFile,
-                    Status = status,
-                    Error = status ? null : error,
-                    Signer = signer
-                };
-                WriteObject(result);
+                string resolvedSignature = !string.IsNullOrEmpty(SignaturePath)
+                    ? PathResolver.Resolve(this, SignaturePath)
+                    : null;
+                string resolvedOutput = !string.IsNullOrEmpty(OutFilePath)
+                    ? PathResolver.Resolve(this, OutFilePath)
+                    : null;
+                WriteObject(VerifyFileWithAnyKey(resolvedFile, resolvedSignature, resolvedOutput, publicKeys));
             } else if (ParameterSetName == "String") {
-                bool status = false;
-                string error = string.Empty;
-                string signer = null;
-                foreach (var key in publicKeys) {
-                    try {
-                        using var publicKeyStream = KeyMaterialHelper.OpenRead(key);
-                        var encryptionKeys = new EncryptionKeys(publicKeyStream);
-                        var pgp = new PGP(encryptionKeys);
-                        status = ClearSigned.IsPresent
-                            ? pgp.VerifyClearArmoredString(String)
-                            : pgp.VerifyArmoredString(String, ThrowIfEncrypted.IsPresent);
-                        if (status) {
-                            signer = key;
-                            break;
-                        }
-                    } catch (Exception ex) {
-                        error = PgpExceptionHelper.Normalize(ex, key).Message;
-                    }
-                }
-                var result = new VerificationResult {
-                    Status = status,
-                    Error = status ? null : error,
-                    Signer = signer
-                };
-                WriteObject(result);
+                WriteObject(VerifyStringWithAnyKey(String, Signature, publicKeys));
             }
         } catch (Exception ex) {
             WriteError(new ErrorRecord(ex, "TestPGPFailed", ErrorCategory.NotSpecified, null));
         }
+    }
+
+    private List<string> ResolvePublicKeys() {
+        var publicKeys = new List<string>();
+        foreach (string path in FilePathPublic) {
+            string resolved = PathResolver.Resolve(this, path);
+            if (!File.Exists(resolved)) {
+                ErrorActionHelper.WriteErrorOrWarning(
+                    this,
+                    new FileNotFoundException($"Public key doesn't exist {resolved}"),
+                    "PublicKeyNotFound",
+                    ErrorCategory.InvalidArgument,
+                    resolved,
+                    $"Public key doesn't exist {resolved}");
+                return publicKeys;
+            }
+            DateTime? expiration = KeyExpirationHelper.GetExpiration(resolved);
+            KeyExpirationHelper.WarnIfExpired(this, resolved, expiration);
+            publicKeys.Add(resolved);
+        }
+
+        return publicKeys;
+    }
+
+    private VerificationResult VerifyFileWithAnyKey(string filePath, string signaturePath, string outputPath, List<string> publicKeys) {
+        bool status = false;
+        string error = string.Empty;
+        string signer = null;
+        string verifiedOutput = null;
+
+        foreach (string key in publicKeys) {
+            try {
+                using var publicKeyStream = KeyMaterialHelper.OpenRead(key);
+                var encryptionKeys = new EncryptionKeys(publicKeyStream);
+                var pgp = new PGP(encryptionKeys);
+                status = !string.IsNullOrEmpty(signaturePath)
+                    ? pgp.VerifyDetached(new FileInfo(filePath), new FileInfo(signaturePath))
+                    : !string.IsNullOrEmpty(outputPath)
+                        ? VerifyFileToOutput(pgp, filePath, outputPath)
+                        : ClearSigned.IsPresent
+                            ? pgp.VerifyClearFile(new FileInfo(filePath))
+                            : pgp.VerifyFile(new FileInfo(filePath), ThrowIfEncrypted.IsPresent);
+                if (status) {
+                    signer = key;
+                    verifiedOutput = outputPath;
+                    break;
+                }
+            } catch (Exception ex) {
+                error = PgpExceptionHelper.Normalize(ex, key).Message;
+            }
+        }
+
+        return new VerificationResult {
+            FilePath = filePath,
+            Status = status,
+            Error = status ? null : error,
+            Signer = signer,
+            OutputPath = status ? verifiedOutput : null
+        };
+    }
+
+    private VerificationResult VerifyStringWithAnyKey(string input, string signature, List<string> publicKeys) {
+        bool status = false;
+        string clearText = null;
+        string error = string.Empty;
+        string signer = null;
+
+        foreach (string key in publicKeys) {
+            try {
+                using var publicKeyStream = KeyMaterialHelper.OpenRead(key);
+                var encryptionKeys = new EncryptionKeys(publicKeyStream);
+                var pgp = new PGP(encryptionKeys);
+                if (!string.IsNullOrEmpty(signature)) {
+                    status = pgp.VerifyDetached(input, signature);
+                } else if (ClearSigned.IsPresent) {
+                    PgpCore.Models.VerificationResult result = pgp.VerifyAndReadClearArmoredString(input);
+                    status = result.IsVerified;
+                    clearText = result.ClearText;
+                } else {
+                    PgpCore.Models.VerificationResult result = pgp.VerifyAndReadSignedArmoredString(input, ThrowIfEncrypted.IsPresent);
+                    status = result.IsVerified;
+                    clearText = result.ClearText;
+                }
+
+                if (status) {
+                    signer = key;
+                    break;
+                }
+            } catch (Exception ex) {
+                error = PgpExceptionHelper.Normalize(ex, key).Message;
+            }
+        }
+
+        return new VerificationResult {
+            Status = status,
+            Error = status ? null : error,
+            Signer = signer,
+            ClearText = status ? clearText : null
+        };
+    }
+
+    private bool VerifyFileToOutput(PGP pgp, string inputFile, string outputFile) {
+        string temporaryOutput = GetTemporaryOutputFile(outputFile);
+        try {
+            EnsureDirectoryForFile(temporaryOutput);
+            bool verified = ClearSigned.IsPresent
+                ? pgp.VerifyClear(new FileInfo(inputFile), new FileInfo(temporaryOutput))
+                : pgp.Verify(new FileInfo(inputFile), new FileInfo(temporaryOutput), ThrowIfEncrypted.IsPresent);
+            if (!verified) {
+                return false;
+            }
+
+            EnsureDirectoryForFile(outputFile);
+            if (File.Exists(outputFile)) {
+                File.Delete(outputFile);
+            }
+            File.Move(temporaryOutput, outputFile);
+            return true;
+        } finally {
+            if (File.Exists(temporaryOutput)) {
+                File.Delete(temporaryOutput);
+            }
+        }
+    }
+
+    private static string GetVerifiedOutputFileName(string inputFile) {
+        string fileName = Path.GetFileName(inputFile);
+        foreach (string extension in new[] { ".asc", ".sig", ".pgp", ".gpg" }) {
+            if (fileName.EndsWith(extension, StringComparison.OrdinalIgnoreCase)) {
+                return fileName.Substring(0, fileName.Length - extension.Length);
+            }
+        }
+
+        return fileName;
+    }
+
+    private static void EnsureDirectoryForFile(string filePath) {
+        string directory = Path.GetDirectoryName(filePath);
+        if (string.IsNullOrEmpty(directory)) {
+            directory = Directory.GetCurrentDirectory();
+        }
+
+        Directory.CreateDirectory(directory);
+    }
+
+    private static string GetTemporaryOutputFile(string outputFile) {
+        string directory = Path.GetDirectoryName(outputFile);
+        string fileName = Path.GetFileName(outputFile);
+        if (string.IsNullOrEmpty(directory)) {
+            directory = Directory.GetCurrentDirectory();
+        }
+
+        return Path.Combine(directory, $".{fileName}.{Guid.NewGuid():N}.tmp");
     }
 }

@@ -59,12 +59,20 @@
         $signed = Protect-PGP -SignOnly -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -String 'Signed Text'
         $result = Test-PGP -FilePathPublic $KeyPublic -String $signed
         $result.Status | Should -Be $true
+        $result.ClearText | Should -Be 'Signed Text'
+    }
+
+    It ' Sign and verify detached string' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic } {
+        $signature = Protect-PGP -SignOnly -Detached -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -String 'Detached Signed Text'
+        $result = Test-PGP -FilePathPublic $KeyPublic -String 'Detached Signed Text' -Signature $signature
+        $result.Status | Should -Be $true
     }
 
     It ' Clear sign and verify string' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic } {
         $clearSigned = Protect-PGP -ClearSign -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -String 'Clear Signed Text'
         $result = Test-PGP -FilePathPublic $KeyPublic -String $clearSigned -ClearSigned
         $result.Status | Should -Be $true
+        $result.ClearText | Should -Be 'Clear Signed Text'
     }
 
     It ' Clear sign verification fails with the wrong public key' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic1 } {
@@ -77,9 +85,21 @@
     It ' Clear sign and verify file' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic; KeysDirectory = $KeysDirectory } {
         $sourceFile = [io.path]::Combine($KeysDirectory, 'clear-sign-input.txt')
         $signedFile = [io.path]::Combine($KeysDirectory, 'clear-sign-input.txt.asc')
+        $verifiedFile = [io.path]::Combine($KeysDirectory, 'clear-sign-output.txt')
         Set-Content -Path $sourceFile -Value 'Clear signed file content' -NoNewline
         Protect-PGP -ClearSign -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -FilePath $sourceFile -OutFilePath $signedFile -ErrorAction Stop
-        $result = Test-PGP -FilePathPublic $KeyPublic -FilePath $signedFile -ClearSigned
+        $result = Test-PGP -FilePathPublic $KeyPublic -FilePath $signedFile -ClearSigned -OutFilePath $verifiedFile
+        $result.Status | Should -Be $true
+        $result.OutputPath | Should -Be $verifiedFile
+        Get-Content -LiteralPath $verifiedFile -Raw | Should -Be 'Clear signed file content'
+    }
+
+    It ' Sign and verify detached file' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic; KeysDirectory = $KeysDirectory } {
+        $sourceFile = [io.path]::Combine($KeysDirectory, 'detached-input.txt')
+        $signatureFile = [io.path]::Combine($KeysDirectory, 'detached-input.txt.sig')
+        Set-Content -Path $sourceFile -Value 'Detached signed file content' -NoNewline
+        Protect-PGP -SignOnly -Detached -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -FilePath $sourceFile -OutFilePath $signatureFile -ErrorAction Stop
+        $result = Test-PGP -FilePathPublic $KeyPublic -FilePath $sourceFile -SignaturePath $signatureFile
         $result.Status | Should -Be $true
     }
 
@@ -155,6 +175,7 @@
         $signedResult.IsEncrypted | Should -Be $false
         $encryptedResult.IsEncrypted | Should -Be $true
         $encryptedResult.IsSigned | Should -Be $false
+        $encryptedResult.RecipientKeyIds.Count | Should -BeGreaterThan 0
         $inspectErrors.Count | Should -Be 0
     }
 
@@ -179,6 +200,17 @@
 
         $inspection.IsEncrypted | Should -Be $true
         $inspection.IsIntegrityProtected | Should -Be $true
+    }
+
+    It ' Running New-PGPKey with advanced generation options creates expiring keys' -TestCases @{ KeysDirectory = $KeysDirectory } {
+        $advancedPublic = [io.path]::Combine($KeysDirectory, 'AdvancedPublic.asc')
+        $advancedPrivate = [io.path]::Combine($KeysDirectory, 'AdvancedPrivate.asc')
+        New-PGPKey -FilePathPublic $advancedPublic -FilePathPrivate $advancedPrivate -UserName 'advanced@example.test' -Password 'Advanced123!' -Strength 1024 -Certainty 8 -EmitVersion -KeyExpirationInSeconds 3600 -SignatureExpirationInSeconds 3600 -PreferredHashAlgorithm Sha256,Sha512 -PreferredCompressionAlgorithm Zip -PreferredSymmetricKeyAlgorithm Aes256 -ErrorAction Stop
+
+        Test-Path -LiteralPath $advancedPublic | Should -Be $true
+        Test-Path -LiteralPath $advancedPrivate | Should -Be $true
+        $info = Get-PGPKeyInfo -FilePath $advancedPublic
+        $info.Expiration | Should -Not -BeNullOrEmpty
     }
 
     It ' Test-PGP can flag encrypted content when ThrowIfEncrypted is used' -TestCases @{ KeyPublic = $KeyPublic } {
