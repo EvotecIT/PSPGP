@@ -28,6 +28,9 @@ public class PGPInspectInfo {
     /// <summary>Indicates whether the message is encrypted.</summary>
     public bool IsEncrypted { get; set; }
 
+    /// <summary>Recipient key IDs found in encrypted content.</summary>
+    public string[] RecipientKeyIds { get; set; }
+
     /// <summary>Indicates whether the message is integrity protected.</summary>
     public bool IsIntegrityProtected { get; set; }
 

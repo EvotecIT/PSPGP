@@ -68,14 +68,39 @@ public class CmdletNewPGPKey : PSCmdlet {
     [Parameter(ParameterSetName = "StrengthCredential")]
     public SwitchParameter EmitVersion { get; set; }
 
+    /// <summary>Controls whether generated key files are ASCII armored.</summary>
+    [Parameter(ParameterSetName = "Strength")]
+    [Parameter(ParameterSetName = "StrengthCredential")]
+    public bool Armor { get; set; } = true;
+
+    /// <summary>Key expiration in seconds. Use zero for no expiration.</summary>
+    [Parameter(ParameterSetName = "Strength")]
+    [Parameter(ParameterSetName = "StrengthCredential")]
+    public long KeyExpirationInSeconds { get; set; }
+
+    /// <summary>Signature expiration in seconds. Use zero for no expiration.</summary>
+    [Parameter(ParameterSetName = "Strength")]
+    [Parameter(ParameterSetName = "StrengthCredential")]
+    public long SignatureExpirationInSeconds { get; set; }
+
     /// <summary>Optional hash algorithm used when generating keys.</summary>
     [Parameter]
     [Alias("HashAlgorithmTag")]
     public HashAlgorithmTag? HashAlgorithm { get; set; }
 
+    /// <summary>Preferred hash algorithms advertised by the generated key.</summary>
+    [Parameter(ParameterSetName = "Strength")]
+    [Parameter(ParameterSetName = "StrengthCredential")]
+    public HashAlgorithmTag[] PreferredHashAlgorithm { get; set; }
+
     /// <summary>Optional compression algorithm used when generating keys.</summary>
     [Parameter]
     public CompressionAlgorithmTag? CompressionAlgorithm { get; set; }
+
+    /// <summary>Preferred compression algorithms advertised by the generated key.</summary>
+    [Parameter(ParameterSetName = "Strength")]
+    [Parameter(ParameterSetName = "StrengthCredential")]
+    public CompressionAlgorithmTag[] PreferredCompressionAlgorithm { get; set; }
 
     /// <summary>Defines the file type stored within the PGP package.</summary>
     [Parameter]
@@ -92,6 +117,11 @@ public class CmdletNewPGPKey : PSCmdlet {
     /// <summary>Symmetric key algorithm used for encryption.</summary>
     [Parameter]
     public SymmetricKeyAlgorithmTag? SymmetricKeyAlgorithm { get; set; }
+
+    /// <summary>Preferred symmetric algorithms advertised by the generated key.</summary>
+    [Parameter(ParameterSetName = "Strength")]
+    [Parameter(ParameterSetName = "StrengthCredential")]
+    public SymmetricKeyAlgorithmTag[] PreferredSymmetricKeyAlgorithm { get; set; }
 
     /// <summary>
     /// Generates a new key pair based on the provided
@@ -112,8 +142,25 @@ public class CmdletNewPGPKey : PSCmdlet {
                 pass = Credential.GetNetworkCredential().Password;
             }
 
+            if (!Armor && !string.IsNullOrEmpty(UploadKeyServer)) {
+                throw new InvalidOperationException("New-PGPKey requires armored public key output when UploadKeyServer is used.");
+            }
+
             if (ParameterSetName.StartsWith("Strength")) {
-                pgp.GenerateKey(new FileInfo(resolvedPublic), new FileInfo(resolvedPrivate), user, pass, Strength, Certainty, EmitVersion.IsPresent);
+                pgp.GenerateKey(
+                    new FileInfo(resolvedPublic),
+                    new FileInfo(resolvedPrivate),
+                    user,
+                    pass,
+                    Strength,
+                    Certainty,
+                    Armor,
+                    EmitVersion.IsPresent,
+                    KeyExpirationInSeconds,
+                    SignatureExpirationInSeconds,
+                    PreferredCompressionAlgorithm ?? ToArray(CompressionAlgorithm),
+                    PreferredHashAlgorithm ?? ToArray(HashAlgorithm),
+                    PreferredSymmetricKeyAlgorithm ?? ToArray(SymmetricKeyAlgorithm));
             } else {
                 pgp.GenerateKey(new FileInfo(resolvedPublic), new FileInfo(resolvedPrivate), user, pass);
             }
@@ -125,5 +172,9 @@ public class CmdletNewPGPKey : PSCmdlet {
         } catch (Exception ex) {
             WriteError(new ErrorRecord(ex, "NewPGPKeyFailed", ErrorCategory.NotSpecified, null));
         }
+    }
+
+    private static T[] ToArray<T>(T? value) where T : struct {
+        return value.HasValue ? new[] { value.Value } : null;
     }
 }

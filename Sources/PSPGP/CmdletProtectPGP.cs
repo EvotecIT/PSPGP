@@ -11,8 +11,8 @@ namespace PSPGP;
 /// <summary>
 /// <para>
 /// Encrypts or signs files, folders or strings using one or more public keys.
-/// Use <c>-SignOnly</c> or the <c>Sign*</c> parameter sets to create detached
-/// signatures without encryption.
+/// Use <c>-SignOnly</c> or the <c>Sign*</c> parameter sets to create signatures
+/// without encryption. Add <c>-Detached</c> to create a separate detached signature.
 /// </para>
 /// </summary>
 /// <example>
@@ -170,6 +170,10 @@ public class CmdletProtectPGP : PSCmdlet {
     [Parameter]
     public SwitchParameter OldFormat { get; set; }
 
+    /// <summary>Adds the PGP version header to generated armored content.</summary>
+    [Parameter]
+    public SwitchParameter AddVersionHeader { get; set; }
+
     /// <summary>
     /// When specified, only a signature is produced instead of encrypting
     /// the input. This parameter is automatically implied when using the
@@ -179,6 +183,12 @@ public class CmdletProtectPGP : PSCmdlet {
     [Parameter(Mandatory = true, ParameterSetName = "SignFile")]
     [Parameter(Mandatory = true, ParameterSetName = "SignString")]
     public SwitchParameter SignOnly { get; set; }
+
+    /// <summary>Creates a detached signature over the original input.</summary>
+    [Parameter(ParameterSetName = "SignFolder")]
+    [Parameter(ParameterSetName = "SignFile")]
+    [Parameter(ParameterSetName = "SignString")]
+    public SwitchParameter Detached { get; set; }
 
     /// <summary>
     /// Creates a clear-signed message that remains human readable.
@@ -245,6 +255,7 @@ public class CmdletProtectPGP : PSCmdlet {
             var pgp = new PGP(encryptionKeys);
 
             PGPConfigurator.Configure(pgp, HashAlgorithm, CompressionAlgorithm, FileType, PgpSignatureType, PublicKeyAlgorithm, SymmetricKeyAlgorithm);
+            if (AddVersionHeader.IsPresent) pgp.AddVersionHeader = true;
 
             if (ParameterSetName == "Folder" || ParameterSetName == "SignFolder" || ParameterSetName == "ClearSignFolder") {
                 string resolvedFolder = PathResolver.Resolve(this, FolderPath);
@@ -257,7 +268,11 @@ public class CmdletProtectPGP : PSCmdlet {
                     if (clearSignMode) {
                         pgp.ClearSignFile(new FileInfo(file), new FileInfo(outputFile), headers);
                     } else if (signOnlyMode) {
-                        pgp.SignFile(new FileInfo(file), new FileInfo(outputFile), Armor, LiteralFileName, headers, OldFormat.IsPresent);
+                        if (Detached.IsPresent) {
+                            pgp.SignDetached(new FileInfo(file), new FileInfo(outputFile), Armor, headers);
+                        } else {
+                            pgp.SignFile(new FileInfo(file), new FileInfo(outputFile), Armor, LiteralFileName, headers, OldFormat.IsPresent);
+                        }
                     } else if (SignKey != null) {
                         pgp.EncryptFileAndSign(new FileInfo(file), new FileInfo(outputFile), Armor, WithIntegrityCheck, LiteralFileName, headers, OldFormat.IsPresent);
                     } else {
@@ -272,7 +287,11 @@ public class CmdletProtectPGP : PSCmdlet {
                 if (clearSignMode) {
                     pgp.ClearSignFile(new FileInfo(resolvedFile), new FileInfo(outputFile), headers);
                 } else if (signOnlyMode) {
-                    pgp.SignFile(new FileInfo(resolvedFile), new FileInfo(outputFile), Armor, LiteralFileName, headers, OldFormat.IsPresent);
+                    if (Detached.IsPresent) {
+                        pgp.SignDetached(new FileInfo(resolvedFile), new FileInfo(outputFile), Armor, headers);
+                    } else {
+                        pgp.SignFile(new FileInfo(resolvedFile), new FileInfo(outputFile), Armor, LiteralFileName, headers, OldFormat.IsPresent);
+                    }
                 } else if (SignKey != null) {
                     pgp.EncryptFileAndSign(new FileInfo(resolvedFile), new FileInfo(outputFile), Armor, WithIntegrityCheck, LiteralFileName, headers, OldFormat.IsPresent);
                 } else {
@@ -282,7 +301,9 @@ public class CmdletProtectPGP : PSCmdlet {
                 string result = clearSignMode
                     ? pgp.ClearSignArmoredString(String, headers)
                     : signOnlyMode
-                    ? pgp.SignArmoredString(String, LiteralFileName, headers, OldFormat.IsPresent)
+                    ? Detached.IsPresent
+                        ? pgp.SignDetached(String, headers)
+                        : pgp.SignArmoredString(String, LiteralFileName, headers, OldFormat.IsPresent)
                     : SignKey != null
                         ? pgp.EncryptArmoredStringAndSign(String, WithIntegrityCheck, LiteralFileName, headers, OldFormat.IsPresent)
                         : pgp.EncryptArmoredString(String, WithIntegrityCheck, LiteralFileName, headers, OldFormat.IsPresent);

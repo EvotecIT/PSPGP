@@ -59,12 +59,20 @@
         $signed = Protect-PGP -SignOnly -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -String 'Signed Text'
         $result = Test-PGP -FilePathPublic $KeyPublic -String $signed
         $result.Status | Should -Be $true
+        $result.ClearText | Should -Be 'Signed Text'
+    }
+
+    It ' Sign and verify detached string' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic } {
+        $signature = Protect-PGP -SignOnly -Detached -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -String 'Detached Signed Text'
+        $result = Test-PGP -FilePathPublic $KeyPublic -String 'Detached Signed Text' -Signature $signature
+        $result.Status | Should -Be $true
     }
 
     It ' Clear sign and verify string' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic } {
         $clearSigned = Protect-PGP -ClearSign -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -String 'Clear Signed Text'
         $result = Test-PGP -FilePathPublic $KeyPublic -String $clearSigned -ClearSigned
         $result.Status | Should -Be $true
+        $result.ClearText | Should -Be 'Clear Signed Text'
     }
 
     It ' Clear sign verification fails with the wrong public key' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic1 } {
@@ -77,10 +85,65 @@
     It ' Clear sign and verify file' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic; KeysDirectory = $KeysDirectory } {
         $sourceFile = [io.path]::Combine($KeysDirectory, 'clear-sign-input.txt')
         $signedFile = [io.path]::Combine($KeysDirectory, 'clear-sign-input.txt.asc')
+        $verifiedFile = [io.path]::Combine($KeysDirectory, 'clear-sign-output.txt')
         Set-Content -Path $sourceFile -Value 'Clear signed file content' -NoNewline
         Protect-PGP -ClearSign -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -FilePath $sourceFile -OutFilePath $signedFile -ErrorAction Stop
-        $result = Test-PGP -FilePathPublic $KeyPublic -FilePath $signedFile -ClearSigned
+        $result = Test-PGP -FilePathPublic $KeyPublic -FilePath $signedFile -ClearSigned -OutFilePath $verifiedFile
         $result.Status | Should -Be $true
+        $result.OutputPath | Should -Be $verifiedFile
+        Get-Content -LiteralPath $verifiedFile -Raw | Should -Be 'Clear signed file content'
+    }
+
+    It ' Test-PGP does not write verified output for encrypted-only files' -TestCases @{ KeyPublic = $KeyPublic; KeysDirectory = $KeysDirectory } {
+        $sourceFile = [io.path]::Combine($KeysDirectory, 'verify-encrypted-only-input.txt')
+        $encryptedFile = [io.path]::Combine($KeysDirectory, 'verify-encrypted-only-input.txt.pgp')
+        $verifiedFile = [io.path]::Combine($KeysDirectory, 'verify-encrypted-only-output.txt')
+        Set-Content -Path $sourceFile -Value 'Encrypted only file content' -NoNewline
+        Protect-PGP -FilePathPublic $KeyPublic -FilePath $sourceFile -OutFilePath $encryptedFile -ErrorAction Stop
+
+        $result = Test-PGP -FilePathPublic $KeyPublic -FilePath $encryptedFile -OutFilePath $verifiedFile
+
+        $result.Status | Should -Be $false
+        $result.OutputPath | Should -BeNullOrEmpty
+        $result.Error | Should -Not -BeNullOrEmpty
+        Test-Path -LiteralPath $verifiedFile | Should -Be $false
+    }
+
+    It ' Test-PGP preserves relative paths for folder verification output' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic; KeysDirectory = $KeysDirectory } {
+        $inputFolder = [io.path]::Combine($KeysDirectory, 'verify-folder-input')
+        $outputFolder = [io.path]::Combine($KeysDirectory, 'verify-folder-output')
+        $folderA = [io.path]::Combine($inputFolder, 'a')
+        $folderB = [io.path]::Combine($inputFolder, 'b')
+        $sourceA = [io.path]::Combine($KeysDirectory, 'verify-folder-a.txt')
+        $sourceB = [io.path]::Combine($KeysDirectory, 'verify-folder-b.txt')
+        $signedA = [io.path]::Combine($folderA, 'report.txt.asc')
+        $signedB = [io.path]::Combine($folderB, 'report.txt.asc')
+        New-Item -ItemType Directory -Path $folderA,$folderB,$outputFolder -Force | Out-Null
+        Set-Content -Path $sourceA -Value 'Folder A report' -NoNewline
+        Set-Content -Path $sourceB -Value 'Folder B report' -NoNewline
+        Protect-PGP -ClearSign -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -FilePath $sourceA -OutFilePath $signedA -ErrorAction Stop
+        Protect-PGP -ClearSign -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -FilePath $sourceB -OutFilePath $signedB -ErrorAction Stop
+
+        $results = Test-PGP -FilePathPublic $KeyPublic -FolderPath $inputFolder -OutputFolderPath $outputFolder -ClearSigned
+
+        $results.Count | Should -Be 2
+        $results.Status | Should -Be @($true, $true)
+        $outputA = [io.path]::Combine($outputFolder, 'a', 'report.txt')
+        $outputB = [io.path]::Combine($outputFolder, 'b', 'report.txt')
+        Get-Content -LiteralPath $outputA -Raw | Should -Be 'Folder A report'
+        Get-Content -LiteralPath $outputB -Raw | Should -Be 'Folder B report'
+    }
+
+    It ' Sign and verify detached file' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic; KeysDirectory = $KeysDirectory } {
+        $sourceFile = [io.path]::Combine($KeysDirectory, 'detached-input.txt')
+        $signatureFile = [io.path]::Combine($KeysDirectory, 'detached-input.txt.sig')
+        $verifiedFile = [io.path]::Combine($KeysDirectory, 'detached-output.txt')
+        Set-Content -Path $sourceFile -Value 'Detached signed file content' -NoNewline
+        Protect-PGP -SignOnly -Detached -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -FilePath $sourceFile -OutFilePath $signatureFile -ErrorAction Stop
+        $result = Test-PGP -FilePathPublic $KeyPublic -FilePath $sourceFile -SignaturePath $signatureFile -OutFilePath $verifiedFile
+        $result.Status | Should -Be $true
+        $result.OutputPath | Should -BeNullOrEmpty
+        Test-Path -LiteralPath $verifiedFile | Should -Be $false
     }
 
     It ' Encrypt and decrypt string symmetrically' {
@@ -155,6 +218,7 @@
         $signedResult.IsEncrypted | Should -Be $false
         $encryptedResult.IsEncrypted | Should -Be $true
         $encryptedResult.IsSigned | Should -Be $false
+        $encryptedResult.RecipientKeyIds.Count | Should -BeGreaterThan 0
         $inspectErrors.Count | Should -Be 0
     }
 
@@ -181,11 +245,40 @@
         $inspection.IsIntegrityProtected | Should -Be $true
     }
 
+    It ' Running New-PGPKey with advanced generation options creates expiring keys' -TestCases @{ KeysDirectory = $KeysDirectory } {
+        $advancedPublic = [io.path]::Combine($KeysDirectory, 'AdvancedPublic.asc')
+        $advancedPrivate = [io.path]::Combine($KeysDirectory, 'AdvancedPrivate.asc')
+        New-PGPKey -FilePathPublic $advancedPublic -FilePathPrivate $advancedPrivate -UserName 'advanced@example.test' -Password 'Advanced123!' -Strength 1024 -Certainty 8 -EmitVersion -KeyExpirationInSeconds 3600 -SignatureExpirationInSeconds 3600 -PreferredHashAlgorithm Sha256,Sha512 -PreferredCompressionAlgorithm Zip -PreferredSymmetricKeyAlgorithm Aes256 -ErrorAction Stop
+
+        Test-Path -LiteralPath $advancedPublic | Should -Be $true
+        Test-Path -LiteralPath $advancedPrivate | Should -Be $true
+        $info = Get-PGPKeyInfo -FilePath $advancedPublic
+        $info.Expiration | Should -Not -BeNullOrEmpty
+    }
+
+    It ' Running New-PGPKey rejects binary key upload' -TestCases @{ KeysDirectory = $KeysDirectory } {
+        $advancedPublic = [io.path]::Combine($KeysDirectory, 'BinaryUploadPublic.asc')
+        $advancedPrivate = [io.path]::Combine($KeysDirectory, 'BinaryUploadPrivate.asc')
+
+        {
+            New-PGPKey -FilePathPublic $advancedPublic -FilePathPrivate $advancedPrivate -UserName 'binary-upload@example.test' -Password 'Advanced123!' -Strength 1024 -Certainty 8 -Armor:$false -UploadKeyServer 'https://keys.openpgp.org' -ErrorAction Stop
+        } | Should -Throw -ExpectedMessage '*requires armored public key output*'
+    }
+
     It ' Test-PGP can flag encrypted content when ThrowIfEncrypted is used' -TestCases @{ KeyPublic = $KeyPublic } {
         $protected = Protect-PGP -FilePathPublic $KeyPublic -String 'Encrypted but unsigned'
         $result = Test-PGP -FilePathPublic $KeyPublic -String $protected -ThrowIfEncrypted
         $result.Status | Should -Be $false
         $result.Error | Should -Not -BeNullOrEmpty
+    }
+
+    It ' Test-PGP aborts verification when any public key is missing' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic; KeysDirectory = $KeysDirectory } {
+        $missingKey = [io.path]::Combine($KeysDirectory, 'MissingPublic.asc')
+        $signed = Protect-PGP -SignOnly -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -String 'Signed Text'
+
+        $result = Test-PGP -FilePathPublic $KeyPublic,$missingKey -String $signed -WarningAction SilentlyContinue
+
+        $result | Should -BeNullOrEmpty
     }
 
     It ' Encrypt file when public key is UTF-8 BOM encoded' -TestCases @{ KeyPublic = $KeyPublic; KeyPublicBom = $KeyPublicBom; KeysDirectory = $KeysDirectory } {

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Management.Automation;
 using System.Text;
 using Org.BouncyCastle.Bcpg.OpenPgp;
@@ -43,7 +45,11 @@ public class CmdletGetPGPInspect : PSCmdlet {
                 foreach (string file in Directory.GetFiles(resolvedFolder, "*", SearchOption.AllDirectories)) {
                     try {
                         FileInfo fileInfo = new(file);
-                        WriteObject(ToInfo(file, pgp.Inspect(fileInfo), TryGetIntegrityProtected(fileInfo)));
+                        WriteObject(ToInfo(
+                            file,
+                            pgp.Inspect(fileInfo),
+                            GetRecipientKeyIds(() => pgp.GetFileRecipients(fileInfo)),
+                            TryGetIntegrityProtected(fileInfo)));
                     } catch (System.Exception ex) {
                         WriteError(new ErrorRecord(NormalizeInspectException(ex), "GetPGPInspectFailed", ErrorCategory.NotSpecified, file));
                     }
@@ -51,9 +57,17 @@ public class CmdletGetPGPInspect : PSCmdlet {
             } else if (ParameterSetName == "File") {
                 string resolvedFile = PathResolver.Resolve(this, FilePath);
                 FileInfo fileInfo = new(resolvedFile);
-                WriteObject(ToInfo(resolvedFile, pgp.Inspect(fileInfo), TryGetIntegrityProtected(fileInfo)));
+                WriteObject(ToInfo(
+                    resolvedFile,
+                    pgp.Inspect(fileInfo),
+                    GetRecipientKeyIds(() => pgp.GetFileRecipients(fileInfo)),
+                    TryGetIntegrityProtected(fileInfo)));
             } else {
-                WriteObject(ToInfo(null, pgp.Inspect(String), TryGetIntegrityProtected(String)));
+                WriteObject(ToInfo(
+                    null,
+                    pgp.Inspect(String),
+                    GetRecipientKeyIds(() => pgp.GetArmoredStringRecipients(String)),
+                    TryGetIntegrityProtected(String)));
             }
         } catch (System.Exception ex) {
             WriteError(new ErrorRecord(NormalizeInspectException(ex), "GetPGPInspectFailed", ErrorCategory.NotSpecified, null));
@@ -68,6 +82,16 @@ public class CmdletGetPGPInspect : PSCmdlet {
         }
 
         return exception;
+    }
+
+    private static string[] GetRecipientKeyIds(Func<IEnumerable<long>> getRecipients) {
+        try {
+            return getRecipients()
+                .Select(id => $"0x{unchecked((ulong)id):X16}")
+                .ToArray();
+        } catch {
+            return Array.Empty<string>();
+        }
     }
 
     private static bool? TryGetIntegrityProtected(FileInfo fileInfo) {
@@ -107,7 +131,7 @@ public class CmdletGetPGPInspect : PSCmdlet {
         return null;
     }
 
-    private static string GetHeaderValue(System.Collections.Generic.Dictionary<string, string> messageHeaders, string key) {
+    private static string GetHeaderValue(Dictionary<string, string> messageHeaders, string key) {
         if (messageHeaders != null && messageHeaders.TryGetValue(key, out string value)) {
             return value;
         }
@@ -115,7 +139,7 @@ public class CmdletGetPGPInspect : PSCmdlet {
         return null;
     }
 
-    private static PGPInspectInfo ToInfo(string sourcePath, PgpInspectResult result, bool? integrityProtected) {
+    private static PGPInspectInfo ToInfo(string sourcePath, PgpInspectResult result, string[] recipientKeyIds, bool? integrityProtected) {
         return new PGPInspectInfo {
             SourcePath = sourcePath,
             IsArmored = result.IsArmored,
@@ -124,6 +148,7 @@ public class CmdletGetPGPInspect : PSCmdlet {
             Comment = GetHeaderValue(result.MessageHeaders, "Comment"),
             IsCompressed = result.IsCompressed,
             IsEncrypted = result.IsEncrypted,
+            RecipientKeyIds = recipientKeyIds,
             IsIntegrityProtected = result.IsIntegrityProtected || integrityProtected == true,
             IsSigned = result.IsSigned,
             SymmetricKeyAlgorithm = result.SymmetricKeyAlgorithm,
