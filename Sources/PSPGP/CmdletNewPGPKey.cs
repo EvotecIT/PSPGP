@@ -142,6 +142,10 @@ public class CmdletNewPGPKey : PSCmdlet {
                 pass = Credential.GetNetworkCredential().Password;
             }
 
+            if (!Armor && !string.IsNullOrEmpty(UploadKeyServer)) {
+                throw new InvalidOperationException("New-PGPKey requires armored public key output when UploadKeyServer is used.");
+            }
+
             if (ParameterSetName.StartsWith("Strength")) {
                 pgp.GenerateKey(
                     new FileInfo(resolvedPublic),

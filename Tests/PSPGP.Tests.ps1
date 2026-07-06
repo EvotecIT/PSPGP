@@ -97,10 +97,13 @@
     It ' Sign and verify detached file' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic; KeysDirectory = $KeysDirectory } {
         $sourceFile = [io.path]::Combine($KeysDirectory, 'detached-input.txt')
         $signatureFile = [io.path]::Combine($KeysDirectory, 'detached-input.txt.sig')
+        $verifiedFile = [io.path]::Combine($KeysDirectory, 'detached-output.txt')
         Set-Content -Path $sourceFile -Value 'Detached signed file content' -NoNewline
         Protect-PGP -SignOnly -Detached -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -FilePath $sourceFile -OutFilePath $signatureFile -ErrorAction Stop
-        $result = Test-PGP -FilePathPublic $KeyPublic -FilePath $sourceFile -SignaturePath $signatureFile
+        $result = Test-PGP -FilePathPublic $KeyPublic -FilePath $sourceFile -SignaturePath $signatureFile -OutFilePath $verifiedFile
         $result.Status | Should -Be $true
+        $result.OutputPath | Should -BeNullOrEmpty
+        Test-Path -LiteralPath $verifiedFile | Should -Be $false
     }
 
     It ' Encrypt and decrypt string symmetrically' {
@@ -213,11 +216,29 @@
         $info.Expiration | Should -Not -BeNullOrEmpty
     }
 
+    It ' Running New-PGPKey rejects binary key upload' -TestCases @{ KeysDirectory = $KeysDirectory } {
+        $advancedPublic = [io.path]::Combine($KeysDirectory, 'BinaryUploadPublic.asc')
+        $advancedPrivate = [io.path]::Combine($KeysDirectory, 'BinaryUploadPrivate.asc')
+
+        {
+            New-PGPKey -FilePathPublic $advancedPublic -FilePathPrivate $advancedPrivate -UserName 'binary-upload@example.test' -Password 'Advanced123!' -Strength 1024 -Certainty 8 -Armor:$false -UploadKeyServer 'https://keys.openpgp.org' -ErrorAction Stop
+        } | Should -Throw -ExpectedMessage '*requires armored public key output*'
+    }
+
     It ' Test-PGP can flag encrypted content when ThrowIfEncrypted is used' -TestCases @{ KeyPublic = $KeyPublic } {
         $protected = Protect-PGP -FilePathPublic $KeyPublic -String 'Encrypted but unsigned'
         $result = Test-PGP -FilePathPublic $KeyPublic -String $protected -ThrowIfEncrypted
         $result.Status | Should -Be $false
         $result.Error | Should -Not -BeNullOrEmpty
+    }
+
+    It ' Test-PGP aborts verification when any public key is missing' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic; KeysDirectory = $KeysDirectory } {
+        $missingKey = [io.path]::Combine($KeysDirectory, 'MissingPublic.asc')
+        $signed = Protect-PGP -SignOnly -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -String 'Signed Text'
+
+        $result = Test-PGP -FilePathPublic $KeyPublic,$missingKey -String $signed -WarningAction SilentlyContinue
+
+        $result | Should -BeNullOrEmpty
     }
 
     It ' Encrypt file when public key is UTF-8 BOM encoded' -TestCases @{ KeyPublic = $KeyPublic; KeyPublicBom = $KeyPublicBom; KeysDirectory = $KeysDirectory } {

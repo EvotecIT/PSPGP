@@ -133,6 +133,7 @@ public class CmdletTestPGP : PSCmdlet {
                     ErrorCategory.InvalidArgument,
                     resolved,
                     $"Public key doesn't exist {resolved}");
+                publicKeys.Clear();
                 return publicKeys;
             }
             DateTime? expiration = KeyExpirationHelper.GetExpiration(resolved);
@@ -163,7 +164,7 @@ public class CmdletTestPGP : PSCmdlet {
                             : pgp.VerifyFile(new FileInfo(filePath), ThrowIfEncrypted.IsPresent);
                 if (status) {
                     signer = key;
-                    verifiedOutput = outputPath;
+                    verifiedOutput = string.IsNullOrEmpty(signaturePath) ? outputPath : null;
                     break;
                 }
             } catch (Exception ex) {
