@@ -94,6 +94,46 @@
         Get-Content -LiteralPath $verifiedFile -Raw | Should -Be 'Clear signed file content'
     }
 
+    It ' Test-PGP does not write verified output for encrypted-only files' -TestCases @{ KeyPublic = $KeyPublic; KeysDirectory = $KeysDirectory } {
+        $sourceFile = [io.path]::Combine($KeysDirectory, 'verify-encrypted-only-input.txt')
+        $encryptedFile = [io.path]::Combine($KeysDirectory, 'verify-encrypted-only-input.txt.pgp')
+        $verifiedFile = [io.path]::Combine($KeysDirectory, 'verify-encrypted-only-output.txt')
+        Set-Content -Path $sourceFile -Value 'Encrypted only file content' -NoNewline
+        Protect-PGP -FilePathPublic $KeyPublic -FilePath $sourceFile -OutFilePath $encryptedFile -ErrorAction Stop
+
+        $result = Test-PGP -FilePathPublic $KeyPublic -FilePath $encryptedFile -OutFilePath $verifiedFile
+
+        $result.Status | Should -Be $false
+        $result.OutputPath | Should -BeNullOrEmpty
+        $result.Error | Should -Not -BeNullOrEmpty
+        Test-Path -LiteralPath $verifiedFile | Should -Be $false
+    }
+
+    It ' Test-PGP preserves relative paths for folder verification output' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic; KeysDirectory = $KeysDirectory } {
+        $inputFolder = [io.path]::Combine($KeysDirectory, 'verify-folder-input')
+        $outputFolder = [io.path]::Combine($KeysDirectory, 'verify-folder-output')
+        $folderA = [io.path]::Combine($inputFolder, 'a')
+        $folderB = [io.path]::Combine($inputFolder, 'b')
+        $sourceA = [io.path]::Combine($KeysDirectory, 'verify-folder-a.txt')
+        $sourceB = [io.path]::Combine($KeysDirectory, 'verify-folder-b.txt')
+        $signedA = [io.path]::Combine($folderA, 'report.txt.asc')
+        $signedB = [io.path]::Combine($folderB, 'report.txt.asc')
+        New-Item -ItemType Directory -Path $folderA,$folderB,$outputFolder -Force | Out-Null
+        Set-Content -Path $sourceA -Value 'Folder A report' -NoNewline
+        Set-Content -Path $sourceB -Value 'Folder B report' -NoNewline
+        Protect-PGP -ClearSign -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -FilePath $sourceA -OutFilePath $signedA -ErrorAction Stop
+        Protect-PGP -ClearSign -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -FilePath $sourceB -OutFilePath $signedB -ErrorAction Stop
+
+        $results = Test-PGP -FilePathPublic $KeyPublic -FolderPath $inputFolder -OutputFolderPath $outputFolder -ClearSigned
+
+        $results.Count | Should -Be 2
+        $results.Status | Should -Be @($true, $true)
+        $outputA = [io.path]::Combine($outputFolder, 'a', 'report.txt')
+        $outputB = [io.path]::Combine($outputFolder, 'b', 'report.txt')
+        Get-Content -LiteralPath $outputA -Raw | Should -Be 'Folder A report'
+        Get-Content -LiteralPath $outputB -Raw | Should -Be 'Folder B report'
+    }
+
     It ' Sign and verify detached file' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic; KeysDirectory = $KeysDirectory } {
         $sourceFile = [io.path]::Combine($KeysDirectory, 'detached-input.txt')
         $signatureFile = [io.path]::Combine($KeysDirectory, 'detached-input.txt.sig')

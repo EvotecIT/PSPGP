@@ -100,7 +100,7 @@ public class CmdletTestPGP : PSCmdlet {
 
                 foreach (string file in Directory.GetFiles(resolvedFolder, "*", SearchOption.AllDirectories)) {
                     string outputPath = !string.IsNullOrEmpty(resolvedOutputFolder)
-                        ? Path.Combine(resolvedOutputFolder, GetVerifiedOutputFileName(file))
+                        ? GetVerifiedOutputPath(resolvedFolder, resolvedOutputFolder, file)
                         : null;
                     WriteObject(VerifyFileWithAnyKey(file, null, outputPath, publicKeys));
                 }
@@ -227,7 +227,7 @@ public class CmdletTestPGP : PSCmdlet {
             EnsureDirectoryForFile(temporaryOutput);
             bool verified = ClearSigned.IsPresent
                 ? pgp.VerifyClear(new FileInfo(inputFile), new FileInfo(temporaryOutput))
-                : pgp.Verify(new FileInfo(inputFile), new FileInfo(temporaryOutput), ThrowIfEncrypted.IsPresent);
+                : pgp.Verify(new FileInfo(inputFile), new FileInfo(temporaryOutput), true);
             if (!verified) {
                 return false;
             }
@@ -245,6 +245,17 @@ public class CmdletTestPGP : PSCmdlet {
         }
     }
 
+    private static string GetVerifiedOutputPath(string inputFolder, string outputFolder, string inputFile) {
+        string relativeInput = GetRelativePath(inputFolder, inputFile);
+        string relativeDirectory = Path.GetDirectoryName(relativeInput);
+        string outputFileName = GetVerifiedOutputFileName(relativeInput);
+        string relativeOutput = string.IsNullOrEmpty(relativeDirectory)
+            ? outputFileName
+            : Path.Combine(relativeDirectory, outputFileName);
+
+        return Path.Combine(outputFolder, relativeOutput);
+    }
+
     private static string GetVerifiedOutputFileName(string inputFile) {
         string fileName = Path.GetFileName(inputFile);
         foreach (string extension in new[] { ".asc", ".sig", ".pgp", ".gpg" }) {
@@ -254,6 +265,30 @@ public class CmdletTestPGP : PSCmdlet {
         }
 
         return fileName;
+    }
+
+    private static string GetRelativePath(string inputFolder, string inputFile) {
+        string root = EnsureTrailingDirectorySeparator(Path.GetFullPath(inputFolder));
+        string file = Path.GetFullPath(inputFile);
+        var rootUri = new Uri(root);
+        var fileUri = new Uri(file);
+        if (!string.Equals(rootUri.Scheme, fileUri.Scheme, StringComparison.OrdinalIgnoreCase)) {
+            return Path.GetFileName(file);
+        }
+
+        string relative = Uri.UnescapeDataString(rootUri.MakeRelativeUri(fileUri).ToString());
+        return string.Equals(fileUri.Scheme, Uri.UriSchemeFile, StringComparison.OrdinalIgnoreCase)
+            ? relative.Replace('/', Path.DirectorySeparatorChar)
+            : relative;
+    }
+
+    private static string EnsureTrailingDirectorySeparator(string path) {
+        if (path.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal)
+            || path.EndsWith(Path.AltDirectorySeparatorChar.ToString(), StringComparison.Ordinal)) {
+            return path;
+        }
+
+        return path + Path.DirectorySeparatorChar;
     }
 
     private static void EnsureDirectoryForFile(string filePath) {
