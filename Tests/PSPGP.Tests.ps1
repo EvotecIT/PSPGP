@@ -158,6 +158,29 @@
         $inspectErrors.Count | Should -Be 0
     }
 
+    It ' Inspect unarmored encrypted file returns encrypted metadata' -TestCases @{ KeyPublic = $KeyPublic; KeysDirectory = $KeysDirectory } {
+        $sourceFile = [io.path]::Combine($KeysDirectory, 'inspect-unarmored-input.txt')
+        $encryptedFile = [io.path]::Combine($KeysDirectory, 'inspect-unarmored.pgp')
+        Set-Content -Path $sourceFile -Value 'Inspect unarmored content' -NoNewline
+        Protect-PGP -FilePathPublic $KeyPublic -FilePath $sourceFile -OutFilePath $encryptedFile -Armor:$false -ErrorAction Stop
+
+        $inspection = Get-PGPInspect -FilePath $encryptedFile -ErrorAction Stop
+
+        $inspection.IsArmored | Should -Be $false
+        $inspection.IsEncrypted | Should -Be $true
+        $inspection.IsIntegrityProtected | Should -Be $true
+        $inspection.Version | Should -BeNullOrEmpty
+        $inspection.Comment | Should -BeNullOrEmpty
+    }
+
+    It ' Inspect symmetric encrypted string reports integrity protection' {
+        $protected = Protect-PGP -SymmetricPassphrase 'SymmetricPass123!' -String 'Symmetric inspect text' -ErrorAction Stop
+        $inspection = Get-PGPInspect -String $protected -ErrorAction Stop
+
+        $inspection.IsEncrypted | Should -Be $true
+        $inspection.IsIntegrityProtected | Should -Be $true
+    }
+
     It ' Test-PGP can flag encrypted content when ThrowIfEncrypted is used' -TestCases @{ KeyPublic = $KeyPublic } {
         $protected = Protect-PGP -FilePathPublic $KeyPublic -String 'Encrypted but unsigned'
         $result = Test-PGP -FilePathPublic $KeyPublic -String $protected -ThrowIfEncrypted

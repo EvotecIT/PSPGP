@@ -7,7 +7,7 @@ internal static class PgpExceptionHelper {
     internal static Exception Normalize(Exception exception, string keyPath = null) {
         string message = exception?.Message ?? string.Empty;
 
-        if (message.IndexOf("unknown packet type encountered: 20", StringComparison.OrdinalIgnoreCase) >= 0) {
+        if (ContainsMessage(exception, "unknown packet type encountered: 20")) {
             return new NotSupportedException(
                 "The encrypted content appears to use OpenPGP AEAD (packet type 20), which the underlying PgpCore/BouncyCastle stack cannot decrypt yet. Re-encrypt the file without AEAD, or remove the AEAD preference from the key before creating new encrypted content.",
                 exception);
@@ -23,5 +23,15 @@ internal static class PgpExceptionHelper {
         }
 
         return exception;
+    }
+
+    private static bool ContainsMessage(Exception exception, string value) {
+        for (Exception current = exception; current != null; current = current.InnerException) {
+            if ((current.Message ?? string.Empty).IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
