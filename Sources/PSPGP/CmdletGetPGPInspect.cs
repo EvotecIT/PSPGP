@@ -1,5 +1,10 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Management.Automation;
+using System.Text;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 using PgpCore;
 using PgpCore.Models;
 
@@ -39,16 +44,30 @@ public class CmdletGetPGPInspect : PSCmdlet {
                 string resolvedFolder = PathResolver.Resolve(this, FolderPath);
                 foreach (string file in Directory.GetFiles(resolvedFolder, "*", SearchOption.AllDirectories)) {
                     try {
-                        WriteObject(ToInfo(file, pgp.Inspect(new FileInfo(file))));
+                        FileInfo fileInfo = new(file);
+                        WriteObject(ToInfo(
+                            file,
+                            pgp.Inspect(fileInfo),
+                            GetRecipientKeyIds(() => pgp.GetFileRecipients(fileInfo)),
+                            TryGetIntegrityProtected(fileInfo)));
                     } catch (System.Exception ex) {
                         WriteError(new ErrorRecord(NormalizeInspectException(ex), "GetPGPInspectFailed", ErrorCategory.NotSpecified, file));
                     }
                 }
             } else if (ParameterSetName == "File") {
                 string resolvedFile = PathResolver.Resolve(this, FilePath);
-                WriteObject(ToInfo(resolvedFile, pgp.Inspect(new FileInfo(resolvedFile))));
+                FileInfo fileInfo = new(resolvedFile);
+                WriteObject(ToInfo(
+                    resolvedFile,
+                    pgp.Inspect(fileInfo),
+                    GetRecipientKeyIds(() => pgp.GetFileRecipients(fileInfo)),
+                    TryGetIntegrityProtected(fileInfo)));
             } else {
-                WriteObject(ToInfo(null, pgp.Inspect(String)));
+                WriteObject(ToInfo(
+                    null,
+                    pgp.Inspect(String),
+                    GetRecipientKeyIds(() => pgp.GetArmoredStringRecipients(String)),
+                    TryGetIntegrityProtected(String)));
             }
         } catch (System.Exception ex) {
             WriteError(new ErrorRecord(NormalizeInspectException(ex), "GetPGPInspectFailed", ErrorCategory.NotSpecified, null));
@@ -58,23 +77,79 @@ public class CmdletGetPGPInspect : PSCmdlet {
     private static System.Exception NormalizeInspectException(System.Exception exception) {
         if (exception is System.NullReferenceException) {
             return new System.NotSupportedException(
-                "PgpCore inspect currently fails for some encrypted messages. Signed content inspection works, but encrypted-message inspection is limited by the upstream library.",
+                "PgpCore inspect could not read this message. Signed, armored, and encrypted packet metadata may still be inspectable for other inputs.",
                 exception);
         }
 
         return exception;
     }
 
-    private static PGPInspectInfo ToInfo(string sourcePath, PgpInspectResult result) {
+    private static string[] GetRecipientKeyIds(Func<IEnumerable<long>> getRecipients) {
+        try {
+            return getRecipients()
+                .Select(id => $"0x{unchecked((ulong)id):X16}")
+                .ToArray();
+        } catch {
+            return Array.Empty<string>();
+        }
+    }
+
+    private static bool? TryGetIntegrityProtected(FileInfo fileInfo) {
+        try {
+            using FileStream stream = fileInfo.OpenRead();
+            return TryGetIntegrityProtected(stream);
+        } catch {
+            return null;
+        }
+    }
+
+    private static bool? TryGetIntegrityProtected(string value) {
+        try {
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(value));
+            return TryGetIntegrityProtected(stream);
+        } catch {
+            return null;
+        }
+    }
+
+    private static bool? TryGetIntegrityProtected(Stream stream) {
+        try {
+            using Stream decoderStream = PgpUtilities.GetDecoderStream(stream);
+            var factory = new PgpObjectFactory(decoderStream);
+            object pgpObject;
+            while ((pgpObject = factory.NextPgpObject()) != null) {
+                if (pgpObject is PgpEncryptedDataList encryptedDataList) {
+                    foreach (PgpEncryptedData encryptedData in encryptedDataList.GetEncryptedDataObjects()) {
+                        return encryptedData.IsIntegrityProtected();
+                    }
+                }
+            }
+        } catch {
+            return null;
+        }
+
+        return null;
+    }
+
+    private static string GetHeaderValue(Dictionary<string, string> messageHeaders, string key) {
+        if (messageHeaders != null && messageHeaders.TryGetValue(key, out string value)) {
+            return value;
+        }
+
+        return null;
+    }
+
+    private static PGPInspectInfo ToInfo(string sourcePath, PgpInspectResult result, string[] recipientKeyIds, bool? integrityProtected) {
         return new PGPInspectInfo {
             SourcePath = sourcePath,
             IsArmored = result.IsArmored,
             MessageHeaders = result.MessageHeaders,
-            Version = result.Version,
-            Comment = result.Comment,
+            Version = GetHeaderValue(result.MessageHeaders, "Version"),
+            Comment = GetHeaderValue(result.MessageHeaders, "Comment"),
             IsCompressed = result.IsCompressed,
             IsEncrypted = result.IsEncrypted,
-            IsIntegrityProtected = result.IsIntegrityProtected,
+            RecipientKeyIds = recipientKeyIds,
+            IsIntegrityProtected = result.IsIntegrityProtected || integrityProtected == true,
             IsSigned = result.IsSigned,
             SymmetricKeyAlgorithm = result.SymmetricKeyAlgorithm,
             FileName = result.FileName,
