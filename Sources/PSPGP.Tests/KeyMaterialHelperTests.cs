@@ -47,4 +47,16 @@ public class KeyMaterialHelperTests {
         normalized.Message.Should().Contain("AEAD");
         normalized.InnerException.Should().BeSameAs(exception);
     }
+
+    [Fact]
+    public void Normalize_WithWrappedPacketType20Error_ShouldReturnAeadGuidance() {
+        var innerException = new IOException("unknown packet type encountered: 20");
+        var exception = new InvalidDataException("encrypted data was not readable", innerException);
+
+        Exception normalized = PgpExceptionHelper.Normalize(exception);
+
+        normalized.Should().BeOfType<NotSupportedException>();
+        normalized.Message.Should().Contain("AEAD");
+        normalized.InnerException.Should().BeSameAs(exception);
+    }
 }
