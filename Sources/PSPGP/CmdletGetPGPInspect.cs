@@ -58,7 +58,7 @@ public class CmdletGetPGPInspect : PSCmdlet {
     private static System.Exception NormalizeInspectException(System.Exception exception) {
         if (exception is System.NullReferenceException) {
             return new System.NotSupportedException(
-                "PgpCore inspect currently fails for some encrypted messages. Signed content inspection works, but encrypted-message inspection is limited by the upstream library.",
+                "PgpCore inspect could not read this message. Signed, armored, and encrypted packet metadata may still be inspectable for other inputs.",
                 exception);
         }
 

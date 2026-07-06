@@ -133,7 +133,7 @@
         $inspection.IsArmored | Should -Be $true
     }
 
-    It ' Inspect folder continues when one file cannot be inspected' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic; KeysDirectory = $KeysDirectory } {
+    It ' Inspect folder returns signed and encrypted message metadata' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic; KeysDirectory = $KeysDirectory } {
         $inspectFolder = [io.path]::Combine($KeysDirectory, 'inspect-folder')
         $sourceFile = [io.path]::Combine($KeysDirectory, 'inspect-input.txt')
         $signedFile = [io.path]::Combine($inspectFolder, 'signed.asc')
@@ -146,11 +146,16 @@
         $inspectErrors = @()
         $results = Get-PGPInspect -FolderPath $inspectFolder -ErrorAction Continue -ErrorVariable +inspectErrors
 
-        $results.Count | Should -Be 1
-        [IO.Path]::GetFullPath($results[0].SourcePath) | Should -Be ([IO.Path]::GetFullPath($signedFile))
-        $results[0].IsSigned | Should -Be $true
-        $inspectErrors.Count | Should -Be 1
-        $inspectErrors[0].Exception.Message | Should -Match 'Signed content inspection works'
+        $results.Count | Should -Be 2
+
+        $signedResult = $results | Where-Object { [IO.Path]::GetFullPath($_.SourcePath) -eq [IO.Path]::GetFullPath($signedFile) }
+        $encryptedResult = $results | Where-Object { [IO.Path]::GetFullPath($_.SourcePath) -eq [IO.Path]::GetFullPath($encryptedFile) }
+
+        $signedResult.IsSigned | Should -Be $true
+        $signedResult.IsEncrypted | Should -Be $false
+        $encryptedResult.IsEncrypted | Should -Be $true
+        $encryptedResult.IsSigned | Should -Be $false
+        $inspectErrors.Count | Should -Be 0
     }
 
     It ' Test-PGP can flag encrypted content when ThrowIfEncrypted is used' -TestCases @{ KeyPublic = $KeyPublic } {

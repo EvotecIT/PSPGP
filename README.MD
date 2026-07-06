@@ -142,7 +142,7 @@ $Signature = Protect-PGP -SignOnly -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -
 Get-PGPInspect -String $Signature
 ```
 
-`Get-PGPInspect` works well for signed content and general armored metadata. Inspection of some encrypted payloads is still limited by upstream `PgpCore` behavior, and PSPGP reports that limitation clearly instead of surfacing a raw crash.
+`Get-PGPInspect` returns metadata for signed content, armored messages, and encrypted messages that can be inspected without decrypting the payload.
 
 ### Sign string
 
