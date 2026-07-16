@@ -22,6 +22,13 @@
         New-PGPKey -FilePathPublic $KeyPublic -FilePathPrivate $KeyPrivate -UserName 'przemyslaw.klys' -Password 'ZielonaMila9!'
         Test-Path -LiteralPath $KeyPublic | Should -Be $true
         Test-Path -LiteralPath $KeyPrivate | Should -Be $true
+        $keyInfo = Get-PGPKeyInfo -FilePath $KeyPublic -ErrorAction Stop
+        $keyInfo.BitStrength | Should -Be 3072
+        $keyInfo.KeyId | Should -Match '^0x[0-9A-F]{16}$'
+        $keyInfo.Fingerprint | Should -Match '^[0-9A-F]+$'
+        $keyInfo.IsMasterKey | Should -Be $true
+        $keyInfo.IsEncryptionKey | Should -Be $true
+        $keyInfo.IsRevoked | Should -Be $false
 
         New-PGPKey -FilePathPublic $KeyPublic1 -FilePathPrivate $KeyPrivate1 -UserName 'przemyslaw.klys1' -Password 'ZielonaMila9!1'
         Test-Path -LiteralPath $KeyPublic1 | Should -Be $true
@@ -60,6 +67,7 @@
         $result = Test-PGP -FilePathPublic $KeyPublic -String $signed
         $result.Status | Should -Be $true
         $result.ClearText | Should -Be 'Signed Text'
+        (Get-PGPInspect -String $signed).IsCompressed | Should -Be $true
     }
 
     It ' Sign and verify detached string' -TestCases @{ KeyPrivate = $KeyPrivate; KeyPublic = $KeyPublic } {

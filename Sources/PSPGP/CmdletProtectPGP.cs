@@ -329,7 +329,7 @@ public class CmdletProtectPGP : PSCmdlet {
                 keyPath = FilePathPublic[0];
             }
 
-            WriteError(new ErrorRecord(PgpExceptionHelper.Normalize(ex, keyPath), "ProtectPGPFailed", ErrorCategory.NotSpecified, null));
+            WriteError(PgpExceptionHelper.CreateErrorRecord(ex, "ProtectPGPFailed", keyPath, keyPath));
         } finally {
             signKeyStream?.Dispose();
             foreach (Stream stream in publicKeyStreams) {

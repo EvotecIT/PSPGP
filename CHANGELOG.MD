@@ -1,5 +1,11 @@
 ﻿### ChangeLog
 
+#### Unreleased
+- Upgrade PgpCore to 8.0.0 and adopt its AES-256, SHA-256, ZIP compression, and 3072-bit key defaults.
+- Report key IDs, fingerprints, strength, creation time, and key state from `Get-PGPKeyInfo`.
+- Map PgpCore typed failures to actionable PowerShell error categories.
+- Cover secure defaults and compressed signed-message verification in the test suites.
+
 #### 0.1.13 - 2024.09.18
 - Bump PgpCore version to 6.5.1
 - Small improvements

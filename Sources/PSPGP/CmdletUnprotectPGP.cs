@@ -231,10 +231,10 @@ public class CmdletUnprotectPGP : PSCmdlet {
                         }
 
                         if (!decrypted) {
-                            WriteError(new ErrorRecord(lastError, "DecryptFileFailed", ErrorCategory.NotSpecified, file));
+                            WriteError(PgpExceptionHelper.CreateErrorRecord(lastError, "DecryptFileFailed", file));
                         }
                     } catch (Exception ex) {
-                        WriteError(new ErrorRecord(ex, "DecryptFileFailed", ErrorCategory.NotSpecified, file));
+                        WriteError(PgpExceptionHelper.CreateErrorRecord(ex, "DecryptFileFailed", file));
                         return;
                     }
                 }
@@ -281,10 +281,10 @@ public class CmdletUnprotectPGP : PSCmdlet {
                     }
 
                     if (!decrypted) {
-                        WriteError(new ErrorRecord(lastError, "DecryptFileFailed", ErrorCategory.NotSpecified, FilePath));
+                        WriteError(PgpExceptionHelper.CreateErrorRecord(lastError, "DecryptFileFailed", FilePath));
                     }
                 } catch (Exception ex) {
-                    WriteError(new ErrorRecord(ex, "DecryptFileFailed", ErrorCategory.NotSpecified, FilePath));
+                    WriteError(PgpExceptionHelper.CreateErrorRecord(ex, "DecryptFileFailed", FilePath));
                     return;
                 }
             } else if (ParameterSetName.StartsWith("String")) {
@@ -328,14 +328,14 @@ public class CmdletUnprotectPGP : PSCmdlet {
                     if (decrypted) {
                         WriteObject(result);
                     } else {
-                        WriteError(new ErrorRecord(lastError, "DecryptStringFailed", ErrorCategory.NotSpecified, null));
+                        WriteError(PgpExceptionHelper.CreateErrorRecord(lastError, "DecryptStringFailed"));
                     }
                 } catch (Exception ex) {
-                    WriteError(new ErrorRecord(ex, "DecryptStringFailed", ErrorCategory.NotSpecified, null));
+                    WriteError(PgpExceptionHelper.CreateErrorRecord(ex, "DecryptStringFailed"));
                 }
             }
         } catch (Exception ex) {
-            WriteError(new ErrorRecord(ex, "UnprotectPGPFailed", ErrorCategory.NotSpecified, null));
+            WriteError(PgpExceptionHelper.CreateErrorRecord(ex, "UnprotectPGPFailed"));
         }
     }
 

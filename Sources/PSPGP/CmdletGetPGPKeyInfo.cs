@@ -89,16 +89,23 @@ public class CmdletGetPGPKeyInfo : PSCmdlet {
                         : publicKey.CreationTime.AddSeconds(publicKey.GetValidSeconds());
                     var info = new PGPKeyInfo {
                         FilePath = resolved,
+                        KeyId = $"0x{unchecked((ulong)publicKey.KeyId):X16}",
+                        Fingerprint = BitConverter.ToString(publicKey.GetFingerprint()).Replace("-", string.Empty),
                         UserIds = userIds.ToArray(),
                         Algorithm = publicKey.Algorithm,
-                        Expiration = expiration
+                        BitStrength = publicKey.BitStrength,
+                        CreationTime = publicKey.CreationTime,
+                        Expiration = expiration,
+                        IsMasterKey = publicKey.IsMasterKey,
+                        IsEncryptionKey = publicKey.IsEncryptionKey,
+                        IsRevoked = publicKey.IsRevoked()
                     };
                     WriteObject(info);
                 } else {
                     WriteError(new ErrorRecord(new InvalidDataException($"Cannot read key from {resolved}"), "InvalidKey", ErrorCategory.InvalidData, resolved));
                 }
             } catch (Exception ex) {
-                WriteError(new ErrorRecord(ex, "GetPGPKeyInfoFailed", ErrorCategory.NotSpecified, path));
+                WriteError(PgpExceptionHelper.CreateErrorRecord(ex, "GetPGPKeyInfoFailed", path, path));
             }
         }
     }

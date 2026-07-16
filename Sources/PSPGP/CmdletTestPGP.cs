@@ -117,7 +117,7 @@ public class CmdletTestPGP : PSCmdlet {
                 WriteObject(VerifyStringWithAnyKey(String, Signature, publicKeys));
             }
         } catch (Exception ex) {
-            WriteError(new ErrorRecord(ex, "TestPGPFailed", ErrorCategory.NotSpecified, null));
+            WriteError(PgpExceptionHelper.CreateErrorRecord(ex, "TestPGPFailed"));
         }
     }
 

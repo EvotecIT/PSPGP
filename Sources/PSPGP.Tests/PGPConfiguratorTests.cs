@@ -24,6 +24,9 @@ public class PGPConfiguratorTests {
             PGPConfigurator.Configure(pgp, null, null, null, null, null, null));
 
         exception.Should().BeNull("Configuration with null parameters should not throw");
+        pgp.HashAlgorithmTag.Should().Be(Org.BouncyCastle.Bcpg.HashAlgorithmTag.Sha256);
+        pgp.CompressionAlgorithm.Should().Be(Org.BouncyCastle.Bcpg.CompressionAlgorithmTag.Zip);
+        pgp.SymmetricKeyAlgorithm.Should().Be(Org.BouncyCastle.Bcpg.SymmetricKeyAlgorithmTag.Aes256);
     }
 
     /// <summary>
@@ -59,7 +62,7 @@ public class PGPConfiguratorTests {
         var action = () => PGPConfigurator.Configure(null,
             Org.BouncyCastle.Bcpg.HashAlgorithmTag.Sha256, null, null, null, null, null);
 
-        action.Should().Throw<NullReferenceException>()
-            .WithMessage("Object reference not set to an instance of an object.");
+        action.Should().Throw<ArgumentNullException>()
+            .WithParameterName("pgp");
     }
 }

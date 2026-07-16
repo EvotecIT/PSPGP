@@ -15,7 +15,7 @@ namespace PSPGP;
 /// </example>
 /// <example>
 /// <code>
-/// New-PGPKey -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -Strength 4096 -Certainty 8 -EmitVersion
+/// New-PGPKey -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -Strength 4096 -Certainty 24 -EmitVersion
 /// </code>
 /// </example>
 [Cmdlet(VerbsCommon.New, "PGPKey", DefaultParameterSetName = "ClearText")]
@@ -170,7 +170,7 @@ public class CmdletNewPGPKey : PSCmdlet {
                 KeyServerHelper.UploadKeyAsync(new Uri(UploadKeyServer), keyData).GetAwaiter().GetResult();
             }
         } catch (Exception ex) {
-            WriteError(new ErrorRecord(ex, "NewPGPKeyFailed", ErrorCategory.NotSpecified, null));
+            WriteError(PgpExceptionHelper.CreateErrorRecord(ex, "NewPGPKeyFailed"));
         }
     }
 
