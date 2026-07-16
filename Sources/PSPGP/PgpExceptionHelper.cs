@@ -24,6 +24,7 @@ internal static class PgpExceptionHelper {
     /// Typed PgpCore failures take precedence over generic wrapper exceptions.
     /// </summary>
     internal static ErrorCategory GetErrorCategory(Exception exception) {
+        if (exception is NotSupportedException) return ErrorCategory.NotImplemented;
         if (ContainsException<IncorrectPassphraseException>(exception)) return ErrorCategory.AuthenticationError;
         if (ContainsException<MessageIntegrityException>(exception)) return ErrorCategory.SecurityError;
         if (ContainsException<InvalidKeyMaterialException>(exception) ||

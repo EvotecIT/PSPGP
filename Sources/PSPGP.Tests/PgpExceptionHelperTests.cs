@@ -62,4 +62,14 @@ public class PgpExceptionHelperTests {
         normalized.Message.Should().Contain("AEAD");
         normalized.InnerException.Should().BeSameAs(exception);
     }
+
+    [Fact]
+    public void GetErrorCategory_WithNormalizedWrappedPacketType20Error_ReturnsNotImplementedCategory() {
+        var innerException = new IOException("unknown packet type encountered: 20");
+        var exception = new InvalidDataException("encrypted data was not readable", innerException);
+
+        Exception normalized = PgpExceptionHelper.Normalize(exception);
+
+        PgpExceptionHelper.GetErrorCategory(normalized).Should().Be(ErrorCategory.NotImplemented);
+    }
 }

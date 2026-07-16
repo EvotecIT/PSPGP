@@ -324,9 +324,11 @@ public class CmdletProtectPGP : PSCmdlet {
                 }
             }
         } catch (Exception ex) {
-            string keyPath = SignKey?.FullName;
-            if (keyPath is null && FilePathPublic != null && FilePathPublic.Length > 0) {
+            string keyPath = null;
+            if (SignKey is null && FilePathPublic != null && FilePathPublic.Length == 1) {
                 keyPath = FilePathPublic[0];
+            } else if (SignKey != null && (FilePathPublic is null || FilePathPublic.Length == 0)) {
+                keyPath = SignKey.FullName;
             }
 
             WriteError(PgpExceptionHelper.CreateErrorRecord(ex, "ProtectPGPFailed", keyPath, keyPath));
