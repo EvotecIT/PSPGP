@@ -1,6 +1,6 @@
 ﻿Describe 'PGP Tests' {
     # prepare things
-    $KeysDirectory = [io.path]::Combine($env:TEMP, 'Keys')
+    $KeysDirectory = [io.path]::Combine([io.path]::GetTempPath(), 'Keys')
     $KeyPublic = [io.path]::Combine($KeysDirectory, 'PublicPGP.asc')
     $KeyPrivate = [io.path]::Combine($KeysDirectory, 'PrivatePGP.asc')
 
@@ -11,7 +11,7 @@
     [string] $Script:ProtectedString = ''
 
     BeforeAll {
-        $KeysDirectory = [io.path]::Combine($env:TEMP, 'Keys')
+        $KeysDirectory = [io.path]::Combine([io.path]::GetTempPath(), 'Keys')
         New-Item -Path $KeysDirectory -Force -ItemType Directory
         # Ensure the module is loaded in test context
         if (-not (Get-Module PSPGP)) {
@@ -284,7 +284,7 @@
         $missingKey = [io.path]::Combine($KeysDirectory, 'MissingPublic.asc')
         $signed = Protect-PGP -SignOnly -SignKey $KeyPrivate -SignPassword 'ZielonaMila9!' -String 'Signed Text'
 
-        $result = Test-PGP -FilePathPublic $KeyPublic,$missingKey -String $signed -WarningAction SilentlyContinue
+        $result = Test-PGP -FilePathPublic $KeyPublic,$missingKey -String $signed -ErrorAction Continue -WarningAction SilentlyContinue
 
         $result | Should -BeNullOrEmpty
     }
@@ -358,7 +358,7 @@
     }
     # clean everything
     AfterAll {
-        $KeysDirectory = [io.path]::Combine($env:TEMP, 'Keys')
+        $KeysDirectory = [io.path]::Combine([io.path]::GetTempPath(), 'Keys')
         Remove-Item -Path $KeysDirectory -Recurse -Force
     }
 }
