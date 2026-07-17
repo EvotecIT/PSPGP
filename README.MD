@@ -27,6 +27,8 @@
 
 - [PgpCore](https://github.com/mattosaurus/PgpCore) - licensed MIT
 
+PSPGP uses PgpCore 8.0. New operations therefore default to AES-256 encryption, SHA-256 hashing, ZIP compression, and 3072-bit keys with a certainty of 24. Existing encrypted data remains readable; set the algorithm parameters explicitly only when an older integration requires legacy output.
+
 CI for this branch runs in GitHub Actions via the `.github/workflows/test-dotnet.yml` and `.github/workflows/test-powershell.yml` workflows.
 
 ## Module surface
@@ -50,7 +52,7 @@ Current capabilities:
 - Create signed, detached-signature, and clear-signed content and verify it with one or more public keys
 - Write verified clear content from signed files to an output path
 - Inspect signed, encrypted, and armored message metadata with `Get-PGPInspect`, including encrypted recipient key IDs when available
-- Download public keys from a key server and inspect local key material
+- Download public keys from a key server and inspect local key IDs, fingerprints, size, creation and expiration dates, and key state
 - Generate new key pairs and optionally upload the public key
 
 The checked-in sample assets under `Examples\Keys` use the `PublicPGP1.asc` / `PrivatePGP1.asc` naming pattern.
@@ -79,6 +81,8 @@ PSPGP supports Windows PowerShell 5.1 and PowerShell 7+.
 
 On Windows PowerShell 5.1, the module requires **.NET Framework 4.7.2** or newer. On PowerShell 7+, the module works cross-platform on Windows, Linux, and macOS.
 
+PgpCore 8 also provides typed errors for invalid key material, wrong passphrases, missing keys, unsupported input, and integrity failures. PSPGP maps these to PowerShell error categories such as `InvalidData`, `AuthenticationError`, `ObjectNotFound`, and `SecurityError`, making `try`/`catch` and `$Error` inspection more useful.
+
 ## Using
 
 ### Create new PGP Public/Private Keys
@@ -86,7 +90,7 @@ On Windows PowerShell 5.1, the module requires **.NET Framework 4.7.2** or newer
 ```powershell
 New-PGPKey -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -UserName 'przemyslaw.klys' -Password 'ZielonaMila9!'
 
-New-PGPKey -FilePathPublic $PSScriptRoot\Keys\ExpiringPublic.asc -FilePathPrivate $PSScriptRoot\Keys\ExpiringPrivate.asc -UserName 'user@example.com' -Password 'secret' -Strength 4096 -Certainty 8 -KeyExpirationInSeconds 31536000 -PreferredHashAlgorithm Sha256,Sha512 -PreferredSymmetricKeyAlgorithm Aes256
+New-PGPKey -FilePathPublic $PSScriptRoot\Keys\ExpiringPublic.asc -FilePathPrivate $PSScriptRoot\Keys\ExpiringPrivate.asc -UserName 'user@example.com' -Password 'secret' -Strength 4096 -Certainty 24 -KeyExpirationInSeconds 31536000 -PreferredHashAlgorithm Sha256,Sha512 -PreferredSymmetricKeyAlgorithm Aes256
 ```
 
 ### Encrypt Folder
@@ -177,7 +181,8 @@ When `-Verify` is used with file output, PSPGP writes decrypted content through 
 
 ```powershell
 Get-PGPKey -KeyServer 'https://keys.openpgp.org' -Search 'user@example.com'
-Get-PGPKeyInfo -FilePath $PSScriptRoot\Keys\PublicPGP1.asc
+$KeyInfo = Get-PGPKeyInfo -FilePath $PSScriptRoot\Keys\PublicPGP1.asc
+$KeyInfo | Select-Object KeyId, Fingerprint, Algorithm, BitStrength, CreationTime, Expiration, IsEncryptionKey, IsRevoked
 New-PGPKey -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -UserName 'user@example.com' -Password 'secret' -UploadKeyServer 'https://keys.openpgp.org'
 ```
 

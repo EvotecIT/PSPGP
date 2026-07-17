@@ -1,5 +1,6 @@
 using Org.BouncyCastle.Bcpg;
 using PgpCore;
+using System;
 
 namespace PSPGP;
 
@@ -24,6 +25,7 @@ public static class PGPConfigurator {
     /// <param name="signatureType">Signature type when signing.</param>
     /// <param name="publicKeyAlgorithm">Public key algorithm for key creation.</param>
     /// <param name="symmetricKeyAlgorithm">Symmetric key algorithm for encryption.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="pgp"/> is <c>null</c>.</exception>
     public static void Configure(
         PGP pgp,
         HashAlgorithmTag? hashAlgorithm,
@@ -32,6 +34,8 @@ public static class PGPConfigurator {
         int? signatureType,
         PublicKeyAlgorithmTag? publicKeyAlgorithm,
         SymmetricKeyAlgorithmTag? symmetricKeyAlgorithm) {
+        if (pgp is null) throw new ArgumentNullException(nameof(pgp));
+
         if (hashAlgorithm.HasValue) pgp.HashAlgorithmTag = hashAlgorithm.Value;
         if (compressionAlgorithm.HasValue) pgp.CompressionAlgorithm = compressionAlgorithm.Value;
         if (fileType.HasValue) pgp.FileType = fileType.Value;
@@ -40,4 +44,3 @@ public static class PGPConfigurator {
         if (symmetricKeyAlgorithm.HasValue) pgp.SymmetricKeyAlgorithm = symmetricKeyAlgorithm.Value;
     }
 }
-

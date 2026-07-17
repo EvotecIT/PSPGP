@@ -51,7 +51,7 @@ public class CmdletGetPGPInspect : PSCmdlet {
                             GetRecipientKeyIds(() => pgp.GetFileRecipients(fileInfo)),
                             TryGetIntegrityProtected(fileInfo)));
                     } catch (System.Exception ex) {
-                        WriteError(new ErrorRecord(NormalizeInspectException(ex), "GetPGPInspectFailed", ErrorCategory.NotSpecified, file));
+                        WriteError(PgpExceptionHelper.CreateErrorRecord(NormalizeInspectException(ex), "GetPGPInspectFailed", file));
                     }
                 }
             } else if (ParameterSetName == "File") {
@@ -70,7 +70,7 @@ public class CmdletGetPGPInspect : PSCmdlet {
                     TryGetIntegrityProtected(String)));
             }
         } catch (System.Exception ex) {
-            WriteError(new ErrorRecord(NormalizeInspectException(ex), "GetPGPInspectFailed", ErrorCategory.NotSpecified, null));
+            WriteError(PgpExceptionHelper.CreateErrorRecord(NormalizeInspectException(ex), "GetPGPInspectFailed"));
         }
     }
 

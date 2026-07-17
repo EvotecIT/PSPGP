@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 using PgpCore;
 using System;
 using System.IO;
@@ -42,6 +43,10 @@ public class PGPCoreIntegrationTests : IDisposable {
         createKeysAction.Should().NotThrow("Key creation should succeed");
         File.Exists(publicKeyPath).Should().BeTrue("Public key should exist");
         File.Exists(privateKeyPath).Should().BeTrue("Private key should exist");
+
+        PgpPublicKey generatedKey = ReadMasterPublicKey(publicKeyPath);
+        generatedKey.BitStrength.Should().Be(3072, "PgpCore v8 generates stronger keys by default");
+        generatedKey.IsEncryptionKey.Should().BeTrue();
 
         // Configure PGP with the generated keys for encryption/decryption
         var encryptionKeys = new EncryptionKeys(new FileInfo(publicKeyPath));
@@ -187,5 +192,19 @@ public class PGPCoreIntegrationTests : IDisposable {
         } catch {
             // Ignore cleanup errors
         }
+    }
+
+    private static PgpPublicKey ReadMasterPublicKey(string path) {
+        using Stream stream = File.OpenRead(path);
+        var bundle = new PgpPublicKeyRingBundle(PgpUtilities.GetDecoderStream(stream));
+        foreach (PgpPublicKeyRing ring in bundle.GetKeyRings()) {
+            foreach (PgpPublicKey key in ring.GetPublicKeys()) {
+                if (key.IsMasterKey) {
+                    return key;
+                }
+            }
+        }
+
+        throw new InvalidDataException($"No master public key was found in '{path}'.");
     }
 }
