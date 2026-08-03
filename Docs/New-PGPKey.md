@@ -11,22 +11,22 @@ Generates a new PGP key pair.
 ## SYNTAX
 ### ClearText (Default)
 ```powershell
-New-PGPKey -FilePathPublic <string> -FilePathPrivate <string> [-UploadKeyServer <string>] [-UserName <string>] [-Password <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <int>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [<CommonParameters>]
+New-PGPKey -FilePathPublic <string> -FilePathPrivate <string> [-UploadKeyServer <string>] [-UserName <string>] [-Password <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [<CommonParameters>]
 ```
 
 ### Strength
 ```powershell
-New-PGPKey -FilePathPublic <string> -FilePathPrivate <string> -Strength <int> -Certainty <int> [-UploadKeyServer <string>] [-UserName <string>] [-Password <string>] [-EmitVersion] [-Armor <bool>] [-KeyExpirationInSeconds <long>] [-SignatureExpirationInSeconds <long>] [-HashAlgorithm <HashAlgorithmTag>] [-PreferredHashAlgorithm <HashAlgorithmTag[]>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-PreferredCompressionAlgorithm <CompressionAlgorithmTag[]>] [-FileType <PGPFileType>] [-PgpSignatureType <int>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-PreferredSymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag[]>] [<CommonParameters>]
+New-PGPKey -FilePathPublic <string> -FilePathPrivate <string> -Strength <int> -Certainty <int> [-UploadKeyServer <string>] [-UserName <string>] [-Password <string>] [-EmitVersion] [-Armor <bool>] [-KeyExpirationInSeconds <long>] [-SignatureExpirationInSeconds <long>] [-HashAlgorithm <HashAlgorithmTag>] [-PreferredHashAlgorithm <HashAlgorithmTag[]>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-PreferredCompressionAlgorithm <CompressionAlgorithmTag[]>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-PreferredSymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag[]>] [<CommonParameters>]
 ```
 
 ### StrengthCredential
 ```powershell
-New-PGPKey -FilePathPublic <string> -FilePathPrivate <string> -Credential <pscredential> -Strength <int> -Certainty <int> [-UploadKeyServer <string>] [-EmitVersion] [-Armor <bool>] [-KeyExpirationInSeconds <long>] [-SignatureExpirationInSeconds <long>] [-HashAlgorithm <HashAlgorithmTag>] [-PreferredHashAlgorithm <HashAlgorithmTag[]>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-PreferredCompressionAlgorithm <CompressionAlgorithmTag[]>] [-FileType <PGPFileType>] [-PgpSignatureType <int>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-PreferredSymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag[]>] [<CommonParameters>]
+New-PGPKey -FilePathPublic <string> -FilePathPrivate <string> -Credential <pscredential> -Strength <int> -Certainty <int> [-UploadKeyServer <string>] [-EmitVersion] [-Armor <bool>] [-KeyExpirationInSeconds <long>] [-SignatureExpirationInSeconds <long>] [-HashAlgorithm <HashAlgorithmTag>] [-PreferredHashAlgorithm <HashAlgorithmTag[]>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-PreferredCompressionAlgorithm <CompressionAlgorithmTag[]>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-PreferredSymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag[]>] [<CommonParameters>]
 ```
 
 ### Credential
 ```powershell
-New-PGPKey -FilePathPublic <string> -FilePathPrivate <string> -Credential <pscredential> [-UploadKeyServer <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <int>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [<CommonParameters>]
+New-PGPKey -FilePathPublic <string> -FilePathPrivate <string> -Credential <pscredential> [-UploadKeyServer <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -84,10 +84,10 @@ Accept wildcard characters: False
 Optional compression algorithm used when generating keys.
 
 ```yaml
-Type: Nullable`1
+Type: CompressionAlgorithmTag
 Parameter Sets: ClearText, Strength, StrengthCredential, Credential
 Aliases: None
-Possible values:
+Possible values: Uncompressed, Zip, ZLib, BZip2
 
 Required: False
 Position: named
@@ -164,10 +164,10 @@ Accept wildcard characters: False
 Defines the file type stored within the PGP package.
 
 ```yaml
-Type: Nullable`1
+Type: PGPFileType
 Parameter Sets: ClearText, Strength, StrengthCredential, Credential
 Aliases: None
-Possible values:
+Possible values: Binary, Text, UTF8
 
 Required: False
 Position: named
@@ -180,10 +180,10 @@ Accept wildcard characters: False
 Optional hash algorithm used when generating keys.
 
 ```yaml
-Type: Nullable`1
+Type: HashAlgorithmTag
 Parameter Sets: ClearText, Strength, StrengthCredential, Credential
 Aliases: HashAlgorithmTag
-Possible values:
+Possible values: MD5, Sha1, RipeMD160, DoubleSha, MD2, Tiger192, Haval5pass160, Sha256, Sha384, Sha512, Sha224, Sha3_256, Sha3_512, MD4, Sha3_224, Sha3_256_Old, Sha3_384, Sha3_512_Old, SM3
 
 Required: False
 Position: named
@@ -228,7 +228,7 @@ Accept wildcard characters: False
 PGP signature type used when creating the key.
 
 ```yaml
-Type: Nullable`1
+Type: Int32
 Parameter Sets: ClearText, Strength, StrengthCredential, Credential
 Aliases: None
 Possible values:
@@ -292,10 +292,10 @@ Accept wildcard characters: False
 Public key algorithm used for key creation.
 
 ```yaml
-Type: Nullable`1
+Type: PublicKeyAlgorithmTag
 Parameter Sets: ClearText, Strength, StrengthCredential, Credential
 Aliases: None
-Possible values:
+Possible values: RsaGeneral, RsaEncrypt, RsaSign, ElGamalEncrypt, Dsa, ECDH, ECDsa, ElGamalGeneral, DiffieHellman, EdDsa, EdDsa_Legacy, Experimental_1, Experimental_2, Experimental_3, Experimental_4, Experimental_5, Experimental_6, Experimental_7, Experimental_8, Experimental_9, Experimental_10, Experimental_11
 
 Required: False
 Position: named
@@ -340,10 +340,10 @@ Accept wildcard characters: False
 Symmetric key algorithm used for encryption.
 
 ```yaml
-Type: Nullable`1
+Type: SymmetricKeyAlgorithmTag
 Parameter Sets: ClearText, Strength, StrengthCredential, Credential
 Aliases: None
-Possible values:
+Possible values: Null, Idea, TripleDes, Cast5, Blowfish, Safer, Des, Aes128, Aes192, Aes256, Twofish, Camellia128, Camellia192, Camellia256
 
 Required: False
 Position: named

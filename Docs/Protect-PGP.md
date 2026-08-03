@@ -13,62 +13,62 @@ without encryption. Add -Detached to create a separate detached signature.
 ## SYNTAX
 ### File (Default)
 ```powershell
-Protect-PGP -FilePathPublic <string[]> -FilePath <string> [-OutFilePath <string>] [-SignKey <FileInfo>] [-SignPassword <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <int>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [<CommonParameters>]
+Protect-PGP -FilePathPublic <string[]> -FilePath <string> [-OutFilePath <string>] [-SignKey <FileInfo>] [-SignPassword <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [<CommonParameters>]
 ```
 
 ### Folder
 ```powershell
-Protect-PGP -FilePathPublic <string[]> -FolderPath <string> [-OutputFolderPath <string>] [-SignKey <FileInfo>] [-SignPassword <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <int>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [<CommonParameters>]
+Protect-PGP -FilePathPublic <string[]> -FolderPath <string> [-OutputFolderPath <string>] [-SignKey <FileInfo>] [-SignPassword <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [<CommonParameters>]
 ```
 
 ### String
 ```powershell
-Protect-PGP -FilePathPublic <string[]> -String <string> [-SignKey <FileInfo>] [-SignPassword <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <int>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [<CommonParameters>]
+Protect-PGP -FilePathPublic <string[]> -String <string> [-SignKey <FileInfo>] [-SignPassword <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [<CommonParameters>]
 ```
 
 ### SignFolder
 ```powershell
-Protect-PGP -FolderPath <string> -SignKey <FileInfo> -SignOnly [-FilePathPublic <string[]>] [-OutputFolderPath <string>] [-SignPassword <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <int>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [-Detached] [<CommonParameters>]
+Protect-PGP -FolderPath <string> -SignKey <FileInfo> -SignOnly [-FilePathPublic <string[]>] [-OutputFolderPath <string>] [-SignPassword <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [-Detached] [<CommonParameters>]
 ```
 
 ### SignFile
 ```powershell
-Protect-PGP -FilePath <string> -SignKey <FileInfo> -SignOnly [-FilePathPublic <string[]>] [-OutFilePath <string>] [-SignPassword <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <int>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [-Detached] [<CommonParameters>]
+Protect-PGP -FilePath <string> -SignKey <FileInfo> -SignOnly [-FilePathPublic <string[]>] [-OutFilePath <string>] [-SignPassword <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [-Detached] [<CommonParameters>]
 ```
 
 ### SignString
 ```powershell
-Protect-PGP -String <string> -SignKey <FileInfo> -SignOnly [-FilePathPublic <string[]>] [-SignPassword <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <int>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [-Detached] [<CommonParameters>]
+Protect-PGP -String <string> -SignKey <FileInfo> -SignOnly [-FilePathPublic <string[]>] [-SignPassword <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [-Detached] [<CommonParameters>]
 ```
 
 ### ClearSignFolder
 ```powershell
-Protect-PGP -FolderPath <string> -SignKey <FileInfo> -ClearSign [-OutputFolderPath <string>] [-SignPassword <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <int>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [<CommonParameters>]
+Protect-PGP -FolderPath <string> -SignKey <FileInfo> -ClearSign [-OutputFolderPath <string>] [-SignPassword <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [<CommonParameters>]
 ```
 
 ### SymmetricFolder
 ```powershell
-Protect-PGP -FolderPath <string> -SymmetricPassphrase <string> [-OutputFolderPath <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <int>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [<CommonParameters>]
+Protect-PGP -FolderPath <string> -SymmetricPassphrase <string> [-OutputFolderPath <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [<CommonParameters>]
 ```
 
 ### ClearSignFile
 ```powershell
-Protect-PGP -FilePath <string> -SignKey <FileInfo> -ClearSign [-OutFilePath <string>] [-SignPassword <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <int>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [<CommonParameters>]
+Protect-PGP -FilePath <string> -SignKey <FileInfo> -ClearSign [-OutFilePath <string>] [-SignPassword <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [<CommonParameters>]
 ```
 
 ### SymmetricFile
 ```powershell
-Protect-PGP -FilePath <string> -SymmetricPassphrase <string> [-OutFilePath <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <int>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [<CommonParameters>]
+Protect-PGP -FilePath <string> -SymmetricPassphrase <string> [-OutFilePath <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [<CommonParameters>]
 ```
 
 ### ClearSignString
 ```powershell
-Protect-PGP -String <string> -SignKey <FileInfo> -ClearSign [-SignPassword <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <int>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [<CommonParameters>]
+Protect-PGP -String <string> -SignKey <FileInfo> -ClearSign [-SignPassword <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [<CommonParameters>]
 ```
 
 ### SymmetricString
 ```powershell
-Protect-PGP -String <string> -SymmetricPassphrase <string> [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <int>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [<CommonParameters>]
+Protect-PGP -String <string> -SymmetricPassphrase <string> [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-Armor <bool>] [-WithIntegrityCheck <bool>] [-LiteralFileName <string>] [-Headers <hashtable>] [-OldFormat] [-AddVersionHeader] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -168,10 +168,10 @@ Accept wildcard characters: False
 Optional compression algorithm for encryption.
 
 ```yaml
-Type: Nullable`1
+Type: CompressionAlgorithmTag
 Parameter Sets: File, Folder, String, SignFolder, SignFile, SignString, ClearSignFolder, SymmetricFolder, ClearSignFile, SymmetricFile, ClearSignString, SymmetricString
 Aliases: None
-Possible values:
+Possible values: Uncompressed, Zip, ZLib, BZip2
 
 Required: False
 Position: named
@@ -232,10 +232,10 @@ Accept wildcard characters: False
 Type of data being encrypted.
 
 ```yaml
-Type: Nullable`1
+Type: PGPFileType
 Parameter Sets: File, Folder, String, SignFolder, SignFile, SignString, ClearSignFolder, SymmetricFolder, ClearSignFile, SymmetricFile, ClearSignString, SymmetricString
 Aliases: None
-Possible values:
+Possible values: Binary, Text, UTF8
 
 Required: False
 Position: named
@@ -264,10 +264,10 @@ Accept wildcard characters: False
 Optional hash algorithm for encryption.
 
 ```yaml
-Type: Nullable`1
+Type: HashAlgorithmTag
 Parameter Sets: File, Folder, String, SignFolder, SignFile, SignString, ClearSignFolder, SymmetricFolder, ClearSignFile, SymmetricFile, ClearSignString, SymmetricString
 Aliases: HashAlgorithmTag
-Possible values:
+Possible values: MD5, Sha1, RipeMD160, DoubleSha, MD2, Tiger192, Haval5pass160, Sha256, Sha384, Sha512, Sha224, Sha3_256, Sha3_512, MD4, Sha3_224, Sha3_256_Old, Sha3_384, Sha3_512_Old, SM3
 
 Required: False
 Position: named
@@ -360,7 +360,7 @@ Accept wildcard characters: False
 PGP signature type when signing data.
 
 ```yaml
-Type: Nullable`1
+Type: Int32
 Parameter Sets: File, Folder, String, SignFolder, SignFile, SignString, ClearSignFolder, SymmetricFolder, ClearSignFile, SymmetricFile, ClearSignString, SymmetricString
 Aliases: None
 Possible values:
@@ -376,10 +376,10 @@ Accept wildcard characters: False
 Public key algorithm used during encryption.
 
 ```yaml
-Type: Nullable`1
+Type: PublicKeyAlgorithmTag
 Parameter Sets: File, Folder, String, SignFolder, SignFile, SignString, ClearSignFolder, SymmetricFolder, ClearSignFile, SymmetricFile, ClearSignString, SymmetricString
 Aliases: None
-Possible values:
+Possible values: RsaGeneral, RsaEncrypt, RsaSign, ElGamalEncrypt, Dsa, ECDH, ECDsa, ElGamalGeneral, DiffieHellman, EdDsa, EdDsa_Legacy, Experimental_1, Experimental_2, Experimental_3, Experimental_4, Experimental_5, Experimental_6, Experimental_7, Experimental_8, Experimental_9, Experimental_10, Experimental_11
 
 Required: False
 Position: named
@@ -459,10 +459,10 @@ Accept wildcard characters: False
 Symmetric key algorithm used during encryption.
 
 ```yaml
-Type: Nullable`1
+Type: SymmetricKeyAlgorithmTag
 Parameter Sets: File, Folder, String, SignFolder, SignFile, SignString, ClearSignFolder, SymmetricFolder, ClearSignFile, SymmetricFile, ClearSignString, SymmetricString
 Aliases: None
-Possible values:
+Possible values: Null, Idea, TripleDes, Cast5, Blowfish, Safer, Des, Aes128, Aes192, Aes256, Twofish, Camellia128, Camellia192, Camellia256
 
 Required: False
 Position: named
