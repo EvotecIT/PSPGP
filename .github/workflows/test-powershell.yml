@@ -23,7 +23,7 @@ jobs:
         runs-on: windows-latest
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
               with:
                 fetch-depth: 0
                 ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref }}
@@ -52,7 +52,7 @@ jobs:
                 git push origin HEAD:$Env:HEAD_BRANCH
 
             - name: Upload refreshed manifest
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                 name: psd1
                 path: PSPGP.psd1
@@ -63,16 +63,16 @@ jobs:
         runs-on: windows-latest
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
 
             - name: Download manifest
-              uses: actions/download-artifact@v4
+              uses: actions/download-artifact@v8
               with:
                 name: psd1
                 path: .
 
             - name: Setup .NET
-              uses: actions/setup-dotnet@v4
+              uses: actions/setup-dotnet@v6
               with:
                 dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -101,16 +101,16 @@ jobs:
         runs-on: windows-latest
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
 
             - name: Download manifest
-              uses: actions/download-artifact@v4
+              uses: actions/download-artifact@v8
               with:
                 name: psd1
                 path: .
 
             - name: Setup .NET
-              uses: actions/setup-dotnet@v4
+              uses: actions/setup-dotnet@v6
               with:
                 dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -136,16 +136,16 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
 
             - name: Download manifest
-              uses: actions/download-artifact@v4
+              uses: actions/download-artifact@v8
               with:
                 name: psd1
                 path: .
 
             - name: Setup .NET
-              uses: actions/setup-dotnet@v4
+              uses: actions/setup-dotnet@v6
               with:
                 dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -178,16 +178,16 @@ jobs:
         runs-on: macos-latest
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
 
             - name: Download manifest
-              uses: actions/download-artifact@v4
+              uses: actions/download-artifact@v8
               with:
                 name: psd1
                 path: .
 
             - name: Setup .NET
-              uses: actions/setup-dotnet@v4
+              uses: actions/setup-dotnet@v6
               with:
                 dotnet-version: ${{ env.DOTNET_VERSION }}
 
