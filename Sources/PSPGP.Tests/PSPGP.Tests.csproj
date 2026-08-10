@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0">
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="xunit" Version="2.9.3">
@@ -19,11 +19,11 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="coverlet.collector" Version="8.0.1">
+        <PackageReference Include="coverlet.collector" Version="10.0.1">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="FluentAssertions" Version="8.9.0">
+        <PackageReference Include="FluentAssertions" Version="8.10.0">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="PowerShellStandard.Library" Version="5.1.1">
