@@ -23,5 +23,4 @@
     }
     RequiredModules        = @()
     RootModule             = 'PSPGP.psm1'
-    ScriptsToProcess       = @()
 }
