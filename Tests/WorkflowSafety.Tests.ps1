@@ -71,6 +71,18 @@ Describe 'PGP workflow safety' {
         @(Get-ChildItem $output -File -Recurse).Count | Should -Be 1
     }
 
+    It 'Rejects an ambiguous output subtree instead of silently omitting source files' {
+        $inputPath = Join-Path $TestDrive 'case-tree'
+        $sourceDirectory = Join-Path $inputPath 'OUTPUT'
+        New-Item -ItemType Directory -Path $sourceDirectory | Out-Null
+        $source = Join-Path $sourceDirectory 'report.txt'
+        [IO.File]::WriteAllText($source, 'preserve this source')
+        { Protect-PGP -FilePathPublic $PublicKey -FolderPath $inputPath -OutputFolderPath (Join-Path $inputPath 'output') -ErrorAction Stop } |
+            Should -Throw '*letter case*'
+        [IO.File]::ReadAllText($source) | Should -Be 'preserve this source'
+        @(Get-ChildItem $sourceDirectory -Filter '*.pgp').Count | Should -Be 0
+    }
+
     It 'Does not create output folders or key files during WhatIf' {
         $directory = Join-Path $TestDrive 'whatif'
         New-PGPKey -FilePathPublic (Join-Path $directory 'public.asc') -FilePathPrivate (Join-Path $directory 'private.asc') -WhatIf -ErrorAction Stop

@@ -209,7 +209,7 @@ See the `Examples` folder for runnable scripts:
 
 ## Safe workflows and compatibility
 
-Folder operations preserve relative directories. An output subtree inside the input is excluded from subsequent runs. Output-name collisions are rejected before writing; symbolic links and reparse points are skipped. Decryption removes only a terminal `.pgp`, `.gpg`, or `.asc` suffix. Other filenames receive `.decrypted`.
+Folder operations preserve relative directories. An output subtree inside the input is excluded from subsequent runs. Output-name collisions, including paths that differ only by letter case, are rejected before writing on every platform; symbolic links and reparse points are skipped. Decryption removes only a terminal `.pgp`, `.gpg`, or `.asc` suffix. Other filenames receive `.decrypted`.
 
 File parameters accept `FileInfo` pipeline records. `-PassThru` returns successful output files, and file-writing commands honor `-WhatIf` and `-Confirm`.
 

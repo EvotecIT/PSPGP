@@ -12,8 +12,9 @@ internal static class FileWorkflow {
         internal string Output { get; set; }
     }
 
-    internal static StringComparer PathComparer => Path.DirectorySeparatorChar == '\\'
-        ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+    // Refuse case-only aliases even on case-sensitive volumes. The destination may
+    // live on a different volume, and probing it would create files during WhatIf.
+    internal static StringComparer PathComparer => StringComparer.OrdinalIgnoreCase;
 
     internal static Item[] Plan(string inputFolder, string outputFolder, Func<string, string> outputName) {
         string root = Path.GetFullPath(inputFolder).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
@@ -26,7 +27,12 @@ internal static class FileWorkflow {
         pending.Push(root);
         while (pending.Count > 0) {
             string directory = pending.Pop();
-            if (excluded != null && IsWithin(directory, excluded)) continue;
+            if (excluded != null && IsWithin(directory, excluded)) {
+                if (!(directory.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar)
+                    .StartsWith(excluded, StringComparison.Ordinal))
+                    throw new IOException($"Source directory '{directory}' differs only by letter case from the output subtree. Use its exact spelling or choose a different output folder.");
+                continue;
+            }
             foreach (string child in Directory.GetDirectories(directory)) {
                 if ((File.GetAttributes(child) & FileAttributes.ReparsePoint) == 0) pending.Push(child);
             }
@@ -47,7 +53,7 @@ internal static class FileWorkflow {
     }
 
     private static bool IsWithin(string path, string root) => (path.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar)
-        .StartsWith(root, Path.DirectorySeparatorChar == '\\' ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+        .StartsWith(root, StringComparison.OrdinalIgnoreCase);
 
     internal static string RemoveEncryptedSuffix(string path) {
         foreach (string extension in new[] { ".pgp", ".gpg", ".asc" }) {
