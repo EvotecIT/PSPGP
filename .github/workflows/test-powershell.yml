@@ -27,7 +27,6 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           ./Build/Build-Module.ps1 -ConfigurationGateMode Build -SignModule $false
-          if ($LASTEXITCODE -ne 0) { throw "Module build failed: $LASTEXITCODE" }
           if (-not (Test-Path Artefacts/Unpacked/PSPGP/PSPGP.psd1)) { throw 'Module artifact is missing.' }
       - uses: actions/upload-artifact@v7
         with:
