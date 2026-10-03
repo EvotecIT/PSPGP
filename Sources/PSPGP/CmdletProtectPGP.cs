@@ -1,4 +1,5 @@
 using Org.BouncyCastle.Bcpg;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 using PgpCore;
 using System;
 using System.Collections;
@@ -45,7 +46,7 @@ namespace PSPGP;
 /// Protect-PGP -ClearSign -SignKey $PSScriptRoot\Keys\PrivatePGP1.asc -SignPassword 'secret' -String "Human readable signed content"
 /// </code>
 /// </example>
-[Cmdlet("Protect", "PGP", DefaultParameterSetName = "File")]
+[Cmdlet("Protect", "PGP", DefaultParameterSetName = "File", SupportsShouldProcess = true)]
 public class CmdletProtectPGP : PSCmdlet {
     /// <summary>Public key files used for encryption.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "Folder")]
@@ -71,10 +72,11 @@ public class CmdletProtectPGP : PSCmdlet {
     public string OutputFolderPath { get; set; }
 
     /// <summary>File to encrypt when using the File parameter set.</summary>
-    [Parameter(Mandatory = true, ParameterSetName = "File")]
-    [Parameter(Mandatory = true, ParameterSetName = "SignFile")]
-    [Parameter(Mandatory = true, ParameterSetName = "ClearSignFile")]
-    [Parameter(Mandatory = true, ParameterSetName = "SymmetricFile")]
+    [Parameter(Mandatory = true, ValueFromPipeline = true, ValueFromPipelineByPropertyName = true, ParameterSetName = "File")]
+    [Parameter(Mandatory = true, ValueFromPipeline = true, ValueFromPipelineByPropertyName = true, ParameterSetName = "SignFile")]
+    [Parameter(Mandatory = true, ValueFromPipeline = true, ValueFromPipelineByPropertyName = true, ParameterSetName = "ClearSignFile")]
+    [Parameter(Mandatory = true, ValueFromPipeline = true, ValueFromPipelineByPropertyName = true, ParameterSetName = "SymmetricFile")]
+    [Alias("FullName", "LiteralPath")]
     public string FilePath { get; set; }
 
     /// <summary>Output file path for the encrypted file.</summary>
@@ -141,7 +143,7 @@ public class CmdletProtectPGP : PSCmdlet {
     [Parameter]
     public int? PgpSignatureType { get; set; }
 
-    /// <summary>Public key algorithm used during encryption.</summary>
+    /// <summary>Compatibility parameter; supplying it is rejected. Existing keys determine their own algorithm.</summary>
     [Parameter]
     public PublicKeyAlgorithmTag? PublicKeyAlgorithm { get; set; }
 
@@ -198,6 +200,17 @@ public class CmdletProtectPGP : PSCmdlet {
     [Parameter(Mandatory = true, ParameterSetName = "ClearSignString")]
     public SwitchParameter ClearSign { get; set; }
 
+    /// <summary>Returns the completed output file for each successful file operation.</summary>
+    [Parameter(ParameterSetName = "Folder")]
+    [Parameter(ParameterSetName = "File")]
+    [Parameter(ParameterSetName = "SignFolder")]
+    [Parameter(ParameterSetName = "SignFile")]
+    [Parameter(ParameterSetName = "ClearSignFolder")]
+    [Parameter(ParameterSetName = "ClearSignFile")]
+    [Parameter(ParameterSetName = "SymmetricFolder")]
+    [Parameter(ParameterSetName = "SymmetricFile")]
+    public SwitchParameter PassThru { get; set; }
+
     /// <summary>
     /// Encrypts or signs input data based on the selected
     /// parameter set and writes results to files or the pipeline.
@@ -210,6 +223,12 @@ public class CmdletProtectPGP : PSCmdlet {
             bool clearSignMode = ClearSign.IsPresent || ParameterSetName.StartsWith("ClearSign", System.StringComparison.OrdinalIgnoreCase);
             bool symmetricMode = ParameterSetName.StartsWith("Symmetric", System.StringComparison.OrdinalIgnoreCase);
             Dictionary<string, string> headers = HeaderHelper.ToDictionary(Headers);
+            if (PublicKeyAlgorithm.HasValue)
+                throw new ArgumentException("PublicKeyAlgorithm cannot change an existing key. Select it when generating the key with New-PGPKey.");
+            if (PgpSignatureType.HasValue && PgpSignatureType.Value != (clearSignMode ? PgpSignature.CanonicalTextDocument : PgpSignature.BinaryDocument))
+                throw new ArgumentException("Use ClearSign for canonical text signatures. Other signing operations produce binary-document signatures.");
+            if (ParameterSetName.EndsWith("String", StringComparison.Ordinal) && !Armor)
+                throw new ArgumentException("String operations produce armored text. Use file input for binary output.");
 
             var publicKeys = new List<string>();
             if (!signOnlyMode && !clearSignMode && !symmetricMode) {
@@ -220,21 +239,20 @@ public class CmdletProtectPGP : PSCmdlet {
                         KeyExpirationHelper.WarnIfExpired(this, resolved, expiration);
                         publicKeys.Add(resolved);
                     } else {
-                        ErrorActionHelper.WriteErrorOrWarning(
+                        CmdletError.Write(
                             this,
                             new FileNotFoundException($"Public key doesn't exist {resolved}"),
                             "PublicKeyNotFound",
                             ErrorCategory.InvalidArgument,
-                            resolved,
-                            $"Public key doesn't exist {resolved}");
+                            resolved);
                         return;
                     }
                 }
             }
 
-            if (SignKey != null && SignKey.Exists) {
-                DateTime? expiration = KeyExpirationHelper.GetExpiration(SignKey.FullName);
-                KeyExpirationHelper.WarnIfExpired(this, SignKey.FullName, expiration);
+            if (SignKey != null && File.Exists(PathResolver.Resolve(this, SignKey.ToString()))) {
+                DateTime? expiration = KeyExpirationHelper.GetExpiration(PathResolver.Resolve(this, SignKey.ToString()));
+                KeyExpirationHelper.WarnIfExpired(this, PathResolver.Resolve(this, SignKey.ToString()), expiration);
             }
 
             foreach (string publicKeyPath in publicKeys) {
@@ -242,61 +260,33 @@ public class CmdletProtectPGP : PSCmdlet {
             }
 
             if (SignKey != null) {
-                signKeyStream = KeyMaterialHelper.OpenRead(SignKey.FullName);
+                signKeyStream = KeyMaterialHelper.OpenRead(PathResolver.Resolve(this, SignKey.ToString()));
             }
 
             EncryptionKeys encryptionKeys = symmetricMode
                 ? new EncryptionKeys(Encoding.UTF8.GetBytes(SymmetricPassphrase))
                 : signOnlyMode || clearSignMode
-                ? new EncryptionKeys(signKeyStream, SignPassword)
+                ? new EncryptionKeys(signKeyStream, SignPassword ?? string.Empty)
                 : SignKey != null
-                    ? new EncryptionKeys(publicKeyStreams, signKeyStream, SignPassword)
+                    ? new EncryptionKeys(publicKeyStreams, signKeyStream, SignPassword ?? string.Empty)
                     : new EncryptionKeys(publicKeyStreams);
             var pgp = new PGP(encryptionKeys);
 
             PGPConfigurator.Configure(pgp, HashAlgorithm, CompressionAlgorithm, FileType, PgpSignatureType, PublicKeyAlgorithm, SymmetricKeyAlgorithm);
-            if (AddVersionHeader.IsPresent) pgp.AddVersionHeader = true;
+            pgp.AddVersionHeader = AddVersionHeader.IsPresent;
 
-            if (ParameterSetName == "Folder" || ParameterSetName == "SignFolder" || ParameterSetName == "ClearSignFolder") {
-                string resolvedFolder = PathResolver.Resolve(this, FolderPath);
-                foreach (var file in Directory.GetFiles(resolvedFolder, "*", SearchOption.AllDirectories)) {
-                    string extension = clearSignMode ? ".asc" : signOnlyMode ? ".sig" : ".pgp";
-                    string outputFile = !string.IsNullOrEmpty(OutputFolderPath)
-                        ? Path.Combine(PathResolver.Resolve(this, OutputFolderPath), Path.GetFileName(file) + extension)
-                        : file + extension;
-
-                    if (clearSignMode) {
-                        pgp.ClearSignFile(new FileInfo(file), new FileInfo(outputFile), headers);
-                    } else if (signOnlyMode) {
-                        if (Detached.IsPresent) {
-                            pgp.SignDetached(new FileInfo(file), new FileInfo(outputFile), Armor, headers);
-                        } else {
-                            pgp.SignFile(new FileInfo(file), new FileInfo(outputFile), Armor, LiteralFileName, headers, OldFormat.IsPresent);
-                        }
-                    } else if (SignKey != null) {
-                        pgp.EncryptFileAndSign(new FileInfo(file), new FileInfo(outputFile), Armor, WithIntegrityCheck, LiteralFileName, headers, OldFormat.IsPresent);
-                    } else {
-                        pgp.EncryptFile(new FileInfo(file), new FileInfo(outputFile), Armor, WithIntegrityCheck, LiteralFileName, headers, OldFormat.IsPresent);
-                    }
-                }
-            } else if (ParameterSetName == "File" || ParameterSetName == "SignFile" || ParameterSetName == "ClearSignFile") {
-                string resolvedFile = PathResolver.Resolve(this, FilePath);
+            if (ParameterSetName.EndsWith("Folder", StringComparison.Ordinal)) {
                 string extension = clearSignMode ? ".asc" : signOnlyMode ? ".sig" : ".pgp";
-                string outputFile = !string.IsNullOrEmpty(OutFilePath) ? PathResolver.Resolve(this, OutFilePath) : resolvedFile + extension;
-
-                if (clearSignMode) {
-                    pgp.ClearSignFile(new FileInfo(resolvedFile), new FileInfo(outputFile), headers);
-                } else if (signOnlyMode) {
-                    if (Detached.IsPresent) {
-                        pgp.SignDetached(new FileInfo(resolvedFile), new FileInfo(outputFile), Armor, headers);
-                    } else {
-                        pgp.SignFile(new FileInfo(resolvedFile), new FileInfo(outputFile), Armor, LiteralFileName, headers, OldFormat.IsPresent);
-                    }
-                } else if (SignKey != null) {
-                    pgp.EncryptFileAndSign(new FileInfo(resolvedFile), new FileInfo(outputFile), Armor, WithIntegrityCheck, LiteralFileName, headers, OldFormat.IsPresent);
-                } else {
-                    pgp.EncryptFile(new FileInfo(resolvedFile), new FileInfo(outputFile), Armor, WithIntegrityCheck, LiteralFileName, headers, OldFormat.IsPresent);
+                var plan = FileWorkflow.Plan(PathResolver.Resolve(this, FolderPath),
+                    string.IsNullOrEmpty(OutputFolderPath) ? null : PathResolver.Resolve(this, OutputFolderPath), name => name + extension);
+                foreach (var item in plan) {
+                    ProcessFile(pgp, item.Input, item.Output, clearSignMode, signOnlyMode, headers);
                 }
+            } else if (ParameterSetName.EndsWith("File", StringComparison.Ordinal)) {
+                string file = PathResolver.Resolve(this, FilePath);
+                string extension = clearSignMode ? ".asc" : signOnlyMode ? ".sig" : ".pgp";
+                string output = string.IsNullOrEmpty(OutFilePath) ? file + extension : PathResolver.Resolve(this, OutFilePath);
+                ProcessFile(pgp, file, output, clearSignMode, signOnlyMode, headers);
             } else if (ParameterSetName == "String" || ParameterSetName == "SignString" || ParameterSetName == "ClearSignString" || ParameterSetName == "SymmetricString") {
                 string result = clearSignMode
                     ? pgp.ClearSignArmoredString(String, headers)
@@ -308,27 +298,13 @@ public class CmdletProtectPGP : PSCmdlet {
                         ? pgp.EncryptArmoredStringAndSign(String, WithIntegrityCheck, LiteralFileName, headers, OldFormat.IsPresent)
                         : pgp.EncryptArmoredString(String, WithIntegrityCheck, LiteralFileName, headers, OldFormat.IsPresent);
                 WriteObject(result);
-            } else if (ParameterSetName == "SymmetricFolder" || ParameterSetName == "SymmetricFile") {
-                string resolvedFile = ParameterSetName == "SymmetricFile" ? PathResolver.Resolve(this, FilePath) : null;
-                if (ParameterSetName == "SymmetricFolder") {
-                    string resolvedFolder = PathResolver.Resolve(this, FolderPath);
-                    foreach (var file in Directory.GetFiles(resolvedFolder, "*", SearchOption.AllDirectories)) {
-                        string outputFile = !string.IsNullOrEmpty(OutputFolderPath)
-                            ? Path.Combine(PathResolver.Resolve(this, OutputFolderPath), Path.GetFileName(file) + ".pgp")
-                            : file + ".pgp";
-                        pgp.EncryptFile(new FileInfo(file), new FileInfo(outputFile), Armor, WithIntegrityCheck, LiteralFileName, headers, OldFormat.IsPresent);
-                    }
-                } else {
-                    string outputFile = !string.IsNullOrEmpty(OutFilePath) ? PathResolver.Resolve(this, OutFilePath) : resolvedFile + ".pgp";
-                    pgp.EncryptFile(new FileInfo(resolvedFile), new FileInfo(outputFile), Armor, WithIntegrityCheck, LiteralFileName, headers, OldFormat.IsPresent);
-                }
             }
-        } catch (Exception ex) {
+        } catch (Exception ex) when (ex is not PipelineStoppedException && ex is not ActionPreferenceStopException) {
             string keyPath = null;
             if (SignKey is null && FilePathPublic != null && FilePathPublic.Length == 1) {
                 keyPath = FilePathPublic[0];
             } else if (SignKey != null && (FilePathPublic is null || FilePathPublic.Length == 0)) {
-                keyPath = SignKey.FullName;
+                keyPath = PathResolver.Resolve(this, SignKey.ToString());
             }
 
             WriteError(PgpExceptionHelper.CreateErrorRecord(ex, "ProtectPGPFailed", keyPath, keyPath));
@@ -339,4 +315,20 @@ public class CmdletProtectPGP : PSCmdlet {
             }
         }
     }
+    private void ProcessFile(PGP pgp, string input, string output, bool clearSign, bool signOnly, IDictionary<string, string> headers) {
+        if (!ShouldProcess(output, clearSign || signOnly ? "Write PGP signature" : "Write encrypted file")) return;
+        FileWorkflow.EnsureOutputDirectory(input, output);
+        if (clearSign) {
+            pgp.ClearSignFile(new FileInfo(input), new FileInfo(output), headers);
+        } else if (signOnly) {
+            if (Detached.IsPresent) pgp.SignDetached(new FileInfo(input), new FileInfo(output), Armor, headers);
+            else pgp.SignFile(new FileInfo(input), new FileInfo(output), Armor, LiteralFileName, headers, OldFormat.IsPresent);
+        } else if (SignKey != null) {
+            pgp.EncryptFileAndSign(new FileInfo(input), new FileInfo(output), Armor, WithIntegrityCheck, LiteralFileName, headers, OldFormat.IsPresent);
+        } else {
+            pgp.EncryptFile(new FileInfo(input), new FileInfo(output), Armor, WithIntegrityCheck, LiteralFileName, headers, OldFormat.IsPresent);
+        }
+        if (PassThru.IsPresent) WriteObject(new FileInfo(output));
+    }
+
 }

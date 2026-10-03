@@ -1,235 +1,61 @@
 name: Test PowerShell
 
 on:
-    push:
-        branches:
-            - v2-speedygonzales
-        paths-ignore:
-            - '*.md'
-            - 'Docs/**'
-            - 'Examples/**'
-            - '.gitignore'
-    pull_request:
-        branches:
-            - v2-speedygonzales
+  push:
+    branches: [v2-speedygonzales]
+    paths-ignore: ['*.md', 'Docs/**', 'Examples/**']
+  pull_request:
+    branches: [v2-speedygonzales]
 
-env:
-    DOTNET_VERSION: '8.x'
-    BUILD_CONFIGURATION: 'Debug'
+permissions:
+  contents: read
 
 jobs:
-    refresh-psd1:
-        name: 'Refresh PSD1'
-        runs-on: windows-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v7
-              with:
-                fetch-depth: 0
-                ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref }}
+  package:
+    name: Build module artifact
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '8.x'
+      - name: Install package tooling
+        shell: pwsh
+        run: Install-Module PSPublishModule -RequiredVersion 3.0.153 -Scope CurrentUser -Force -AllowClobber
+      - name: Build unsigned validation artifact
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          ./Build/Build-Module.ps1 -ConfigurationGateMode Build -SignModule $false
+          if ($LASTEXITCODE -ne 0) { throw "Module build failed: $LASTEXITCODE" }
+          if (-not (Test-Path Artefacts/Unpacked/PSPGP/PSPGP.psd1)) { throw 'Module artifact is missing.' }
+      - uses: actions/upload-artifact@v7
+        with:
+          name: pspgp-module
+          path: Artefacts/Unpacked/PSPGP
+          if-no-files-found: error
 
-            - name: Setup PowerShell modules
-              run: |
-                Install-Module PSPublishModule -Force -Scope CurrentUser -AllowClobber
-              shell: pwsh
-
-            - name: Refresh module manifest
-              env:
-                RefreshPSD1Only: 'true'
-              run: |
-                ./Build/Build-Module.ps1
-              shell: pwsh
-
-            - name: Commit refreshed PSD1
-              env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                HEAD_BRANCH: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref_name }}
-              run: |
-                git config user.name "github-actions[bot]"
-                git config user.email "github-actions[bot]@users.noreply.github.com"
-                git add PSPGP.psd1
-                git diff --cached --quiet
-                if ($LASTEXITCODE -eq 0) {
-                  Write-Host "No PSD1 changes to commit."
-                } elseif ($LASTEXITCODE -eq 1) {
-                  git commit -m "chore: regenerate psd1"
-                  git push origin HEAD:$Env:HEAD_BRANCH
-                } else {
-                  throw "Unable to inspect staged PSD1 changes (git exit code $LASTEXITCODE)."
-                }
-
-            - name: Upload refreshed manifest
-              uses: actions/upload-artifact@v7
-              with:
-                name: psd1
-                path: PSPGP.psd1
-
-    test-windows-ps5:
-        needs: refresh-psd1
-        name: 'Windows PowerShell 5.1'
-        runs-on: windows-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v7
-
-            - name: Download manifest
-              uses: actions/download-artifact@v8
-              with:
-                name: psd1
-                path: .
-
-            - name: Setup .NET
-              uses: actions/setup-dotnet@v6
-              with:
-                dotnet-version: ${{ env.DOTNET_VERSION }}
-
-            - name: Install PowerShell modules
-              run: |
-                Write-Host "PowerShell Version: $($PSVersionTable.PSVersion)"
-                if (-not (Get-PSRepository -Name PSGallery -ErrorAction SilentlyContinue)) {
-                  Register-PSRepository -Default
-                }
-                Install-Module -Name Pester -Repository PSGallery -Force -SkipPublisherCheck -AllowClobber
-                Install-Module -Name PSWriteColor -Repository PSGallery -Force -SkipPublisherCheck -AllowClobber
-              shell: powershell
-
-            - name: Build .NET solution
-              run: |
-                dotnet restore Sources/PSPGP.sln
-                dotnet build Sources/PSPGP.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
-
-            - name: Run PowerShell tests
-              run: ./PSPGP.Tests.ps1
-              shell: powershell
-
-    test-windows-ps7:
-        needs: refresh-psd1
-        name: 'Windows PowerShell 7'
-        runs-on: windows-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v7
-
-            - name: Download manifest
-              uses: actions/download-artifact@v8
-              with:
-                name: psd1
-                path: .
-
-            - name: Setup .NET
-              uses: actions/setup-dotnet@v6
-              with:
-                dotnet-version: ${{ env.DOTNET_VERSION }}
-
-            - name: Install PowerShell modules
-              run: |
-                Write-Host "PowerShell Version: $($PSVersionTable.PSVersion)"
-                Install-Module -Name Pester -Repository PSGallery -Force -SkipPublisherCheck -AllowClobber
-                Install-Module -Name PSWriteColor -Repository PSGallery -Force -SkipPublisherCheck -AllowClobber
-              shell: pwsh
-
-            - name: Build .NET solution
-              run: |
-                dotnet restore Sources/PSPGP.sln
-                dotnet build Sources/PSPGP.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
-
-            - name: Run PowerShell tests
-              run: ./PSPGP.Tests.ps1
-              shell: pwsh
-
-    test-ubuntu:
-        needs: refresh-psd1
-        name: 'Ubuntu PowerShell 7'
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v7
-
-            - name: Download manifest
-              uses: actions/download-artifact@v8
-              with:
-                name: psd1
-                path: .
-
-            - name: Setup .NET
-              uses: actions/setup-dotnet@v6
-              with:
-                dotnet-version: ${{ env.DOTNET_VERSION }}
-
-            - name: Install PowerShell
-              run: |
-                curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-                curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list | sudo tee /etc/apt/sources.list.d/microsoft.list
-                sudo apt-get update
-                sudo apt-get install -y powershell
-
-            - name: Install PowerShell modules
-              run: |
-                Write-Host "PowerShell Version: $($PSVersionTable.PSVersion)"
-                Install-Module -Name Pester -Repository PSGallery -Force -SkipPublisherCheck -AllowClobber
-                Install-Module -Name PSWriteColor -Repository PSGallery -Force -SkipPublisherCheck -AllowClobber
-              shell: pwsh
-
-            - name: Build .NET solution
-              run: |
-                dotnet restore Sources/PSPGP.sln
-                dotnet build Sources/PSPGP.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
-
-            - name: Run PowerShell tests
-              run: ./PSPGP.Tests.ps1
-              shell: pwsh
-
-    test-macos:
-        needs: refresh-psd1
-        name: 'macOS PowerShell 7'
-        runs-on: macos-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v7
-
-            - name: Download manifest
-              uses: actions/download-artifact@v8
-              with:
-                name: psd1
-                path: .
-
-            - name: Setup .NET
-              uses: actions/setup-dotnet@v6
-              with:
-                dotnet-version: ${{ env.DOTNET_VERSION }}
-
-            - name: Ensure PowerShell is available
-              shell: bash
-              run: |
-                if command -v pwsh >/dev/null 2>&1; then
-                  pwsh --version
-                  exit 0
-                fi
-
-                brew update
-                brew tap microsoft/powershell || true
-
-                if brew info --cask powershell >/dev/null 2>&1; then
-                  brew install --cask powershell
-                elif brew info --cask powershell@preview >/dev/null 2>&1; then
-                  brew install --cask powershell@preview
-                else
-                  echo "PowerShell is not available from Homebrew on this runner." >&2
-                  exit 1
-                fi
-
-            - name: Install PowerShell modules
-              run: |
-                Write-Host "PowerShell Version: $($PSVersionTable.PSVersion)"
-                Install-Module -Name Pester -Repository PSGallery -Force -SkipPublisherCheck -AllowClobber
-                Install-Module -Name PSWriteColor -Repository PSGallery -Force -SkipPublisherCheck -AllowClobber
-              shell: pwsh
-
-            - name: Build .NET solution
-              run: |
-                dotnet restore Sources/PSPGP.sln
-                dotnet build Sources/PSPGP.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
-
-            - name: Run PowerShell tests
-              run: ./PSPGP.Tests.ps1
-              shell: pwsh
+  test:
+    name: '${{ matrix.os }} / ${{ matrix.shell }}'
+    needs: package
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, shell: powershell }
+          - { os: windows-latest, shell: pwsh }
+          - { os: ubuntu-latest, shell: pwsh }
+          - { os: macos-latest, shell: pwsh }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: pspgp-module
+          path: .validation-module/PSPGP
+      - name: Install test tooling
+        shell: ${{ matrix.shell }}
+        run: Install-Module Pester -RequiredVersion 5.7.1 -Scope CurrentUser -Force -SkipPublisherCheck
+      - name: Test the packaged module
+        shell: ${{ matrix.shell }}
+        run: ./PSPGP.Tests.ps1 -ModulePath ./.validation-module/PSPGP/PSPGP.psd1

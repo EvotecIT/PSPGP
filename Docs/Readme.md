@@ -7,14 +7,14 @@ Locale: en-US
 ---
 # PSPGP Module
 ## Description
-PSPGP is a PowerShell module that provides PGP functionality in PowerShell. It allows encrypting and decrypting files/folders and strings using PGP.
+PGP encryption, decryption, signing, verification, and key management for PowerShell.
 
 ## PSPGP Cmdlets
 ### [Get-PGPInspect](Get-PGPInspect.md)
 Inspects PGP content and returns message metadata.
 
 ### [Get-PGPKey](Get-PGPKey.md)
-Downloads a public key from a key server.
+Downloads validated public certificates from an HTTPS key server.
 
 ### [Get-PGPKeyInfo](Get-PGPKeyInfo.md)
 Returns information about a PGP key such as algorithm, expiration and user IDs.

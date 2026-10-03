@@ -33,7 +33,7 @@ namespace PSPGP;
 /// Test-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -String $ProtectedString -ThrowIfEncrypted
 /// </code>
 /// </example>
-[Cmdlet(VerbsDiagnostic.Test, "PGP", DefaultParameterSetName = "File")]
+[Cmdlet(VerbsDiagnostic.Test, "PGP", DefaultParameterSetName = "File", SupportsShouldProcess = true)]
 [OutputType(typeof(VerificationResult))]
 public class CmdletTestPGP : PSCmdlet {
     /// <summary>Public key file used to verify signatures.</summary>
@@ -51,7 +51,8 @@ public class CmdletTestPGP : PSCmdlet {
     public string OutputFolderPath { get; set; }
 
     /// <summary>File path to verify.</summary>
-    [Parameter(Mandatory = true, ParameterSetName = "File")]
+    [Parameter(Mandatory = true, ValueFromPipeline = true, ValueFromPipelineByPropertyName = true, ParameterSetName = "File")]
+    [Alias("FullName", "LiteralPath")]
     public string FilePath { get; set; }
 
     /// <summary>Detached signature file for the input file.</summary>
@@ -70,7 +71,7 @@ public class CmdletTestPGP : PSCmdlet {
     [Parameter(ParameterSetName = "String")]
     public string Signature { get; set; }
 
-    /// <summary>Throws when encrypted content is passed to verify methods.</summary>
+    /// <summary>Retained for compatibility. Encrypted input is always rejected; use Unprotect-PGP -Verify.</summary>
     [Parameter]
     public SwitchParameter ThrowIfEncrypted { get; set; }
 
@@ -90,19 +91,14 @@ public class CmdletTestPGP : PSCmdlet {
             }
 
             if (ParameterSetName == "Folder") {
-                string resolvedFolder = PathResolver.Resolve(this, FolderPath);
-                string resolvedOutputFolder = !string.IsNullOrEmpty(OutputFolderPath)
-                    ? PathResolver.Resolve(this, OutputFolderPath)
-                    : null;
-                if (!string.IsNullOrEmpty(resolvedOutputFolder)) {
-                    Directory.CreateDirectory(resolvedOutputFolder);
-                }
-
-                foreach (string file in Directory.GetFiles(resolvedFolder, "*", SearchOption.AllDirectories)) {
-                    string outputPath = !string.IsNullOrEmpty(resolvedOutputFolder)
-                        ? GetVerifiedOutputPath(resolvedFolder, resolvedOutputFolder, file)
-                        : null;
-                    WriteObject(VerifyFileWithAnyKey(file, null, outputPath, publicKeys));
+                string root = PathResolver.Resolve(this, FolderPath);
+                string destination = string.IsNullOrEmpty(OutputFolderPath) ? null : PathResolver.Resolve(this, OutputFolderPath);
+                if (destination == null) {
+                    foreach (string file in Directory.GetFiles(root, "*", SearchOption.AllDirectories))
+                        WriteObject(VerifyFileWithAnyKey(file, null, null, publicKeys));
+                } else {
+                    foreach (var item in FileWorkflow.Plan(root, destination, FileWorkflow.RemoveSignedSuffix))
+                        WriteObject(VerifyFileWithAnyKey(item.Input, null, item.Output, publicKeys));
                 }
             } else if (ParameterSetName == "File") {
                 string resolvedFile = PathResolver.Resolve(this, FilePath);
@@ -116,7 +112,7 @@ public class CmdletTestPGP : PSCmdlet {
             } else if (ParameterSetName == "String") {
                 WriteObject(VerifyStringWithAnyKey(String, Signature, publicKeys));
             }
-        } catch (Exception ex) {
+        } catch (Exception ex) when (ex is not PipelineStoppedException && ex is not ActionPreferenceStopException) {
             WriteError(PgpExceptionHelper.CreateErrorRecord(ex, "TestPGPFailed"));
         }
     }
@@ -126,13 +122,12 @@ public class CmdletTestPGP : PSCmdlet {
         foreach (string path in FilePathPublic) {
             string resolved = PathResolver.Resolve(this, path);
             if (!File.Exists(resolved)) {
-                ErrorActionHelper.WriteErrorOrWarning(
+                CmdletError.Write(
                     this,
                     new FileNotFoundException($"Public key doesn't exist {resolved}"),
                     "PublicKeyNotFound",
                     ErrorCategory.InvalidArgument,
-                    resolved,
-                    $"Public key doesn't exist {resolved}");
+                    resolved);
                 publicKeys.Clear();
                 return publicKeys;
             }
@@ -146,9 +141,10 @@ public class CmdletTestPGP : PSCmdlet {
 
     private VerificationResult VerifyFileWithAnyKey(string filePath, string signaturePath, string outputPath, List<string> publicKeys) {
         bool status = false;
-        string error = string.Empty;
+        string error = "No valid signature matched the supplied public keys.";
         string signer = null;
         string verifiedOutput = null;
+        string approvedOutput = string.IsNullOrEmpty(outputPath) || ShouldProcess(outputPath, "Write verified content") ? outputPath : null;
 
         foreach (string key in publicKeys) {
             try {
@@ -157,17 +153,17 @@ public class CmdletTestPGP : PSCmdlet {
                 var pgp = new PGP(encryptionKeys);
                 status = !string.IsNullOrEmpty(signaturePath)
                     ? pgp.VerifyDetached(new FileInfo(filePath), new FileInfo(signaturePath))
-                    : !string.IsNullOrEmpty(outputPath)
-                        ? VerifyFileToOutput(pgp, filePath, outputPath)
+                    : !string.IsNullOrEmpty(approvedOutput)
+                        ? VerifyFileToOutput(pgp, filePath, approvedOutput)
                         : ClearSigned.IsPresent
                             ? pgp.VerifyClearFile(new FileInfo(filePath))
                             : pgp.VerifyFile(new FileInfo(filePath), ThrowIfEncrypted.IsPresent);
                 if (status) {
                     signer = key;
-                    verifiedOutput = string.IsNullOrEmpty(signaturePath) ? outputPath : null;
+                    verifiedOutput = string.IsNullOrEmpty(signaturePath) ? approvedOutput : null;
                     break;
                 }
-            } catch (Exception ex) {
+            } catch (Exception ex) when (ex is not PipelineStoppedException && ex is not ActionPreferenceStopException) {
                 error = PgpExceptionHelper.Normalize(ex, key).Message;
             }
         }
@@ -184,7 +180,7 @@ public class CmdletTestPGP : PSCmdlet {
     private VerificationResult VerifyStringWithAnyKey(string input, string signature, List<string> publicKeys) {
         bool status = false;
         string clearText = null;
-        string error = string.Empty;
+        string error = "No valid signature matched the supplied public keys.";
         string signer = null;
 
         foreach (string key in publicKeys) {
@@ -208,7 +204,7 @@ public class CmdletTestPGP : PSCmdlet {
                     signer = key;
                     break;
                 }
-            } catch (Exception ex) {
+            } catch (Exception ex) when (ex is not PipelineStoppedException && ex is not ActionPreferenceStopException) {
                 error = PgpExceptionHelper.Normalize(ex, key).Message;
             }
         }
@@ -222,91 +218,9 @@ public class CmdletTestPGP : PSCmdlet {
     }
 
     private bool VerifyFileToOutput(PGP pgp, string inputFile, string outputFile) {
-        string temporaryOutput = GetTemporaryOutputFile(outputFile);
-        try {
-            EnsureDirectoryForFile(temporaryOutput);
-            bool verified = ClearSigned.IsPresent
-                ? pgp.VerifyClear(new FileInfo(inputFile), new FileInfo(temporaryOutput))
-                : pgp.Verify(new FileInfo(inputFile), new FileInfo(temporaryOutput), true);
-            if (!verified) {
-                return false;
-            }
-
-            EnsureDirectoryForFile(outputFile);
-            if (File.Exists(outputFile)) {
-                File.Delete(outputFile);
-            }
-            File.Move(temporaryOutput, outputFile);
-            return true;
-        } finally {
-            if (File.Exists(temporaryOutput)) {
-                File.Delete(temporaryOutput);
-            }
-        }
-    }
-
-    private static string GetVerifiedOutputPath(string inputFolder, string outputFolder, string inputFile) {
-        string relativeInput = GetRelativePath(inputFolder, inputFile);
-        string relativeDirectory = Path.GetDirectoryName(relativeInput);
-        string outputFileName = GetVerifiedOutputFileName(relativeInput);
-        string relativeOutput = string.IsNullOrEmpty(relativeDirectory)
-            ? outputFileName
-            : Path.Combine(relativeDirectory, outputFileName);
-
-        return Path.Combine(outputFolder, relativeOutput);
-    }
-
-    private static string GetVerifiedOutputFileName(string inputFile) {
-        string fileName = Path.GetFileName(inputFile);
-        foreach (string extension in new[] { ".asc", ".sig", ".pgp", ".gpg" }) {
-            if (fileName.EndsWith(extension, StringComparison.OrdinalIgnoreCase)) {
-                return fileName.Substring(0, fileName.Length - extension.Length);
-            }
-        }
-
-        return fileName;
-    }
-
-    private static string GetRelativePath(string inputFolder, string inputFile) {
-        string root = EnsureTrailingDirectorySeparator(Path.GetFullPath(inputFolder));
-        string file = Path.GetFullPath(inputFile);
-        var rootUri = new Uri(root);
-        var fileUri = new Uri(file);
-        if (!string.Equals(rootUri.Scheme, fileUri.Scheme, StringComparison.OrdinalIgnoreCase)) {
-            return Path.GetFileName(file);
-        }
-
-        string relative = Uri.UnescapeDataString(rootUri.MakeRelativeUri(fileUri).ToString());
-        return string.Equals(fileUri.Scheme, Uri.UriSchemeFile, StringComparison.OrdinalIgnoreCase)
-            ? relative.Replace('/', Path.DirectorySeparatorChar)
-            : relative;
-    }
-
-    private static string EnsureTrailingDirectorySeparator(string path) {
-        if (path.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal)
-            || path.EndsWith(Path.AltDirectorySeparatorChar.ToString(), StringComparison.Ordinal)) {
-            return path;
-        }
-
-        return path + Path.DirectorySeparatorChar;
-    }
-
-    private static void EnsureDirectoryForFile(string filePath) {
-        string directory = Path.GetDirectoryName(filePath);
-        if (string.IsNullOrEmpty(directory)) {
-            directory = Directory.GetCurrentDirectory();
-        }
-
-        Directory.CreateDirectory(directory);
-    }
-
-    private static string GetTemporaryOutputFile(string outputFile) {
-        string directory = Path.GetDirectoryName(outputFile);
-        string fileName = Path.GetFileName(outputFile);
-        if (string.IsNullOrEmpty(directory)) {
-            directory = Directory.GetCurrentDirectory();
-        }
-
-        return Path.Combine(directory, $".{fileName}.{Guid.NewGuid():N}.tmp");
+        FileWorkflow.EnsureOutputDirectory(inputFile, outputFile);
+        return ClearSigned.IsPresent
+            ? pgp.VerifyClear(new FileInfo(inputFile), new FileInfo(outputFile))
+            : pgp.Verify(new FileInfo(inputFile), new FileInfo(outputFile), true);
     }
 }
