@@ -1,3 +1,4 @@
+using System.Linq;
 using Org.BouncyCastle.Bcpg.OpenPgp;
 using System;
 using System.IO;
@@ -17,30 +18,8 @@ internal static class KeyExpirationHelper {
     /// <returns>The expiration date if available.</returns>
     internal static DateTime? GetExpiration(string filePath) {
         using Stream keyStream = KeyMaterialHelper.OpenRead(filePath);
-        using Stream decoderStream = PgpUtilities.GetDecoderStream(keyStream);
-        PgpObjectFactory factory = new(decoderStream);
-        PgpPublicKey publicKey = null;
-
-        object pgpObject = factory.NextPgpObject();
-        switch (pgpObject) {
-            case PgpPublicKeyRing publicRing:
-                publicKey = publicRing.GetPublicKey();
-                break;
-            case PgpSecretKeyRing secretRing:
-                publicKey = secretRing.GetSecretKey().PublicKey;
-                break;
-            case PgpPublicKey key:
-                publicKey = key;
-                break;
-        }
-
-        if (publicKey != null) {
-            return publicKey.GetValidSeconds() == 0
-                ? null
-                : publicKey.CreationTime.AddSeconds(publicKey.GetValidSeconds());
-        }
-
-        return null;
+        return PgpCore.PGP.InspectKeys(keyStream).Where(key => key.IsMasterKey && key.Expiration.HasValue)
+            .Select(key => key.Expiration).OrderBy(value => value).FirstOrDefault();
     }
 
     /// <summary>

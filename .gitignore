@@ -1,0 +1,8 @@
+# Regenerable .NET and module build output.
+**/bin/
+**/obj/
+Artefacts/
+TestResults/
+
+# PowerForge regenerates source-side assembly loaders.
+Lib/

@@ -1,6 +1,7 @@
-﻿Describe 'PGP Tests' {
+$PGPTestDirectory = [io.path]::Combine([io.path]::GetTempPath(), 'PSPGP-tests-' + [guid]::NewGuid().ToString('N'))
+Describe 'PGP Tests' -ForEach @{ PGPTestDirectory = $PGPTestDirectory } {
     # prepare things
-    $KeysDirectory = [io.path]::Combine([io.path]::GetTempPath(), 'Keys')
+    $KeysDirectory = $PGPTestDirectory
     $KeyPublic = [io.path]::Combine($KeysDirectory, 'PublicPGP.asc')
     $KeyPrivate = [io.path]::Combine($KeysDirectory, 'PrivatePGP.asc')
 
@@ -11,7 +12,7 @@
     [string] $Script:ProtectedString = ''
 
     BeforeAll {
-        $KeysDirectory = [io.path]::Combine([io.path]::GetTempPath(), 'Keys')
+        $KeysDirectory = $PGPTestDirectory
         New-Item -Path $KeysDirectory -Force -ItemType Directory
         # Ensure the module is loaded in test context
         if (-not (Get-Module PSPGP)) {
@@ -340,25 +341,18 @@
                 } | Should -Throw
             }
 
-            It "$($current.Name) warns when ErrorActionPreference is Continue" -TestCases @{ CommandName = $current.Name; Params = $current.Params } {
+            It "$($current.Name) emits an error record under Continue" -TestCases @{ CommandName = $current.Name; Params = $current.Params } {
                 param($CommandName, $Params)
-                {
-                    $old = $ErrorActionPreference
-                    try {
-                        $ErrorActionPreference = 'Continue'
-                        $paramString = ($Params.GetEnumerator() | ForEach-Object { "-$($_.Key) '$($_.Value)'" }) -join ' '
-                        Invoke-Expression "$CommandName $paramString -WarningAction SilentlyContinue"
-                    }
-                    finally {
-                        $ErrorActionPreference = $old
-                    }
-                } | Should -Not -Throw
+                $reported = @()
+                & $CommandName @Params -ErrorAction SilentlyContinue -ErrorVariable +reported
+                $reported.Count | Should -BeGreaterThan 0
+                $reported[0] | Should -BeOfType ([System.Management.Automation.ErrorRecord])
             }
         }
     }
     # clean everything
     AfterAll {
-        $KeysDirectory = [io.path]::Combine([io.path]::GetTempPath(), 'Keys')
+        $KeysDirectory = $PGPTestDirectory
         Remove-Item -Path $KeysDirectory -Recurse -Force
     }
 }

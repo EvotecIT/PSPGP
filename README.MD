@@ -1,4 +1,4 @@
-﻿# PSPGP - PowerShell Module
+# PSPGP - PowerShell Module
 
 <p align="center">
   <a href="https://github.com/EvotecIT/PSPGP/actions/workflows/test-dotnet.yml"><img src="https://github.com/EvotecIT/PSPGP/actions/workflows/test-dotnet.yml/badge.svg?branch=v2-speedygonzales" alt="Test .NET"></a>
@@ -175,7 +175,7 @@ $Protected = Protect-PGP -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -Sign
 Unprotect-PGP -FilePathPrivate $PSScriptRoot\Keys\PrivatePGP1.asc -FilePathPublic $PSScriptRoot\Keys\PublicPGP1.asc -Password 'ZielonaMila9!' -String $Protected -Verify
 ```
 
-When `-Verify` is used with file output, PSPGP writes decrypted content through a temporary file and only moves it to the requested output path after signature verification succeeds.
+File encryption, decryption, signing, and verified extraction use PgpCore staging. Existing destinations are replaced after the operation succeeds. Decryption checks message integrity when the message carries an integrity packet; `-Verify` also requires a valid signature. Invalid output is discarded.
 
 ### Download and inspect public keys
 
@@ -206,3 +206,51 @@ See the `Examples` folder for runnable scripts:
 - `Examples\Example-SymmetricString.ps1`
 - `Examples\Example-InspectSignedString.ps1`
 - `Examples\Example-GetPGPKeyInfo.ps1`
+
+## Safe workflows and compatibility
+
+Folder operations preserve relative directories. An output subtree inside the input is excluded from subsequent runs. Output-name collisions are rejected before writing; symbolic links and reparse points are skipped. Decryption removes only a terminal `.pgp`, `.gpg`, or `.asc` suffix. Other filenames receive `.decrypted`.
+
+File parameters accept `FileInfo` pipeline records. `-PassThru` returns successful output files, and file-writing commands honor `-WhatIf` and `-Confirm`.
+
+```powershell
+$encrypted = Get-Item './report.txt' |
+    Protect-PGP -FilePathPublic './recipient.asc' -PassThru
+$encrypted | Unprotect-PGP -FilePathPrivate './recipient-private.asc' -PassThru
+```
+
+Omit `-Password` or `-SignPassword` for an unprotected private key. `New-PGPKey` defaults to 3072 bits and requires `-Force` to replace existing key files. `-Strength` and `-Certainty` can be set independently. `Protect-PGP -PublicKeyAlgorithm` is rejected because an existing key determines its algorithm; choose the algorithm with `New-PGPKey`. String output is armored text. Use file input for binary output.
+
+`Test-PGP` returns a result object. Test its `Status` property: PowerShell treats an object as true even when its status is false.
+
+```powershell
+$result = Test-PGP -FilePathPublic './signer.asc' -FilePath './report.txt.sig'
+if (-not $result.Status) { throw $result.Error }
+```
+
+Encrypted input requires `Unprotect-PGP -Verify`; `Test-PGP` verifies signed or clear-signed input and detached signatures. Verification authenticates the signature against the supplied certificate. Obtain the signer's complete fingerprint through a trusted channel. Verification can use expired or revoked certificates to check older signatures; it does not establish whether a signature was made before expiration or revocation.
+
+`Get-PGPKeyInfo` reports every primary certificate, its authenticated user IDs, and a `Subkeys` array. `-IncludeSubkeys` also emits subkeys as separate records. Use `CanSign` and `CanEncrypt` for authenticated capabilities, and `IsUsableForSigning` / `IsUsableForEncryption` for current use. `IsEncryptionKey` describes the underlying algorithm.
+
+Key servers require HTTPS. Downloads reject redirects, malformed certificates, secret-key packets, and responses larger than 8 MiB. Requests time out after 60 seconds and can be stopped with the PowerShell pipeline. `-ExpectedFingerprint` requires a single matching certificate:
+
+```powershell
+# Set this from an independently trusted channel.
+Get-PGPKey -KeyServer 'https://keys.openpgp.org' -Search $expectedFingerprint `
+    -ExpectedFingerprint $expectedFingerprint -OutFilePath './recipient.asc'
+```
+
+Errors use PowerShell error records and honor `-ErrorAction`, `-ErrorVariable`, and `$ErrorActionPreference`.
+
+## Building and testing
+
+The build uses PSPublishModule 3.0.153 or later. Its default mode builds artifacts without installing or publishing them. Signing defaults to enabled; use an explicitly unsigned build for local validation:
+
+```powershell
+./Build/Build-Module.ps1 -ConfigurationGateMode Build -SignModule $false
+./PSPGP.Tests.ps1 -ModulePath './Artefacts/Unpacked/PSPGP/PSPGP.psd1'
+```
+
+Tests use Pester 5.7.1 and exercise the packaged module on Windows PowerShell 5.1 and PowerShell 7. CI also runs that same artifact on Linux and macOS. The package contains .NET Framework 4.7.2 and .NET Standard 2.0 binaries. PowerShell Core uses the shared loader's assembly isolation to avoid conflicts with other modules' PGP dependencies.
+
+The source bootstrapper loads development binaries only when `PSPGP_DEVELOPMENT=true`. Set `PSPGP_DEVELOPMENT_CONFIGURATION` to choose `Debug` or `Release`. Command help is generated from C# XML documentation; regenerate it through the build's `Documentation` mode.

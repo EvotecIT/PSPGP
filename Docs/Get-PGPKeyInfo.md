@@ -11,7 +11,7 @@ Returns information about a PGP key such as algorithm, expiration and user IDs.
 ## SYNTAX
 ### __AllParameterSets
 ```powershell
-Get-PGPKeyInfo -FilePath <string[]> [<CommonParameters>]
+Get-PGPKeyInfo -FilePath <string[]> [-IncludeSubkeys] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -40,6 +40,22 @@ Required: True
 Position: named
 Default value: None
 Accept pipeline input: True (ByValue, ByPropertyName)
+Accept wildcard characters: False
+```
+
+### -IncludeSubkeys
+Emits subkeys as separate records in addition to primary certificates.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: __AllParameterSets
+Aliases: None
+Possible values:
+
+Required: False
+Position: named
+Default value: None
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
