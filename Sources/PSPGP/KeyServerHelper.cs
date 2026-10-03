@@ -58,7 +58,9 @@ public static class KeyServerHelper {
         PGP.ExportPublicKeys(input, normalized);
         using var content = new StringContent("keytext=" + Uri.EscapeDataString(Encoding.ASCII.GetString(normalized.ToArray())),
             Encoding.UTF8, "application/x-www-form-urlencoded");
-        using var response = await Client.PostAsync(serverUri.AbsoluteUri.TrimEnd('/') + "/pks/add", content, cancellationToken).ConfigureAwait(false);
+        using var request = new HttpRequestMessage(HttpMethod.Post, serverUri.AbsoluteUri.TrimEnd('/') + "/pks/add") { Content = content };
+        // Only the status is useful. Do not buffer or wait for an untrusted response body.
+        using var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
     }
 
