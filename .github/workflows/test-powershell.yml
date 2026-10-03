@@ -47,6 +47,9 @@ jobs:
           - { os: ubuntu-latest, shell: pwsh }
           - { os: macos-latest, shell: pwsh }
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
@@ -54,8 +57,6 @@ jobs:
           name: pspgp-module
           path: .validation-module/PSPGP
       - name: Install test tooling
-        shell: ${{ matrix.shell }}
         run: Install-Module Pester -RequiredVersion 5.7.1 -Scope CurrentUser -Force -SkipPublisherCheck
       - name: Test the packaged module
-        shell: ${{ matrix.shell }}
         run: ./PSPGP.Tests.ps1 -ModulePath ./.validation-module/PSPGP/PSPGP.psd1
