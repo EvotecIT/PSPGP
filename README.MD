@@ -209,7 +209,7 @@ See the `Examples` folder for runnable scripts:
 
 ## Safe workflows and compatibility
 
-Folder operations preserve relative directories. An output subtree inside the input is excluded from subsequent runs. Output-name collisions, including paths that differ only by letter case, are rejected before writing on every platform; symbolic links and reparse points are skipped. Decryption removes only a terminal `.pgp`, `.gpg`, or `.asc` suffix. Other filenames receive `.decrypted`.
+Folder operations preserve relative directories. An output subtree inside the input is excluded from subsequent runs. Output-name collisions, including paths that differ only by letter case or require the same path to be both a file and a directory, are rejected before writing on every platform. Child symbolic links and reparse points are skipped during protection, decryption, verification, and inspection. Decryption removes only a terminal `.pgp`, `.gpg`, or `.asc` suffix. Other filenames, including names consisting solely of one of those suffixes, receive `.decrypted`.
 
 File parameters accept `FileInfo` pipeline records. `-PassThru` returns successful output files, and file-writing commands honor `-WhatIf` and `-Confirm`.
 
@@ -229,6 +229,8 @@ if (-not $result.Status) { throw $result.Error }
 ```
 
 Encrypted input requires `Unprotect-PGP -Verify`; `Test-PGP` verifies signed or clear-signed input and detached signatures. Verification authenticates the signature against the supplied certificate. Obtain the signer's complete fingerprint through a trusted channel. Verification can use expired or revoked certificates to check older signatures; it does not establish whether a signature was made before expiration or revocation.
+
+AEAD/OCB encrypted messages (packet tag 20), including public-key messages produced by GnuPG or Kleopatra, cannot be decrypted by the current PgpCore/BouncyCastle stack. `Unprotect-PGP` and `Get-PGPInspect` report this as an unsupported format with the PowerShell `NotImplemented` error category. Ask the sender to re-encrypt using non-AEAD, MDC-protected output. Changing a key's preferences does not repair an already encrypted file. See [the upstream tracking issue](https://github.com/mattosaurus/PgpCore/issues/219).
 
 `Get-PGPKeyInfo` reports every primary certificate, its authenticated user IDs, and a `Subkeys` array. `-IncludeSubkeys` also emits subkeys as separate records. Use `CanSign` and `CanEncrypt` for authenticated capabilities, and `IsUsableForSigning` / `IsUsableForEncryption` for current use. `IsEncryptionKey` describes the underlying algorithm.
 

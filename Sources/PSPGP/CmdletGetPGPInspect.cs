@@ -42,7 +42,7 @@ public class CmdletGetPGPInspect : PSCmdlet {
         try {
             if (ParameterSetName == "Folder") {
                 string resolvedFolder = PathResolver.Resolve(this, FolderPath);
-                foreach (string file in Directory.GetFiles(resolvedFolder, "*", SearchOption.AllDirectories)) {
+                foreach (string file in FileWorkflow.EnumerateFiles(resolvedFolder)) {
                     try {
                         FileInfo fileInfo = new(file);
                         WriteObject(ToInfo(

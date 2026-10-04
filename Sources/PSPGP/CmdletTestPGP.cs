@@ -94,7 +94,7 @@ public class CmdletTestPGP : PSCmdlet {
                 string root = PathResolver.Resolve(this, FolderPath);
                 string destination = string.IsNullOrEmpty(OutputFolderPath) ? null : PathResolver.Resolve(this, OutputFolderPath);
                 if (destination == null) {
-                    foreach (string file in Directory.GetFiles(root, "*", SearchOption.AllDirectories))
+                    foreach (string file in FileWorkflow.EnumerateFiles(root))
                         WriteObject(VerifyFileWithAnyKey(file, null, null, publicKeys));
                 } else {
                     foreach (var item in FileWorkflow.Plan(root, destination, FileWorkflow.RemoveSignedSuffix))

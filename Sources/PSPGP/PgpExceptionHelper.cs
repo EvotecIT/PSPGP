@@ -25,6 +25,7 @@ internal static class PgpExceptionHelper {
     /// </summary>
     internal static ErrorCategory GetErrorCategory(Exception exception) {
         if (exception is NotSupportedException) return ErrorCategory.NotImplemented;
+        if (ContainsException<UnsupportedAeadException>(exception)) return ErrorCategory.NotImplemented;
         if (ContainsException<IncorrectPassphraseException>(exception)) return ErrorCategory.AuthenticationError;
         if (ContainsException<MessageIntegrityException>(exception)) return ErrorCategory.SecurityError;
         if (ContainsException<InvalidKeyMaterialException>(exception) ||

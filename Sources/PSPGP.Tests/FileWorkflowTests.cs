@@ -6,6 +6,27 @@ namespace PSPGP.Tests;
 
 public class FileWorkflowTests {
     [Fact]
+    public void FileDirectoryOutputCollision_IsRejectedBeforeOutputCreation() {
+        using var files = new TestFileHelper();
+        string input = files.CreateTempDirectory("input");
+        Directory.CreateDirectory(Path.Combine(input, "a"));
+        File.WriteAllText(Path.Combine(input, "a.pgp"), "first encrypted file");
+        File.WriteAllText(Path.Combine(input, "a", "b.pgp"), "second encrypted file");
+        string output = Path.Combine(files.TempDirectory, "output");
+        Assert.Throws<IOException>(() => FileWorkflow.Plan(input, output, FileWorkflow.RemoveEncryptedSuffix));
+        Assert.False(Directory.Exists(output));
+    }
+
+    [Theory]
+    [InlineData(".pgp", ".pgp.decrypted")]
+    [InlineData("a/.gpg", "a/.gpg.decrypted")]
+    [InlineData("a/.asc", "a/.asc.decrypted")]
+    [InlineData("a/.sig", "a/.sig.decrypted")]
+    public void SuffixOnlyFilename_DoesNotMapToItsContainingDirectory(string input, string expected) {
+        Assert.Equal(expected, FileWorkflow.RemoveSignedSuffix(input));
+    }
+
+    [Fact]
     public void CaseOnlyOutputAliases_AreRejectedBeforeOutputCreation() {
         using var files = new TestFileHelper();
         string input = files.CreateTempDirectory("input");

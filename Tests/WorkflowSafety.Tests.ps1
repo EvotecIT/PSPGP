@@ -61,6 +61,38 @@ Describe 'PGP workflow safety' {
         Test-Path $output | Should -BeFalse
     }
 
+    It 'Rejects file-directory output collisions before producing any output' {
+        $inputPath = Join-Path $TestDrive 'hierarchy-input'
+        $output = Join-Path $TestDrive 'hierarchy-output'
+        New-Item -ItemType Directory -Path (Join-Path $inputPath 'a') | Out-Null
+        Protect-PGP -FilePathPublic $PublicKey -String first | Set-Content (Join-Path $inputPath 'a.pgp')
+        Protect-PGP -FilePathPublic $PublicKey -String second | Set-Content (Join-Path $inputPath 'a/b.pgp')
+        { Unprotect-PGP -FilePathPrivate $PrivateKey -FolderPath $inputPath -OutputFolderPath $output -ErrorAction Stop } |
+            Should -Throw '*both a file and a directory*'
+        Test-Path $output | Should -BeFalse
+    }
+
+    It 'Skips linked child folders during verification without extraction' {
+        $inputPath = Join-Path $TestDrive 'verify-input'
+        $external = Join-Path $TestDrive 'verify-external'
+        New-Item -ItemType Directory -Path $inputPath, $external | Out-Null
+        $signed = Protect-PGP -SignOnly -SignKey $PrivateKey -String verified -ErrorAction Stop
+        $signed | Set-Content (Join-Path $inputPath 'inside.sig')
+        $signed | Set-Content (Join-Path $external 'outside.sig')
+        $link = Join-Path $inputPath 'linked'
+        $linkType = if ($env:OS -eq 'Windows_NT') { 'Junction' } else { 'SymbolicLink' }
+        New-Item -ItemType $linkType -Path $link -Target $external -ErrorAction Stop | Out-Null
+        try {
+            $results = @(Test-PGP -FilePathPublic $PublicKey -FolderPath $inputPath -ErrorAction Stop)
+            $results.Count | Should -Be 1
+            $results[0].Status | Should -BeTrue
+            $results[0].FilePath | Should -Be (Join-Path $inputPath 'inside.sig')
+            $inspected = @(Get-PGPInspect -FolderPath $inputPath -ErrorAction Stop)
+            $inspected.Count | Should -Be 1
+            $inspected[0].SourcePath | Should -Be (Join-Path $inputPath 'inside.sig')
+        } finally { [IO.Directory]::Delete($link) }
+    }
+
     It 'Skips an existing output subtree during repeated folder protection' {
         $inputPath = Join-Path $TestDrive 'nested-tree'
         $output = Join-Path $inputPath 'output'
