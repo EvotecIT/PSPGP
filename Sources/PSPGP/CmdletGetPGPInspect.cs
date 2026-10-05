@@ -87,7 +87,7 @@ public class CmdletGetPGPInspect : PSCmdlet {
     private static string[] GetRecipientKeyIds(Func<IEnumerable<long>> getRecipients) {
         try {
             return getRecipients()
-                .Select(id => $"0x{unchecked((ulong)id):X16}")
+                .Select(id => $"{unchecked((ulong)id):X16}")
                 .ToArray();
         } catch {
             return Array.Empty<string>();
