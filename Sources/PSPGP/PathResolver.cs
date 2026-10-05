@@ -22,6 +22,10 @@ public static class PathResolver {
             throw new ArgumentNullException(nameof(cmdlet));
         }
 
-        return cmdlet.SessionState.Path.GetUnresolvedProviderPathFromPSPath(path);
+        string resolved = cmdlet.SessionState.Path.GetUnresolvedProviderPathFromPSPath(path, out ProviderInfo provider, out PSDriveInfo drive);
+        if (!string.Equals(provider.Name, "FileSystem", StringComparison.OrdinalIgnoreCase)) {
+            throw new ArgumentException("PGP commands require a filesystem path.", nameof(path));
+        }
+        return resolved;
     }
 }

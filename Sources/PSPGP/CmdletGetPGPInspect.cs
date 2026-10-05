@@ -42,7 +42,7 @@ public class CmdletGetPGPInspect : PSCmdlet {
         try {
             if (ParameterSetName == "Folder") {
                 string resolvedFolder = PathResolver.Resolve(this, FolderPath);
-                foreach (string file in Directory.GetFiles(resolvedFolder, "*", SearchOption.AllDirectories)) {
+                foreach (string file in FileWorkflow.EnumerateFiles(resolvedFolder)) {
                     try {
                         FileInfo fileInfo = new(file);
                         WriteObject(ToInfo(
@@ -87,7 +87,7 @@ public class CmdletGetPGPInspect : PSCmdlet {
     private static string[] GetRecipientKeyIds(Func<IEnumerable<long>> getRecipients) {
         try {
             return getRecipients()
-                .Select(id => $"0x{unchecked((ulong)id):X16}")
+                .Select(id => $"{unchecked((ulong)id):X16}")
                 .ToArray();
         } catch {
             return Array.Empty<string>();

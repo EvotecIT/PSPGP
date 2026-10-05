@@ -39,4 +39,17 @@ public class PGPKeyInfo {
 
     /// <summary>Indicates whether the key has been revoked.</summary>
     public bool IsRevoked { get; set; }
+    /// <summary>Fingerprint of the primary certificate owning this key.</summary>
+    public string PrimaryFingerprint { get; set; }
+    /// <summary>Subkeys belonging to this primary certificate.</summary>
+    public PGPKeyInfo[] Subkeys { get; set; } = Array.Empty<PGPKeyInfo>();
+    /// <summary>Whether authenticated flags and bindings authorize signing.</summary>
+    public bool CanSign { get; set; }
+    /// <summary>Whether authenticated flags and bindings authorize encryption.</summary>
+    public bool CanEncrypt { get; set; }
+    /// <summary>Whether the key is current and authorized to create signatures.</summary>
+    public bool IsUsableForSigning { get; set; }
+    /// <summary>Whether the key is current and authorized for encryption.</summary>
+    public bool IsUsableForEncryption { get; set; }
+
 }

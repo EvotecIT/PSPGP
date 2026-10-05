@@ -5,7 +5,7 @@
     CompanyName            = 'Evotec'
     CompatiblePSEditions   = @('Desktop', 'Core')
     Copyright              = '(c) 2011 - 2026 Przemyslaw Klys @ Evotec. All rights reserved.'
-    Description            = 'PSPGP is a PowerShell module that provides PGP functionality in PowerShell. It allows encrypting and decrypting files/folders and strings using PGP.'
+    Description            = 'PGP encryption, decryption, signing, verification, and key management for PowerShell.'
     DotNetFrameworkVersion = '4.7.2'
     FunctionsToExport      = @()
     GUID                   = 'edbf6d52-2d66-405e-a4d4-d4a95db8fb45'
@@ -15,7 +15,7 @@
         PSData = @{
             ExternalModuleDependencies = @()
             IconUri                    = 'https://evotec.xyz/wp-content/uploads/2021/08/PSPGP.png'
-            LicenseUri                 = 'https://github.com/EvotecIT/PSPGP/blob/master/License'
+            LicenseUri                 = 'https://github.com/EvotecIT/PSPGP/blob/v2-speedygonzales/License'
             ProjectUri                 = 'https://github.com/EvotecIT/PSPGP'
             RequireLicenseAcceptance   = $false
             Tags                       = @('pgp', 'gpg', 'encrypt', 'decrypt', 'windows', 'macos', 'linux')

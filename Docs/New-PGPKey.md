@@ -11,22 +11,12 @@ Generates a new PGP key pair.
 ## SYNTAX
 ### ClearText (Default)
 ```powershell
-New-PGPKey -FilePathPublic <string> -FilePathPrivate <string> [-UploadKeyServer <string>] [-UserName <string>] [-Password <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [<CommonParameters>]
-```
-
-### Strength
-```powershell
-New-PGPKey -FilePathPublic <string> -FilePathPrivate <string> -Strength <int> -Certainty <int> [-UploadKeyServer <string>] [-UserName <string>] [-Password <string>] [-EmitVersion] [-Armor <bool>] [-KeyExpirationInSeconds <long>] [-SignatureExpirationInSeconds <long>] [-HashAlgorithm <HashAlgorithmTag>] [-PreferredHashAlgorithm <HashAlgorithmTag[]>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-PreferredCompressionAlgorithm <CompressionAlgorithmTag[]>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-PreferredSymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag[]>] [<CommonParameters>]
-```
-
-### StrengthCredential
-```powershell
-New-PGPKey -FilePathPublic <string> -FilePathPrivate <string> -Credential <pscredential> -Strength <int> -Certainty <int> [-UploadKeyServer <string>] [-EmitVersion] [-Armor <bool>] [-KeyExpirationInSeconds <long>] [-SignatureExpirationInSeconds <long>] [-HashAlgorithm <HashAlgorithmTag>] [-PreferredHashAlgorithm <HashAlgorithmTag[]>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-PreferredCompressionAlgorithm <CompressionAlgorithmTag[]>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-PreferredSymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag[]>] [<CommonParameters>]
+New-PGPKey -FilePathPublic <string> -FilePathPrivate <string> [-UploadKeyServer <string>] [-Force] [-UserName <string>] [-Password <string>] [-Strength <int>] [-Certainty <int>] [-EmitVersion] [-Armor <bool>] [-KeyExpirationInSeconds <long>] [-SignatureExpirationInSeconds <long>] [-HashAlgorithm <HashAlgorithmTag>] [-PreferredHashAlgorithm <HashAlgorithmTag[]>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-PreferredCompressionAlgorithm <CompressionAlgorithmTag[]>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-PreferredSymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag[]>] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### Credential
 ```powershell
-New-PGPKey -FilePathPublic <string> -FilePathPrivate <string> -Credential <pscredential> [-UploadKeyServer <string>] [-HashAlgorithm <HashAlgorithmTag>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [<CommonParameters>]
+New-PGPKey -FilePathPublic <string> -FilePathPrivate <string> -Credential <pscredential> [-UploadKeyServer <string>] [-Force] [-Strength <int>] [-Certainty <int>] [-EmitVersion] [-Armor <bool>] [-KeyExpirationInSeconds <long>] [-SignatureExpirationInSeconds <long>] [-HashAlgorithm <HashAlgorithmTag>] [-PreferredHashAlgorithm <HashAlgorithmTag[]>] [-CompressionAlgorithm <CompressionAlgorithmTag>] [-PreferredCompressionAlgorithm <CompressionAlgorithmTag[]>] [-FileType <PGPFileType>] [-PgpSignatureType <Int32>] [-PublicKeyAlgorithm <PublicKeyAlgorithmTag>] [-SymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag>] [-PreferredSymmetricKeyAlgorithm <SymmetricKeyAlgorithmTag[]>] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -53,7 +43,7 @@ Controls whether generated key files are ASCII armored.
 
 ```yaml
 Type: Boolean
-Parameter Sets: Strength, StrengthCredential
+Parameter Sets: ClearText, Credential
 Aliases: None
 Possible values:
 
@@ -69,11 +59,11 @@ Certainty value used when generating a key.
 
 ```yaml
 Type: Int32
-Parameter Sets: Strength, StrengthCredential
+Parameter Sets: ClearText, Credential
 Aliases: None
 Possible values:
 
-Required: True
+Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
@@ -85,7 +75,7 @@ Optional compression algorithm used when generating keys.
 
 ```yaml
 Type: CompressionAlgorithmTag
-Parameter Sets: ClearText, Strength, StrengthCredential, Credential
+Parameter Sets: ClearText, Credential
 Aliases: None
 Possible values: Uncompressed, Zip, ZLib, BZip2
 
@@ -101,7 +91,7 @@ Credential object providing user name and password.
 
 ```yaml
 Type: PSCredential
-Parameter Sets: StrengthCredential, Credential
+Parameter Sets: Credential
 Aliases: None
 Possible values:
 
@@ -117,7 +107,7 @@ Adds the PGP version notation to the key.
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: Strength, StrengthCredential
+Parameter Sets: ClearText, Credential
 Aliases: None
 Possible values:
 
@@ -133,7 +123,7 @@ Path to the private key file to create.
 
 ```yaml
 Type: String
-Parameter Sets: ClearText, Strength, StrengthCredential, Credential
+Parameter Sets: ClearText, Credential
 Aliases: None
 Possible values:
 
@@ -149,7 +139,7 @@ Path to the public key file to create.
 
 ```yaml
 Type: String
-Parameter Sets: ClearText, Strength, StrengthCredential, Credential
+Parameter Sets: ClearText, Credential
 Aliases: None
 Possible values:
 
@@ -165,9 +155,25 @@ Defines the file type stored within the PGP package.
 
 ```yaml
 Type: PGPFileType
-Parameter Sets: ClearText, Strength, StrengthCredential, Credential
+Parameter Sets: ClearText, Credential
 Aliases: None
 Possible values: Binary, Text, UTF8
+
+Required: False
+Position: named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Force
+Explicitly permits replacing existing public and private key files.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: ClearText, Credential
+Aliases: None
+Possible values:
 
 Required: False
 Position: named
@@ -181,7 +187,7 @@ Optional hash algorithm used when generating keys.
 
 ```yaml
 Type: HashAlgorithmTag
-Parameter Sets: ClearText, Strength, StrengthCredential, Credential
+Parameter Sets: ClearText, Credential
 Aliases: HashAlgorithmTag
 Possible values: MD5, Sha1, RipeMD160, DoubleSha, MD2, Tiger192, Haval5pass160, Sha256, Sha384, Sha512, Sha224, Sha3_256, Sha3_512, MD4, Sha3_224, Sha3_256_Old, Sha3_384, Sha3_512_Old, SM3
 
@@ -197,7 +203,23 @@ Key expiration in seconds. Use zero for no expiration.
 
 ```yaml
 Type: Int64
-Parameter Sets: Strength, StrengthCredential
+Parameter Sets: ClearText, Credential
+Aliases: None
+Possible values:
+
+Required: False
+Position: named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -PassThru
+Returns the successfully written key file or key-pair files.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: ClearText, Credential
 Aliases: None
 Possible values:
 
@@ -213,7 +235,7 @@ Password used to protect the private key.
 
 ```yaml
 Type: String
-Parameter Sets: ClearText, Strength
+Parameter Sets: ClearText
 Aliases: None
 Possible values:
 
@@ -229,7 +251,7 @@ PGP signature type used when creating the key.
 
 ```yaml
 Type: Int32
-Parameter Sets: ClearText, Strength, StrengthCredential, Credential
+Parameter Sets: ClearText, Credential
 Aliases: None
 Possible values:
 
@@ -245,7 +267,7 @@ Preferred compression algorithms advertised by the generated key.
 
 ```yaml
 Type: CompressionAlgorithmTag[]
-Parameter Sets: Strength, StrengthCredential
+Parameter Sets: ClearText, Credential
 Aliases: None
 Possible values: Uncompressed, Zip, ZLib, BZip2
 
@@ -261,7 +283,7 @@ Preferred hash algorithms advertised by the generated key.
 
 ```yaml
 Type: HashAlgorithmTag[]
-Parameter Sets: Strength, StrengthCredential
+Parameter Sets: ClearText, Credential
 Aliases: None
 Possible values: MD5, Sha1, RipeMD160, DoubleSha, MD2, Tiger192, Haval5pass160, Sha256, Sha384, Sha512, Sha224, Sha3_256, Sha3_512, MD4, Sha3_224, Sha3_256_Old, Sha3_384, Sha3_512_Old, SM3
 
@@ -277,7 +299,7 @@ Preferred symmetric algorithms advertised by the generated key.
 
 ```yaml
 Type: SymmetricKeyAlgorithmTag[]
-Parameter Sets: Strength, StrengthCredential
+Parameter Sets: ClearText, Credential
 Aliases: None
 Possible values: Null, Idea, TripleDes, Cast5, Blowfish, Safer, Des, Aes128, Aes192, Aes256, Twofish, Camellia128, Camellia192, Camellia256
 
@@ -293,9 +315,9 @@ Public key algorithm used for key creation.
 
 ```yaml
 Type: PublicKeyAlgorithmTag
-Parameter Sets: ClearText, Strength, StrengthCredential, Credential
+Parameter Sets: ClearText, Credential
 Aliases: None
-Possible values: RsaGeneral, RsaEncrypt, RsaSign, ElGamalEncrypt, Dsa, ECDH, ECDsa, ElGamalGeneral, DiffieHellman, EdDsa, EdDsa_Legacy, Experimental_1, Experimental_2, Experimental_3, Experimental_4, Experimental_5, Experimental_6, Experimental_7, Experimental_8, Experimental_9, Experimental_10, Experimental_11
+Possible values: RsaGeneral, RsaEncrypt, RsaSign, ElGamalEncrypt, Dsa, ECDH, ECDsa, ElGamalGeneral, DiffieHellman, EdDsa, EdDsa_Legacy, X25519, X448, Ed25519, Ed448, Experimental_1, Experimental_2, Experimental_3, Experimental_4, Experimental_5, Experimental_6, Experimental_7, Experimental_8, Experimental_9, Experimental_10, Experimental_11
 
 Required: False
 Position: named
@@ -309,7 +331,7 @@ Signature expiration in seconds. Use zero for no expiration.
 
 ```yaml
 Type: Int64
-Parameter Sets: Strength, StrengthCredential
+Parameter Sets: ClearText, Credential
 Aliases: None
 Possible values:
 
@@ -325,11 +347,11 @@ Key strength in bits.
 
 ```yaml
 Type: Int32
-Parameter Sets: Strength, StrengthCredential
+Parameter Sets: ClearText, Credential
 Aliases: None
 Possible values:
 
-Required: True
+Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
@@ -341,7 +363,7 @@ Symmetric key algorithm used for encryption.
 
 ```yaml
 Type: SymmetricKeyAlgorithmTag
-Parameter Sets: ClearText, Strength, StrengthCredential, Credential
+Parameter Sets: ClearText, Credential
 Aliases: None
 Possible values: Null, Idea, TripleDes, Cast5, Blowfish, Safer, Des, Aes128, Aes192, Aes256, Twofish, Camellia128, Camellia192, Camellia256
 
@@ -357,7 +379,7 @@ Key server URL to upload the generated public key.
 
 ```yaml
 Type: String
-Parameter Sets: ClearText, Strength, StrengthCredential, Credential
+Parameter Sets: ClearText, Credential
 Aliases: None
 Possible values:
 
@@ -373,7 +395,7 @@ User name associated with the generated key.
 
 ```yaml
 Type: String
-Parameter Sets: ClearText, Strength
+Parameter Sets: ClearText
 Aliases: None
 Possible values:
 

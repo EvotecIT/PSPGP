@@ -11,17 +11,17 @@ Verifies PGP signatures for files, folders or strings.
 ## SYNTAX
 ### File (Default)
 ```powershell
-Test-PGP -FilePathPublic <string[]> -FilePath <string> [-SignaturePath <string>] [-OutFilePath <string>] [-ThrowIfEncrypted] [-ClearSigned] [<CommonParameters>]
+Test-PGP -FilePathPublic <string[]> -FilePath <string> [-SignaturePath <string>] [-OutFilePath <string>] [-ThrowIfEncrypted] [-ClearSigned] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### Folder
 ```powershell
-Test-PGP -FilePathPublic <string[]> -FolderPath <string> [-OutputFolderPath <string>] [-ThrowIfEncrypted] [-ClearSigned] [<CommonParameters>]
+Test-PGP -FilePathPublic <string[]> -FolderPath <string> [-OutputFolderPath <string>] [-ThrowIfEncrypted] [-ClearSigned] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### String
 ```powershell
-Test-PGP -FilePathPublic <string[]> -String <string> [-Signature <string>] [-ThrowIfEncrypted] [-ClearSigned] [<CommonParameters>]
+Test-PGP -FilePathPublic <string[]> -String <string> [-Signature <string>] [-ThrowIfEncrypted] [-ClearSigned] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -83,13 +83,13 @@ File path to verify.
 ```yaml
 Type: String
 Parameter Sets: File
-Aliases: None
+Aliases: FullName, LiteralPath
 Possible values:
 
 Required: True
 Position: named
 Default value: None
-Accept pipeline input: False
+Accept pipeline input: True (ByValue, ByPropertyName)
 Accept wildcard characters: False
 ```
 
@@ -206,7 +206,7 @@ Accept wildcard characters: False
 ```
 
 ### -ThrowIfEncrypted
-Throws when encrypted content is passed to verify methods.
+Retained for compatibility. Encrypted input is always rejected; use Unprotect-PGP -Verify.
 
 ```yaml
 Type: SwitchParameter
@@ -226,7 +226,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-- `None`
+- `System.String`
 
 ## OUTPUTS
 
