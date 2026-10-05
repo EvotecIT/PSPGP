@@ -16,12 +16,12 @@ Describe 'Unsupported PGP encryption formats' {
         $operationErrors = @()
         Unprotect-PGP -FilePathPrivate $private -FilePath $encrypted -OutFilePath $output -ErrorAction SilentlyContinue -ErrorVariable operationErrors
         $operationErrors.Count | Should -BeGreaterThan 0
-        $operationErrors[0].Exception.Message | Should -Match 'AEAD.*OCB'
+        $operationErrors[0].Exception.Message | Should -Match 'AEAD.*packet tag 20'
         $operationErrors[0].CategoryInfo.Category | Should -Be 'NotImplemented'
         [IO.File]::ReadAllText($output) | Should -Be 'preserve existing content'
     }
 
     It 'Uses the same unsupported-format diagnostic for inspection' {
-        { Get-PGPInspect -FilePath $encrypted -ErrorAction Stop } | Should -Throw '*AEAD*OCB*'
+        { Get-PGPInspect -FilePath $encrypted -ErrorAction Stop } | Should -Throw '*AEAD*packet tag 20*'
     }
 }

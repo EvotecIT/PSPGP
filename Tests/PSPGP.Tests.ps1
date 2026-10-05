@@ -25,7 +25,7 @@ Describe 'PGP Tests' -ForEach @{ PGPTestDirectory = $PGPTestDirectory } {
         Test-Path -LiteralPath $KeyPrivate | Should -Be $true
         $keyInfo = Get-PGPKeyInfo -FilePath $KeyPublic -ErrorAction Stop
         $keyInfo.BitStrength | Should -Be 3072
-        $keyInfo.KeyId | Should -Match '^0x[0-9A-F]{16}$'
+        $keyInfo.KeyId | Should -Match '^[0-9A-F]{16}$'
         $keyInfo.Fingerprint | Should -Match '^[0-9A-F]+$'
         $keyInfo.IsMasterKey | Should -Be $true
         $keyInfo.IsEncryptionKey | Should -Be $true
@@ -228,6 +228,7 @@ Describe 'PGP Tests' -ForEach @{ PGPTestDirectory = $PGPTestDirectory } {
         $encryptedResult.IsEncrypted | Should -Be $true
         $encryptedResult.IsSigned | Should -Be $false
         $encryptedResult.RecipientKeyIds.Count | Should -BeGreaterThan 0
+        $encryptedResult.RecipientKeyIds[0] | Should -Match '^[0-9A-F]{16}$'
         $inspectErrors.Count | Should -Be 0
     }
 
