@@ -12,7 +12,7 @@
 
     <ItemGroup>
         <PackageReference Include="BouncyCastle.Cryptography" Version="2.7.0" />
-        <PackageReference Include="PgpCore" Version="8.0.0" />
+        <PackageReference Include="PgpCore" Version="8.1.0" />
         <PackageReference Include="PowerShellStandard.Library" Version="5.1.1" PrivateAssets="all" />
     </ItemGroup>
 
