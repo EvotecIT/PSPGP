@@ -24,7 +24,7 @@ namespace PSPGP;
 /// Unprotect-PGP -SymmetricPassphrase 'SymmetricPass123!' -String $Encrypted
 /// </code>
 /// </example>
-[Cmdlet("Unprotect", "PGP", DefaultParameterSetName = "FolderClearText")]
+[Cmdlet("Unprotect", "PGP", DefaultParameterSetName = "FolderClearText", SupportsShouldProcess = true)]
 public class CmdletUnprotectPGP : PSCmdlet {
     /// <summary>Private key file used to decrypt data.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "FolderCredential")]
@@ -41,7 +41,7 @@ public class CmdletUnprotectPGP : PSCmdlet {
     [Parameter(Mandatory = true, ParameterSetName = "StringVerifyCredential")]
     public string[] FilePathPrivate { get; set; }
 
-    /// <summary>Public key files reserved for signed-and-encrypted verification workflows.</summary>
+    /// <summary>Trusted public key files used to verify encrypted and signed content.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "FolderVerifyCredential")]
     [Parameter(Mandatory = true, ParameterSetName = "FolderVerifyClearText")]
     [Parameter(Mandatory = true, ParameterSetName = "FileVerifyCredential")]
@@ -91,19 +91,20 @@ public class CmdletUnprotectPGP : PSCmdlet {
     public string OutputFolderPath { get; set; }
 
     /// <summary>Encrypted file to decrypt.</summary>
-    [Parameter(Mandatory = true, ParameterSetName = "FileCredential")]
-    [Parameter(Mandatory = true, ParameterSetName = "FileClearText")]
-    [Parameter(Mandatory = true, ParameterSetName = "FileSymmetric")]
-    [Parameter(Mandatory = true, ParameterSetName = "FileVerifyCredential")]
-    [Parameter(Mandatory = true, ParameterSetName = "FileVerifyClearText")]
+    [Parameter(Mandatory = true, ValueFromPipeline = true, ValueFromPipelineByPropertyName = true, ParameterSetName = "FileCredential")]
+    [Parameter(Mandatory = true, ValueFromPipeline = true, ValueFromPipelineByPropertyName = true, ParameterSetName = "FileClearText")]
+    [Parameter(Mandatory = true, ValueFromPipeline = true, ValueFromPipelineByPropertyName = true, ParameterSetName = "FileSymmetric")]
+    [Parameter(Mandatory = true, ValueFromPipeline = true, ValueFromPipelineByPropertyName = true, ParameterSetName = "FileVerifyCredential")]
+    [Parameter(Mandatory = true, ValueFromPipeline = true, ValueFromPipelineByPropertyName = true, ParameterSetName = "FileVerifyClearText")]
+    [Alias("FullName", "LiteralPath")]
     public string FilePath { get; set; }
 
     /// <summary>Output file path for decrypted data.</summary>
-    [Parameter(Mandatory = true, ParameterSetName = "FileCredential")]
-    [Parameter(Mandatory = true, ParameterSetName = "FileClearText")]
-    [Parameter(Mandatory = true, ParameterSetName = "FileSymmetric")]
-    [Parameter(Mandatory = true, ParameterSetName = "FileVerifyCredential")]
-    [Parameter(Mandatory = true, ParameterSetName = "FileVerifyClearText")]
+    [Parameter(ParameterSetName = "FileCredential")]
+    [Parameter(ParameterSetName = "FileClearText")]
+    [Parameter(ParameterSetName = "FileSymmetric")]
+    [Parameter(ParameterSetName = "FileVerifyCredential")]
+    [Parameter(ParameterSetName = "FileVerifyClearText")]
     public string OutFilePath { get; set; }
 
     /// <summary>Encrypted text to decrypt.</summary>
@@ -114,7 +115,7 @@ public class CmdletUnprotectPGP : PSCmdlet {
     [Parameter(Mandatory = true, ParameterSetName = "StringVerifyCredential")]
     public string String { get; set; }
 
-    /// <summary>Reserved for future signed-and-encrypted verification support.</summary>
+    /// <summary>Verifies the signature inside encrypted content before returning plaintext.</summary>
     [Parameter(Mandatory = true, ParameterSetName = "FolderVerifyCredential")]
     [Parameter(Mandatory = true, ParameterSetName = "FolderVerifyClearText")]
     [Parameter(Mandatory = true, ParameterSetName = "FileVerifyCredential")]
@@ -126,6 +127,19 @@ public class CmdletUnprotectPGP : PSCmdlet {
     /// <summary>Ignores modification-detection/integrity-check failures during decryption.</summary>
     [Parameter]
     public SwitchParameter IgnoreIntegrityCheckFailure { get; set; }
+
+    /// <summary>Returns the completed output file for each successful file operation.</summary>
+    [Parameter(ParameterSetName = "FolderCredential")]
+    [Parameter(ParameterSetName = "FolderClearText")]
+    [Parameter(ParameterSetName = "FolderSymmetric")]
+    [Parameter(ParameterSetName = "FolderVerifyCredential")]
+    [Parameter(ParameterSetName = "FolderVerifyClearText")]
+    [Parameter(ParameterSetName = "FileCredential")]
+    [Parameter(ParameterSetName = "FileClearText")]
+    [Parameter(ParameterSetName = "FileSymmetric")]
+    [Parameter(ParameterSetName = "FileVerifyCredential")]
+    [Parameter(ParameterSetName = "FileVerifyClearText")]
+    public SwitchParameter PassThru { get; set; }
 
     /// <summary>
     /// Decrypts files or strings using the supplied private keys
@@ -142,13 +156,12 @@ public class CmdletUnprotectPGP : PSCmdlet {
                 foreach (var path in FilePathPrivate) {
                     string resolved = PathResolver.Resolve(this, path);
                     if (!File.Exists(resolved)) {
-                        ErrorActionHelper.WriteErrorOrWarning(
+                        CmdletError.Write(
                             this,
                             new FileNotFoundException($"Private key doesn't exist {resolved}"),
                             "PrivateKeyNotFound",
                             ErrorCategory.InvalidArgument,
-                            resolved,
-                            $"Private key doesn't exist {resolved}");
+                            resolved);
                         return;
                     }
                     DateTime? expiration = KeyExpirationHelper.GetExpiration(resolved);
@@ -161,13 +174,12 @@ public class CmdletUnprotectPGP : PSCmdlet {
                 foreach (var path in FilePathPublic) {
                     string resolved = PathResolver.Resolve(this, path);
                     if (!File.Exists(resolved)) {
-                        ErrorActionHelper.WriteErrorOrWarning(
+                        CmdletError.Write(
                             this,
                             new FileNotFoundException($"Public key doesn't exist {resolved}"),
                             "PublicKeyNotFound",
                             ErrorCategory.InvalidArgument,
-                            resolved,
-                            $"Public key doesn't exist {resolved}");
+                            resolved);
                         return;
                     }
                     DateTime? expiration = KeyExpirationHelper.GetExpiration(resolved);
@@ -176,117 +188,20 @@ public class CmdletUnprotectPGP : PSCmdlet {
                 }
             }
 
-            string password = Password;
+            string password = Password ?? string.Empty;
             if (Credential != null) {
                 password = Credential.GetNetworkCredential().Password;
             }
 
-            if (ParameterSetName.StartsWith("Folder")) {
-                string resolvedFolder = PathResolver.Resolve(this, FolderPath);
-                foreach (var file in Directory.GetFiles(resolvedFolder, "*", SearchOption.AllDirectories)) {
-                    try {
-                        string outputFile;
-                        if (!string.IsNullOrEmpty(OutputFolderPath)) {
-                            string resolvedOutput = PathResolver.Resolve(this, OutputFolderPath);
-                            outputFile = Path.Combine(resolvedOutput, Path.GetFileName(file).Replace(".pgp", string.Empty));
-                        } else {
-                            outputFile = file.Replace(".pgp", string.Empty);
-                        }
-
-                        bool decrypted = false;
-                        Exception lastError = null;
-                        if (symmetricMode) {
-                            try {
-                                var encryptionKeys = new EncryptionKeys(Encoding.UTF8.GetBytes(SymmetricPassphrase));
-                                var pgp = new PGP(encryptionKeys);
-                                ConfigureDecryption(pgp);
-                                pgp.DecryptFile(new FileInfo(file), new FileInfo(outputFile));
-                                decrypted = true;
-                            } catch (Exception ex) {
-                                lastError = PgpExceptionHelper.Normalize(ex);
-                            }
-                        } else {
-                            foreach (var key in resolvedPrivates) {
-                                try {
-                                    using var privateKeyStream = KeyMaterialHelper.OpenRead(key);
-                                    List<Stream> publicKeyStreams = null;
-                                    try {
-                                        var encryptionKeys = CreateEncryptionKeys(privateKeyStream, password, resolvedPublics, verifyMode, out publicKeyStreams);
-                                        var pgp = new PGP(encryptionKeys);
-                                        ConfigureDecryption(pgp);
-                                        if (verifyMode) {
-                                            DecryptFileAndVerifyToOutput(pgp, file, outputFile);
-                                        } else {
-                                            pgp.DecryptFile(new FileInfo(file), new FileInfo(outputFile));
-                                        }
-                                    } finally {
-                                        DisposeStreams(publicKeyStreams);
-                                    }
-                                    decrypted = true;
-                                    break;
-                                } catch (Exception ex) {
-                                    lastError = PgpExceptionHelper.Normalize(ex, key);
-                                }
-                            }
-                        }
-
-                        if (!decrypted) {
-                            WriteError(PgpExceptionHelper.CreateErrorRecord(lastError, "DecryptFileFailed", file));
-                        }
-                    } catch (Exception ex) {
-                        WriteError(PgpExceptionHelper.CreateErrorRecord(ex, "DecryptFileFailed", file));
-                        return;
-                    }
+            if (ParameterSetName.StartsWith("Folder", StringComparison.Ordinal)) {
+                var plan = FileWorkflow.Plan(PathResolver.Resolve(this, FolderPath), PathResolver.Resolve(this, OutputFolderPath), FileWorkflow.RemoveEncryptedSuffix);
+                foreach (var item in plan) {
+                    ProcessFile(item.Input, item.Output, resolvedPrivates, password, resolvedPublics, symmetricMode, verifyMode);
                 }
-            } else if (ParameterSetName.StartsWith("File")) {
-                try {
-                    string resolvedFile = PathResolver.Resolve(this, FilePath);
-                    string outputFile = !string.IsNullOrEmpty(OutFilePath) ? PathResolver.Resolve(this, OutFilePath) : resolvedFile.Replace(".pgp", string.Empty);
-
-                    bool decrypted = false;
-                    Exception lastError = null;
-                    if (symmetricMode) {
-                        try {
-                            var encryptionKeys = new EncryptionKeys(Encoding.UTF8.GetBytes(SymmetricPassphrase));
-                            var pgp = new PGP(encryptionKeys);
-                            ConfigureDecryption(pgp);
-                            pgp.DecryptFile(new FileInfo(resolvedFile), new FileInfo(outputFile));
-                            decrypted = true;
-                        } catch (Exception ex) {
-                            lastError = PgpExceptionHelper.Normalize(ex);
-                        }
-                    } else {
-                        foreach (var key in resolvedPrivates) {
-                            try {
-                                using var privateKeyStream = KeyMaterialHelper.OpenRead(key);
-                                List<Stream> publicKeyStreams = null;
-                                try {
-                                    var encryptionKeys = CreateEncryptionKeys(privateKeyStream, password, resolvedPublics, verifyMode, out publicKeyStreams);
-                                    var pgp = new PGP(encryptionKeys);
-                                    ConfigureDecryption(pgp);
-                                    if (verifyMode) {
-                                        DecryptFileAndVerifyToOutput(pgp, resolvedFile, outputFile);
-                                    } else {
-                                        pgp.DecryptFile(new FileInfo(resolvedFile), new FileInfo(outputFile));
-                                    }
-                                } finally {
-                                    DisposeStreams(publicKeyStreams);
-                                }
-                                decrypted = true;
-                                break;
-                            } catch (Exception ex) {
-                                lastError = PgpExceptionHelper.Normalize(ex, key);
-                            }
-                        }
-                    }
-
-                    if (!decrypted) {
-                        WriteError(PgpExceptionHelper.CreateErrorRecord(lastError, "DecryptFileFailed", FilePath));
-                    }
-                } catch (Exception ex) {
-                    WriteError(PgpExceptionHelper.CreateErrorRecord(ex, "DecryptFileFailed", FilePath));
-                    return;
-                }
+            } else if (ParameterSetName.StartsWith("File", StringComparison.Ordinal)) {
+                string file = PathResolver.Resolve(this, FilePath);
+                string output = string.IsNullOrEmpty(OutFilePath) ? FileWorkflow.RemoveEncryptedSuffix(file) : PathResolver.Resolve(this, OutFilePath);
+                ProcessFile(file, output, resolvedPrivates, password, resolvedPublics, symmetricMode, verifyMode);
             } else if (ParameterSetName.StartsWith("String")) {
                 try {
                     bool decrypted = false;
@@ -299,7 +214,7 @@ public class CmdletUnprotectPGP : PSCmdlet {
                             ConfigureDecryption(pgp);
                             result = pgp.DecryptArmoredString(String);
                             decrypted = true;
-                        } catch (Exception ex) {
+                        } catch (Exception ex) when (ex is not PipelineStoppedException && ex is not ActionPreferenceStopException) {
                             lastError = PgpExceptionHelper.Normalize(ex);
                         }
                     } else {
@@ -319,7 +234,7 @@ public class CmdletUnprotectPGP : PSCmdlet {
                                 }
                                 decrypted = true;
                                 break;
-                            } catch (Exception ex) {
+                            } catch (Exception ex) when (ex is not PipelineStoppedException && ex is not ActionPreferenceStopException) {
                                 lastError = PgpExceptionHelper.Normalize(ex, key);
                             }
                         }
@@ -330,11 +245,11 @@ public class CmdletUnprotectPGP : PSCmdlet {
                     } else {
                         WriteError(PgpExceptionHelper.CreateErrorRecord(lastError, "DecryptStringFailed"));
                     }
-                } catch (Exception ex) {
+                } catch (Exception ex) when (ex is not PipelineStoppedException && ex is not ActionPreferenceStopException) {
                     WriteError(PgpExceptionHelper.CreateErrorRecord(ex, "DecryptStringFailed"));
                 }
             }
-        } catch (Exception ex) {
+        } catch (Exception ex) when (ex is not PipelineStoppedException && ex is not ActionPreferenceStopException) {
             WriteError(PgpExceptionHelper.CreateErrorRecord(ex, "UnprotectPGPFailed"));
         }
     }
@@ -379,28 +294,29 @@ public class CmdletUnprotectPGP : PSCmdlet {
         }
     }
 
-    private static void DecryptFileAndVerifyToOutput(PGP pgp, string inputFile, string outputFile) {
-        string tempOutputFile = GetTemporaryOutputFile(outputFile);
-        try {
-            pgp.DecryptFileAndVerify(new FileInfo(inputFile), new FileInfo(tempOutputFile));
-            if (File.Exists(outputFile)) {
-                File.Delete(outputFile);
-            }
-            File.Move(tempOutputFile, outputFile);
-        } finally {
-            if (File.Exists(tempOutputFile)) {
-                File.Delete(tempOutputFile);
+    private void ProcessFile(string input, string output, List<string> privateKeys, string password, List<string> publicKeys, bool symmetric, bool verify) {
+        if (!ShouldProcess(output, verify ? "Write decrypted and verified file" : "Write decrypted file")) return;
+        FileWorkflow.EnsureOutputDirectory(input, output);
+        Exception lastError = null;
+        IEnumerable<string> candidates = symmetric ? new string[] { null } : privateKeys;
+        foreach (string key in candidates) {
+            List<Stream> publicStreams = null;
+            try {
+                using var privateStream = symmetric ? null : KeyMaterialHelper.OpenRead(key);
+                var keys = symmetric ? new EncryptionKeys(Encoding.UTF8.GetBytes(SymmetricPassphrase))
+                    : CreateEncryptionKeys(privateStream, password, publicKeys, verify, out publicStreams);
+                var pgp = new PGP(keys);
+                ConfigureDecryption(pgp);
+                if (verify) pgp.DecryptFileAndVerify(new FileInfo(input), new FileInfo(output));
+                else pgp.DecryptFile(new FileInfo(input), new FileInfo(output));
+                if (PassThru.IsPresent) WriteObject(new FileInfo(output));
+                return;
+            } catch (Exception ex) when (ex is not PipelineStoppedException && ex is not ActionPreferenceStopException) {
+                lastError = PgpExceptionHelper.Normalize(ex, key);
+            } finally {
+                DisposeStreams(publicStreams);
             }
         }
-    }
-
-    private static string GetTemporaryOutputFile(string outputFile) {
-        string directory = Path.GetDirectoryName(outputFile);
-        string fileName = Path.GetFileName(outputFile);
-        if (string.IsNullOrEmpty(directory)) {
-            directory = Directory.GetCurrentDirectory();
-        }
-
-        return Path.Combine(directory, $".{fileName}.{Guid.NewGuid():N}.tmp");
+        WriteError(PgpExceptionHelper.CreateErrorRecord(lastError, "DecryptFileFailed", input));
     }
 }

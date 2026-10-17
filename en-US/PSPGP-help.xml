@@ -137,19 +137,31 @@ Get-PGPInspect -String $Signature</dev:code>
       <command:verb>Get</command:verb>
       <command:noun>PGPKey</command:noun>
       <maml:description>
-        <maml:para>Downloads a public key from a key server.</maml:para>
+        <maml:para>Downloads validated public certificates from an HTTPS key server.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Downloads a public key from a key server.</maml:para>
+      <maml:para>Downloads validated public certificates from an HTTPS key server.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem parameterSetName="__AllParameterSets">
         <maml:name>Get-PGPKey</maml:name>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>ExpectedFingerprint</maml:name>
+          <maml:description>
+            <maml:para>Optional complete primary fingerprint obtained through an independently trusted channel.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
         <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>KeyServer</maml:name>
           <maml:description>
-            <maml:para>URL of the key server.</maml:para>
+            <maml:para>HTTPS URL of the key server.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -161,7 +173,7 @@ Get-PGPInspect -String $Signature</dev:code>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>OutFilePath</maml:name>
           <maml:description>
-            <maml:para>File path where the downloaded key is stored.</maml:para>
+            <maml:para>Optional destination file, replaced only after certificate validation.</maml:para>
           </maml:description>
           <command:parameterValue required="false" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -170,10 +182,22 @@ Get-PGPInspect -String $Signature</dev:code>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the successfully written key file or key-pair files.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
         <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>Search</maml:name>
           <maml:description>
-            <maml:para>Search string identifying the key.</maml:para>
+            <maml:para>Search string identifying the key; a user ID or short key ID does not establish trust.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -185,10 +209,22 @@ Get-PGPInspect -String $Signature</dev:code>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <maml:name>ExpectedFingerprint</maml:name>
+        <maml:description>
+          <maml:para>Optional complete primary fingerprint obtained through an independently trusted channel.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
       <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
         <maml:name>KeyServer</maml:name>
         <maml:description>
-          <maml:para>URL of the key server.</maml:para>
+          <maml:para>HTTPS URL of the key server.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -200,7 +236,7 @@ Get-PGPInspect -String $Signature</dev:code>
       <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
         <maml:name>OutFilePath</maml:name>
         <maml:description>
-          <maml:para>File path where the downloaded key is stored.</maml:para>
+          <maml:para>Optional destination file, replaced only after certificate validation.</maml:para>
         </maml:description>
         <command:parameterValue required="false" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -209,10 +245,22 @@ Get-PGPInspect -String $Signature</dev:code>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <maml:name>PassThru</maml:name>
+        <maml:description>
+          <maml:para>Returns the successfully written key file or key-pair files.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
       <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
         <maml:name>Search</maml:name>
         <maml:description>
-          <maml:para>Search string identifying the key.</maml:para>
+          <maml:para>Search string identifying the key; a user ID or short key ID does not establish trust.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -238,7 +286,7 @@ Get-PGPInspect -String $Signature</dev:code>
     <command:examples>
       <command:example>
         <maml:title>EXAMPLE 1</maml:title>
-        <dev:code>Get-PGPKey -KeyServer "https://keys.example.com" -Search "user@example.com" -OutFilePath "key.asc"</dev:code>
+        <dev:code>Get-PGPKey -KeyServer 'Value' -Search 'Value'</dev:code>
         <dev:remarks>
           <maml:para></maml:para>
         </dev:remarks>
@@ -273,6 +321,18 @@ Get-PGPInspect -String $Signature</dev:code>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>IncludeSubkeys</maml:name>
+          <maml:description>
+            <maml:para>Emits subkeys as separate records in addition to primary certificates.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
@@ -284,6 +344,18 @@ Get-PGPInspect -String $Signature</dev:code>
         <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
         <dev:type>
           <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <maml:name>IncludeSubkeys</maml:name>
+        <maml:description>
+          <maml:para>Emits subkeys as separate records in addition to primary certificates.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -338,213 +410,6 @@ Get-PGPInspect -String $Signature</dev:code>
       <command:syntaxItem parameterSetName="ClearText">
         <maml:name>New-PGPKey</maml:name>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>CompressionAlgorithm</maml:name>
-          <maml:description>
-            <maml:para>Optional compression algorithm used when generating keys.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">CompressionAlgorithmTag</command:parameterValue>
-          <command:parameterValueGroup>
-            <command:parameterValue required="false" variableLength="false">Uncompressed</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Zip</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">ZLib</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">BZip2</command:parameterValue>
-          </command:parameterValueGroup>
-          <dev:type>
-            <maml:name>CompressionAlgorithmTag</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>FilePathPrivate</maml:name>
-          <maml:description>
-            <maml:para>Path to the private key file to create.</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>FilePathPublic</maml:name>
-          <maml:description>
-            <maml:para>Path to the public key file to create.</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>FileType</maml:name>
-          <maml:description>
-            <maml:para>Defines the file type stored within the PGP package.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">PGPFileType</command:parameterValue>
-          <command:parameterValueGroup>
-            <command:parameterValue required="false" variableLength="false">Binary</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Text</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">UTF8</command:parameterValue>
-          </command:parameterValueGroup>
-          <dev:type>
-            <maml:name>PGPFileType</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="HashAlgorithmTag">
-          <maml:name>HashAlgorithm</maml:name>
-          <maml:description>
-            <maml:para>Optional hash algorithm used when generating keys.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">HashAlgorithmTag</command:parameterValue>
-          <command:parameterValueGroup>
-            <command:parameterValue required="false" variableLength="false">MD5</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha1</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">RipeMD160</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">DoubleSha</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">MD2</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Tiger192</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Haval5pass160</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha256</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha384</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha512</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha224</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha3_256</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha3_512</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">MD4</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha3_224</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha3_256_Old</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha3_384</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha3_512_Old</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">SM3</command:parameterValue>
-          </command:parameterValueGroup>
-          <dev:type>
-            <maml:name>HashAlgorithmTag</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>Password</maml:name>
-          <maml:description>
-            <maml:para>Password used to protect the private key.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>PgpSignatureType</maml:name>
-          <maml:description>
-            <maml:para>PGP signature type used when creating the key.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">Int32</command:parameterValue>
-          <dev:type>
-            <maml:name>Int32</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>PublicKeyAlgorithm</maml:name>
-          <maml:description>
-            <maml:para>Public key algorithm used for key creation.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">PublicKeyAlgorithmTag</command:parameterValue>
-          <command:parameterValueGroup>
-            <command:parameterValue required="false" variableLength="false">RsaGeneral</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">RsaEncrypt</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">RsaSign</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">ElGamalEncrypt</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Dsa</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">ECDH</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">ECDsa</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">ElGamalGeneral</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">DiffieHellman</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">EdDsa</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">EdDsa_Legacy</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_1</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_2</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_3</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_4</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_5</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_6</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_7</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_8</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_9</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_10</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_11</command:parameterValue>
-          </command:parameterValueGroup>
-          <dev:type>
-            <maml:name>PublicKeyAlgorithmTag</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>SymmetricKeyAlgorithm</maml:name>
-          <maml:description>
-            <maml:para>Symmetric key algorithm used for encryption.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">SymmetricKeyAlgorithmTag</command:parameterValue>
-          <command:parameterValueGroup>
-            <command:parameterValue required="false" variableLength="false">Null</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Idea</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">TripleDes</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Cast5</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Blowfish</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Safer</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Des</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Aes128</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Aes192</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Aes256</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Twofish</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Camellia128</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Camellia192</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Camellia256</command:parameterValue>
-          </command:parameterValueGroup>
-          <dev:type>
-            <maml:name>SymmetricKeyAlgorithmTag</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>UploadKeyServer</maml:name>
-          <maml:description>
-            <maml:para>Key server URL to upload the generated public key.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>UserName</maml:name>
-          <maml:description>
-            <maml:para>User name associated with the generated key.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-      </command:syntaxItem>
-      <command:syntaxItem parameterSetName="Strength">
-        <maml:name>New-PGPKey</maml:name>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>Armor</maml:name>
           <maml:description>
             <maml:para>Controls whether generated key files are ASCII armored.</maml:para>
@@ -556,12 +421,12 @@ Get-PGPInspect -String $Signature</dev:code>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>Certainty</maml:name>
           <maml:description>
             <maml:para>Certainty value used when generating a key.</maml:para>
           </maml:description>
-          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+          <command:parameterValue required="false" variableLength="false">Int32</command:parameterValue>
           <dev:type>
             <maml:name>Int32</maml:name>
             <maml:uri />
@@ -639,6 +504,18 @@ Get-PGPInspect -String $Signature</dev:code>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>Force</maml:name>
+          <maml:description>
+            <maml:para>Explicitly permits replacing existing public and private key files.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="HashAlgorithmTag">
           <maml:name>HashAlgorithm</maml:name>
           <maml:description>
@@ -680,6 +557,18 @@ Get-PGPInspect -String $Signature</dev:code>
           <command:parameterValue required="false" variableLength="false">Int64</command:parameterValue>
           <dev:type>
             <maml:name>Int64</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the successfully written key file or key-pair files.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -805,6 +694,10 @@ Get-PGPInspect -String $Signature</dev:code>
             <command:parameterValue required="false" variableLength="false">DiffieHellman</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa_Legacy</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X448</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed448</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_1</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_2</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_3</command:parameterValue>
@@ -835,12 +728,12 @@ Get-PGPInspect -String $Signature</dev:code>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>Strength</maml:name>
           <maml:description>
             <maml:para>Key strength in bits.</maml:para>
           </maml:description>
-          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+          <command:parameterValue required="false" variableLength="false">Int32</command:parameterValue>
           <dev:type>
             <maml:name>Int32</maml:name>
             <maml:uri />
@@ -891,352 +784,6 @@ Get-PGPInspect -String $Signature</dev:code>
           <maml:name>UserName</maml:name>
           <maml:description>
             <maml:para>User name associated with the generated key.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-      </command:syntaxItem>
-      <command:syntaxItem parameterSetName="StrengthCredential">
-        <maml:name>New-PGPKey</maml:name>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>Armor</maml:name>
-          <maml:description>
-            <maml:para>Controls whether generated key files are ASCII armored.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">Boolean</command:parameterValue>
-          <dev:type>
-            <maml:name>Boolean</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>Certainty</maml:name>
-          <maml:description>
-            <maml:para>Certainty value used when generating a key.</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
-          <dev:type>
-            <maml:name>Int32</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>CompressionAlgorithm</maml:name>
-          <maml:description>
-            <maml:para>Optional compression algorithm used when generating keys.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">CompressionAlgorithmTag</command:parameterValue>
-          <command:parameterValueGroup>
-            <command:parameterValue required="false" variableLength="false">Uncompressed</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Zip</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">ZLib</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">BZip2</command:parameterValue>
-          </command:parameterValueGroup>
-          <dev:type>
-            <maml:name>CompressionAlgorithmTag</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>Credential</maml:name>
-          <maml:description>
-            <maml:para>Credential object providing user name and password.</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">PSCredential</command:parameterValue>
-          <dev:type>
-            <maml:name>PSCredential</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>EmitVersion</maml:name>
-          <maml:description>
-            <maml:para>Adds the PGP version notation to the key.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
-          <dev:type>
-            <maml:name>SwitchParameter</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>FilePathPrivate</maml:name>
-          <maml:description>
-            <maml:para>Path to the private key file to create.</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>FilePathPublic</maml:name>
-          <maml:description>
-            <maml:para>Path to the public key file to create.</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-          <dev:type>
-            <maml:name>String</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>FileType</maml:name>
-          <maml:description>
-            <maml:para>Defines the file type stored within the PGP package.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">PGPFileType</command:parameterValue>
-          <command:parameterValueGroup>
-            <command:parameterValue required="false" variableLength="false">Binary</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Text</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">UTF8</command:parameterValue>
-          </command:parameterValueGroup>
-          <dev:type>
-            <maml:name>PGPFileType</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="HashAlgorithmTag">
-          <maml:name>HashAlgorithm</maml:name>
-          <maml:description>
-            <maml:para>Optional hash algorithm used when generating keys.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">HashAlgorithmTag</command:parameterValue>
-          <command:parameterValueGroup>
-            <command:parameterValue required="false" variableLength="false">MD5</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha1</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">RipeMD160</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">DoubleSha</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">MD2</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Tiger192</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Haval5pass160</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha256</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha384</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha512</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha224</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha3_256</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha3_512</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">MD4</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha3_224</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha3_256_Old</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha3_384</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha3_512_Old</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">SM3</command:parameterValue>
-          </command:parameterValueGroup>
-          <dev:type>
-            <maml:name>HashAlgorithmTag</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>KeyExpirationInSeconds</maml:name>
-          <maml:description>
-            <maml:para>Key expiration in seconds. Use zero for no expiration.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">Int64</command:parameterValue>
-          <dev:type>
-            <maml:name>Int64</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>PgpSignatureType</maml:name>
-          <maml:description>
-            <maml:para>PGP signature type used when creating the key.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">Int32</command:parameterValue>
-          <dev:type>
-            <maml:name>Int32</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>PreferredCompressionAlgorithm</maml:name>
-          <maml:description>
-            <maml:para>Preferred compression algorithms advertised by the generated key.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">CompressionAlgorithmTag[]</command:parameterValue>
-          <command:parameterValueGroup>
-            <command:parameterValue required="false" variableLength="false">Uncompressed</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Zip</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">ZLib</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">BZip2</command:parameterValue>
-          </command:parameterValueGroup>
-          <dev:type>
-            <maml:name>CompressionAlgorithmTag[]</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>PreferredHashAlgorithm</maml:name>
-          <maml:description>
-            <maml:para>Preferred hash algorithms advertised by the generated key.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">HashAlgorithmTag[]</command:parameterValue>
-          <command:parameterValueGroup>
-            <command:parameterValue required="false" variableLength="false">MD5</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha1</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">RipeMD160</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">DoubleSha</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">MD2</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Tiger192</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Haval5pass160</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha256</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha384</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha512</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha224</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha3_256</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha3_512</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">MD4</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha3_224</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha3_256_Old</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha3_384</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Sha3_512_Old</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">SM3</command:parameterValue>
-          </command:parameterValueGroup>
-          <dev:type>
-            <maml:name>HashAlgorithmTag[]</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>PreferredSymmetricKeyAlgorithm</maml:name>
-          <maml:description>
-            <maml:para>Preferred symmetric algorithms advertised by the generated key.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">SymmetricKeyAlgorithmTag[]</command:parameterValue>
-          <command:parameterValueGroup>
-            <command:parameterValue required="false" variableLength="false">Null</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Idea</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">TripleDes</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Cast5</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Blowfish</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Safer</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Des</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Aes128</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Aes192</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Aes256</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Twofish</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Camellia128</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Camellia192</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Camellia256</command:parameterValue>
-          </command:parameterValueGroup>
-          <dev:type>
-            <maml:name>SymmetricKeyAlgorithmTag[]</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>PublicKeyAlgorithm</maml:name>
-          <maml:description>
-            <maml:para>Public key algorithm used for key creation.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">PublicKeyAlgorithmTag</command:parameterValue>
-          <command:parameterValueGroup>
-            <command:parameterValue required="false" variableLength="false">RsaGeneral</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">RsaEncrypt</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">RsaSign</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">ElGamalEncrypt</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Dsa</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">ECDH</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">ECDsa</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">ElGamalGeneral</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">DiffieHellman</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">EdDsa</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">EdDsa_Legacy</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_1</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_2</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_3</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_4</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_5</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_6</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_7</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_8</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_9</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_10</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Experimental_11</command:parameterValue>
-          </command:parameterValueGroup>
-          <dev:type>
-            <maml:name>PublicKeyAlgorithmTag</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>SignatureExpirationInSeconds</maml:name>
-          <maml:description>
-            <maml:para>Signature expiration in seconds. Use zero for no expiration.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">Int64</command:parameterValue>
-          <dev:type>
-            <maml:name>Int64</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>Strength</maml:name>
-          <maml:description>
-            <maml:para>Key strength in bits.</maml:para>
-          </maml:description>
-          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
-          <dev:type>
-            <maml:name>Int32</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>SymmetricKeyAlgorithm</maml:name>
-          <maml:description>
-            <maml:para>Symmetric key algorithm used for encryption.</maml:para>
-          </maml:description>
-          <command:parameterValue required="false" variableLength="false">SymmetricKeyAlgorithmTag</command:parameterValue>
-          <command:parameterValueGroup>
-            <command:parameterValue required="false" variableLength="false">Null</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Idea</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">TripleDes</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Cast5</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Blowfish</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Safer</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Des</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Aes128</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Aes192</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Aes256</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Twofish</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Camellia128</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Camellia192</command:parameterValue>
-            <command:parameterValue required="false" variableLength="false">Camellia256</command:parameterValue>
-          </command:parameterValueGroup>
-          <dev:type>
-            <maml:name>SymmetricKeyAlgorithmTag</maml:name>
-            <maml:uri />
-          </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
-        </command:parameter>
-        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
-          <maml:name>UploadKeyServer</maml:name>
-          <maml:description>
-            <maml:para>Key server URL to upload the generated public key.</maml:para>
           </maml:description>
           <command:parameterValue required="false" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -1249,6 +796,30 @@ Get-PGPInspect -String $Signature</dev:code>
       <command:syntaxItem parameterSetName="Credential">
         <maml:name>New-PGPKey</maml:name>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>Armor</maml:name>
+          <maml:description>
+            <maml:para>Controls whether generated key files are ASCII armored.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">Boolean</command:parameterValue>
+          <dev:type>
+            <maml:name>Boolean</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>Certainty</maml:name>
+          <maml:description>
+            <maml:para>Certainty value used when generating a key.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">Int32</command:parameterValue>
+          <dev:type>
+            <maml:name>Int32</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>CompressionAlgorithm</maml:name>
           <maml:description>
             <maml:para>Optional compression algorithm used when generating keys.</maml:para>
@@ -1274,6 +845,18 @@ Get-PGPInspect -String $Signature</dev:code>
           <command:parameterValue required="true" variableLength="false">PSCredential</command:parameterValue>
           <dev:type>
             <maml:name>PSCredential</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>EmitVersion</maml:name>
+          <maml:description>
+            <maml:para>Adds the PGP version notation to the key.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -1319,6 +902,18 @@ Get-PGPInspect -String $Signature</dev:code>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>Force</maml:name>
+          <maml:description>
+            <maml:para>Explicitly permits replacing existing public and private key files.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="HashAlgorithmTag">
           <maml:name>HashAlgorithm</maml:name>
           <maml:description>
@@ -1353,6 +948,30 @@ Get-PGPInspect -String $Signature</dev:code>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>KeyExpirationInSeconds</maml:name>
+          <maml:description>
+            <maml:para>Key expiration in seconds. Use zero for no expiration.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">Int64</command:parameterValue>
+          <dev:type>
+            <maml:name>Int64</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the successfully written key file or key-pair files.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PgpSignatureType</maml:name>
           <maml:description>
             <maml:para>PGP signature type used when creating the key.</maml:para>
@@ -1360,6 +979,85 @@ Get-PGPInspect -String $Signature</dev:code>
           <command:parameterValue required="false" variableLength="false">Int32</command:parameterValue>
           <dev:type>
             <maml:name>Int32</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PreferredCompressionAlgorithm</maml:name>
+          <maml:description>
+            <maml:para>Preferred compression algorithms advertised by the generated key.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">CompressionAlgorithmTag[]</command:parameterValue>
+          <command:parameterValueGroup>
+            <command:parameterValue required="false" variableLength="false">Uncompressed</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Zip</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">ZLib</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">BZip2</command:parameterValue>
+          </command:parameterValueGroup>
+          <dev:type>
+            <maml:name>CompressionAlgorithmTag[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PreferredHashAlgorithm</maml:name>
+          <maml:description>
+            <maml:para>Preferred hash algorithms advertised by the generated key.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">HashAlgorithmTag[]</command:parameterValue>
+          <command:parameterValueGroup>
+            <command:parameterValue required="false" variableLength="false">MD5</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Sha1</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">RipeMD160</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">DoubleSha</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">MD2</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Tiger192</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Haval5pass160</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Sha256</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Sha384</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Sha512</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Sha224</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Sha3_256</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Sha3_512</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">MD4</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Sha3_224</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Sha3_256_Old</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Sha3_384</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Sha3_512_Old</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">SM3</command:parameterValue>
+          </command:parameterValueGroup>
+          <dev:type>
+            <maml:name>HashAlgorithmTag[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PreferredSymmetricKeyAlgorithm</maml:name>
+          <maml:description>
+            <maml:para>Preferred symmetric algorithms advertised by the generated key.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SymmetricKeyAlgorithmTag[]</command:parameterValue>
+          <command:parameterValueGroup>
+            <command:parameterValue required="false" variableLength="false">Null</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Idea</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">TripleDes</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Cast5</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Blowfish</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Safer</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Des</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Aes128</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Aes192</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Aes256</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Twofish</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Camellia128</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Camellia192</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Camellia256</command:parameterValue>
+          </command:parameterValueGroup>
+          <dev:type>
+            <maml:name>SymmetricKeyAlgorithmTag[]</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -1382,6 +1080,10 @@ Get-PGPInspect -String $Signature</dev:code>
             <command:parameterValue required="false" variableLength="false">DiffieHellman</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa_Legacy</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X448</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed448</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_1</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_2</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_3</command:parameterValue>
@@ -1396,6 +1098,30 @@ Get-PGPInspect -String $Signature</dev:code>
           </command:parameterValueGroup>
           <dev:type>
             <maml:name>PublicKeyAlgorithmTag</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>SignatureExpirationInSeconds</maml:name>
+          <maml:description>
+            <maml:para>Signature expiration in seconds. Use zero for no expiration.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">Int64</command:parameterValue>
+          <dev:type>
+            <maml:name>Int64</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>Strength</maml:name>
+          <maml:description>
+            <maml:para>Key strength in bits.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">Int32</command:parameterValue>
+          <dev:type>
+            <maml:name>Int32</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -1455,12 +1181,12 @@ Get-PGPInspect -String $Signature</dev:code>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
         <maml:name>Certainty</maml:name>
         <maml:description>
           <maml:para>Certainty value used when generating a key.</maml:para>
         </maml:description>
-        <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+        <command:parameterValue required="false" variableLength="false">Int32</command:parameterValue>
         <dev:type>
           <maml:name>Int32</maml:name>
           <maml:uri />
@@ -1550,6 +1276,18 @@ Get-PGPInspect -String $Signature</dev:code>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <maml:name>Force</maml:name>
+        <maml:description>
+          <maml:para>Explicitly permits replacing existing public and private key files.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
       <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="HashAlgorithmTag">
         <maml:name>HashAlgorithm</maml:name>
         <maml:description>
@@ -1591,6 +1329,18 @@ Get-PGPInspect -String $Signature</dev:code>
         <command:parameterValue required="false" variableLength="false">Int64</command:parameterValue>
         <dev:type>
           <maml:name>Int64</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <maml:name>PassThru</maml:name>
+        <maml:description>
+          <maml:para>Returns the successfully written key file or key-pair files.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -1716,6 +1466,10 @@ Get-PGPInspect -String $Signature</dev:code>
           <command:parameterValue required="false" variableLength="false">DiffieHellman</command:parameterValue>
           <command:parameterValue required="false" variableLength="false">EdDsa</command:parameterValue>
           <command:parameterValue required="false" variableLength="false">EdDsa_Legacy</command:parameterValue>
+          <command:parameterValue required="false" variableLength="false">X25519</command:parameterValue>
+          <command:parameterValue required="false" variableLength="false">X448</command:parameterValue>
+          <command:parameterValue required="false" variableLength="false">Ed25519</command:parameterValue>
+          <command:parameterValue required="false" variableLength="false">Ed448</command:parameterValue>
           <command:parameterValue required="false" variableLength="false">Experimental_1</command:parameterValue>
           <command:parameterValue required="false" variableLength="false">Experimental_2</command:parameterValue>
           <command:parameterValue required="false" variableLength="false">Experimental_3</command:parameterValue>
@@ -1746,12 +1500,12 @@ Get-PGPInspect -String $Signature</dev:code>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
         <maml:name>Strength</maml:name>
         <maml:description>
           <maml:para>Key strength in bits.</maml:para>
         </maml:description>
-        <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+        <command:parameterValue required="false" variableLength="false">Int32</command:parameterValue>
         <dev:type>
           <maml:name>Int32</maml:name>
           <maml:uri />
@@ -1903,7 +1657,7 @@ without encryption. Add -Detached to create a separate detached signature.</maml
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="True (ByValue, ByPropertyName)" position="named" aliases="FullName,LiteralPath">
           <maml:name>FilePath</maml:name>
           <maml:description>
             <maml:para>File to encrypt when using the File parameter set.</maml:para>
@@ -2026,6 +1780,18 @@ without encryption. Add -Detached to create a separate detached signature.</maml
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PgpSignatureType</maml:name>
           <maml:description>
             <maml:para>PGP signature type when signing data.</maml:para>
@@ -2040,7 +1806,7 @@ without encryption. Add -Detached to create a separate detached signature.</maml
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PublicKeyAlgorithm</maml:name>
           <maml:description>
-            <maml:para>Public key algorithm used during encryption.</maml:para>
+            <maml:para>Compatibility parameter; supplying it is rejected. Existing keys determine their own algorithm.</maml:para>
           </maml:description>
           <command:parameterValue required="false" variableLength="false">PublicKeyAlgorithmTag</command:parameterValue>
           <command:parameterValueGroup>
@@ -2055,6 +1821,10 @@ without encryption. Add -Detached to create a separate detached signature.</maml
             <command:parameterValue required="false" variableLength="false">DiffieHellman</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa_Legacy</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X448</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed448</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_1</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_2</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_3</command:parameterValue>
@@ -2306,6 +2076,18 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PgpSignatureType</maml:name>
           <maml:description>
             <maml:para>PGP signature type when signing data.</maml:para>
@@ -2320,7 +2102,7 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PublicKeyAlgorithm</maml:name>
           <maml:description>
-            <maml:para>Public key algorithm used during encryption.</maml:para>
+            <maml:para>Compatibility parameter; supplying it is rejected. Existing keys determine their own algorithm.</maml:para>
           </maml:description>
           <command:parameterValue required="false" variableLength="false">PublicKeyAlgorithmTag</command:parameterValue>
           <command:parameterValueGroup>
@@ -2335,6 +2117,10 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
             <command:parameterValue required="false" variableLength="false">DiffieHellman</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa_Legacy</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X448</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed448</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_1</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_2</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_3</command:parameterValue>
@@ -2576,7 +2362,7 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PublicKeyAlgorithm</maml:name>
           <maml:description>
-            <maml:para>Public key algorithm used during encryption.</maml:para>
+            <maml:para>Compatibility parameter; supplying it is rejected. Existing keys determine their own algorithm.</maml:para>
           </maml:description>
           <command:parameterValue required="false" variableLength="false">PublicKeyAlgorithmTag</command:parameterValue>
           <command:parameterValueGroup>
@@ -2591,6 +2377,10 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
             <command:parameterValue required="false" variableLength="false">DiffieHellman</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa_Legacy</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X448</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed448</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_1</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_2</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_3</command:parameterValue>
@@ -2866,6 +2656,18 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PgpSignatureType</maml:name>
           <maml:description>
             <maml:para>PGP signature type when signing data.</maml:para>
@@ -2880,7 +2682,7 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PublicKeyAlgorithm</maml:name>
           <maml:description>
-            <maml:para>Public key algorithm used during encryption.</maml:para>
+            <maml:para>Compatibility parameter; supplying it is rejected. Existing keys determine their own algorithm.</maml:para>
           </maml:description>
           <command:parameterValue required="false" variableLength="false">PublicKeyAlgorithmTag</command:parameterValue>
           <command:parameterValueGroup>
@@ -2895,6 +2697,10 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
             <command:parameterValue required="false" variableLength="false">DiffieHellman</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa_Legacy</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X448</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed448</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_1</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_2</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_3</command:parameterValue>
@@ -3049,7 +2855,7 @@ Sign* parameter sets.</maml:para>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="True (ByValue, ByPropertyName)" position="named" aliases="FullName,LiteralPath">
           <maml:name>FilePath</maml:name>
           <maml:description>
             <maml:para>File to encrypt when using the File parameter set.</maml:para>
@@ -3172,6 +2978,18 @@ Sign* parameter sets.</maml:para>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PgpSignatureType</maml:name>
           <maml:description>
             <maml:para>PGP signature type when signing data.</maml:para>
@@ -3186,7 +3004,7 @@ Sign* parameter sets.</maml:para>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PublicKeyAlgorithm</maml:name>
           <maml:description>
-            <maml:para>Public key algorithm used during encryption.</maml:para>
+            <maml:para>Compatibility parameter; supplying it is rejected. Existing keys determine their own algorithm.</maml:para>
           </maml:description>
           <command:parameterValue required="false" variableLength="false">PublicKeyAlgorithmTag</command:parameterValue>
           <command:parameterValueGroup>
@@ -3201,6 +3019,10 @@ Sign* parameter sets.</maml:para>
             <command:parameterValue required="false" variableLength="false">DiffieHellman</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa_Legacy</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X448</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed448</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_1</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_2</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_3</command:parameterValue>
@@ -3468,7 +3290,7 @@ Sign* parameter sets.</maml:para>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PublicKeyAlgorithm</maml:name>
           <maml:description>
-            <maml:para>Public key algorithm used during encryption.</maml:para>
+            <maml:para>Compatibility parameter; supplying it is rejected. Existing keys determine their own algorithm.</maml:para>
           </maml:description>
           <command:parameterValue required="false" variableLength="false">PublicKeyAlgorithmTag</command:parameterValue>
           <command:parameterValueGroup>
@@ -3483,6 +3305,10 @@ Sign* parameter sets.</maml:para>
             <command:parameterValue required="false" variableLength="false">DiffieHellman</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa_Legacy</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X448</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed448</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_1</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_2</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_3</command:parameterValue>
@@ -3760,6 +3586,18 @@ Sign* parameter sets.</maml:para>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PgpSignatureType</maml:name>
           <maml:description>
             <maml:para>PGP signature type when signing data.</maml:para>
@@ -3774,7 +3612,7 @@ Sign* parameter sets.</maml:para>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PublicKeyAlgorithm</maml:name>
           <maml:description>
-            <maml:para>Public key algorithm used during encryption.</maml:para>
+            <maml:para>Compatibility parameter; supplying it is rejected. Existing keys determine their own algorithm.</maml:para>
           </maml:description>
           <command:parameterValue required="false" variableLength="false">PublicKeyAlgorithmTag</command:parameterValue>
           <command:parameterValueGroup>
@@ -3789,6 +3627,10 @@ Sign* parameter sets.</maml:para>
             <command:parameterValue required="false" variableLength="false">DiffieHellman</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa_Legacy</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X448</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed448</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_1</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_2</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_3</command:parameterValue>
@@ -4028,6 +3870,18 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PgpSignatureType</maml:name>
           <maml:description>
             <maml:para>PGP signature type when signing data.</maml:para>
@@ -4042,7 +3896,7 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PublicKeyAlgorithm</maml:name>
           <maml:description>
-            <maml:para>Public key algorithm used during encryption.</maml:para>
+            <maml:para>Compatibility parameter; supplying it is rejected. Existing keys determine their own algorithm.</maml:para>
           </maml:description>
           <command:parameterValue required="false" variableLength="false">PublicKeyAlgorithmTag</command:parameterValue>
           <command:parameterValueGroup>
@@ -4057,6 +3911,10 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
             <command:parameterValue required="false" variableLength="false">DiffieHellman</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa_Legacy</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X448</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed448</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_1</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_2</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_3</command:parameterValue>
@@ -4184,7 +4042,7 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="True (ByValue, ByPropertyName)" position="named" aliases="FullName,LiteralPath">
           <maml:name>FilePath</maml:name>
           <maml:description>
             <maml:para>File to encrypt when using the File parameter set.</maml:para>
@@ -4295,6 +4153,18 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PgpSignatureType</maml:name>
           <maml:description>
             <maml:para>PGP signature type when signing data.</maml:para>
@@ -4309,7 +4179,7 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PublicKeyAlgorithm</maml:name>
           <maml:description>
-            <maml:para>Public key algorithm used during encryption.</maml:para>
+            <maml:para>Compatibility parameter; supplying it is rejected. Existing keys determine their own algorithm.</maml:para>
           </maml:description>
           <command:parameterValue required="false" variableLength="false">PublicKeyAlgorithmTag</command:parameterValue>
           <command:parameterValueGroup>
@@ -4324,6 +4194,10 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
             <command:parameterValue required="false" variableLength="false">DiffieHellman</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa_Legacy</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X448</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed448</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_1</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_2</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_3</command:parameterValue>
@@ -4452,7 +4326,7 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="True (ByValue, ByPropertyName)" position="named" aliases="FullName,LiteralPath">
           <maml:name>FilePath</maml:name>
           <maml:description>
             <maml:para>File to encrypt when using the File parameter set.</maml:para>
@@ -4563,6 +4437,18 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PgpSignatureType</maml:name>
           <maml:description>
             <maml:para>PGP signature type when signing data.</maml:para>
@@ -4577,7 +4463,7 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PublicKeyAlgorithm</maml:name>
           <maml:description>
-            <maml:para>Public key algorithm used during encryption.</maml:para>
+            <maml:para>Compatibility parameter; supplying it is rejected. Existing keys determine their own algorithm.</maml:para>
           </maml:description>
           <command:parameterValue required="false" variableLength="false">PublicKeyAlgorithmTag</command:parameterValue>
           <command:parameterValueGroup>
@@ -4592,6 +4478,10 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
             <command:parameterValue required="false" variableLength="false">DiffieHellman</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa_Legacy</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X448</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed448</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_1</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_2</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_3</command:parameterValue>
@@ -4820,7 +4710,7 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PublicKeyAlgorithm</maml:name>
           <maml:description>
-            <maml:para>Public key algorithm used during encryption.</maml:para>
+            <maml:para>Compatibility parameter; supplying it is rejected. Existing keys determine their own algorithm.</maml:para>
           </maml:description>
           <command:parameterValue required="false" variableLength="false">PublicKeyAlgorithmTag</command:parameterValue>
           <command:parameterValueGroup>
@@ -4835,6 +4725,10 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
             <command:parameterValue required="false" variableLength="false">DiffieHellman</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa_Legacy</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X448</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed448</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_1</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_2</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_3</command:parameterValue>
@@ -5076,7 +4970,7 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>PublicKeyAlgorithm</maml:name>
           <maml:description>
-            <maml:para>Public key algorithm used during encryption.</maml:para>
+            <maml:para>Compatibility parameter; supplying it is rejected. Existing keys determine their own algorithm.</maml:para>
           </maml:description>
           <command:parameterValue required="false" variableLength="false">PublicKeyAlgorithmTag</command:parameterValue>
           <command:parameterValueGroup>
@@ -5091,6 +4985,10 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
             <command:parameterValue required="false" variableLength="false">DiffieHellman</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">EdDsa_Legacy</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">X448</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed25519</command:parameterValue>
+            <command:parameterValue required="false" variableLength="false">Ed448</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_1</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_2</command:parameterValue>
             <command:parameterValue required="false" variableLength="false">Experimental_3</command:parameterValue>
@@ -5242,7 +5140,7 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="True (ByValue, ByPropertyName)" position="named" aliases="FullName,LiteralPath">
         <maml:name>FilePath</maml:name>
         <maml:description>
           <maml:para>File to encrypt when using the File parameter set.</maml:para>
@@ -5254,12 +5152,12 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="None">
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="None">
         <maml:name>FilePathPublic</maml:name>
         <maml:description>
           <maml:para>Public key files used for encryption.</maml:para>
         </maml:description>
-        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <command:parameterValue required="false" variableLength="false">String[]</command:parameterValue>
         <dev:type>
           <maml:name>String[]</maml:name>
           <maml:uri />
@@ -5389,6 +5287,18 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
       <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <maml:name>PassThru</maml:name>
+        <maml:description>
+          <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
         <maml:name>PgpSignatureType</maml:name>
         <maml:description>
           <maml:para>PGP signature type when signing data.</maml:para>
@@ -5403,7 +5313,7 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
       <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
         <maml:name>PublicKeyAlgorithm</maml:name>
         <maml:description>
-          <maml:para>Public key algorithm used during encryption.</maml:para>
+          <maml:para>Compatibility parameter; supplying it is rejected. Existing keys determine their own algorithm.</maml:para>
         </maml:description>
         <command:parameterValue required="false" variableLength="false">PublicKeyAlgorithmTag</command:parameterValue>
         <command:parameterValueGroup>
@@ -5418,6 +5328,10 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
           <command:parameterValue required="false" variableLength="false">DiffieHellman</command:parameterValue>
           <command:parameterValue required="false" variableLength="false">EdDsa</command:parameterValue>
           <command:parameterValue required="false" variableLength="false">EdDsa_Legacy</command:parameterValue>
+          <command:parameterValue required="false" variableLength="false">X25519</command:parameterValue>
+          <command:parameterValue required="false" variableLength="false">X448</command:parameterValue>
+          <command:parameterValue required="false" variableLength="false">Ed25519</command:parameterValue>
+          <command:parameterValue required="false" variableLength="false">Ed448</command:parameterValue>
           <command:parameterValue required="false" variableLength="false">Experimental_1</command:parameterValue>
           <command:parameterValue required="false" variableLength="false">Experimental_2</command:parameterValue>
           <command:parameterValue required="false" variableLength="false">Experimental_3</command:parameterValue>
@@ -5436,13 +5350,13 @@ Sign* parameter sets or the -SignOnly switch.</maml:para>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
         <maml:name>SignKey</maml:name>
         <maml:description>
           <maml:para>Private key used for signing data. Mandatory when using the&#xD;
 Sign* parameter sets or the -SignOnly switch.</maml:para>
         </maml:description>
-        <command:parameterValue required="true" variableLength="false">FileInfo</command:parameterValue>
+        <command:parameterValue required="false" variableLength="false">FileInfo</command:parameterValue>
         <dev:type>
           <maml:name>FileInfo</maml:name>
           <maml:uri />
@@ -5543,7 +5457,7 @@ Sign* parameter sets.</maml:para>
     <command:inputTypes>
       <command:inputType>
         <dev:type>
-          <maml:name>None</maml:name>
+          <maml:name>System.String</maml:name>
         </dev:type>
       </command:inputType>
     </command:inputTypes>
@@ -5626,7 +5540,7 @@ Sign* parameter sets.</maml:para>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="True (ByValue, ByPropertyName)" position="named" aliases="FullName,LiteralPath">
           <maml:name>FilePath</maml:name>
           <maml:description>
             <maml:para>File path to verify.</maml:para>
@@ -5677,7 +5591,7 @@ Sign* parameter sets.</maml:para>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>ThrowIfEncrypted</maml:name>
           <maml:description>
-            <maml:para>Throws when encrypted content is passed to verify methods.</maml:para>
+            <maml:para>Retained for compatibility. Encrypted input is always rejected; use Unprotect-PGP -Verify.</maml:para>
           </maml:description>
           <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
           <dev:type>
@@ -5740,7 +5654,7 @@ Sign* parameter sets.</maml:para>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>ThrowIfEncrypted</maml:name>
           <maml:description>
-            <maml:para>Throws when encrypted content is passed to verify methods.</maml:para>
+            <maml:para>Retained for compatibility. Encrypted input is always rejected; use Unprotect-PGP -Verify.</maml:para>
           </maml:description>
           <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
           <dev:type>
@@ -5803,7 +5717,7 @@ Sign* parameter sets.</maml:para>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>ThrowIfEncrypted</maml:name>
           <maml:description>
-            <maml:para>Throws when encrypted content is passed to verify methods.</maml:para>
+            <maml:para>Retained for compatibility. Encrypted input is always rejected; use Unprotect-PGP -Verify.</maml:para>
           </maml:description>
           <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
           <dev:type>
@@ -5827,7 +5741,7 @@ Sign* parameter sets.</maml:para>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="True (ByValue, ByPropertyName)" position="named" aliases="FullName,LiteralPath">
         <maml:name>FilePath</maml:name>
         <maml:description>
           <maml:para>File path to verify.</maml:para>
@@ -5926,7 +5840,7 @@ Sign* parameter sets.</maml:para>
       <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
         <maml:name>ThrowIfEncrypted</maml:name>
         <maml:description>
-          <maml:para>Throws when encrypted content is passed to verify methods.</maml:para>
+          <maml:para>Retained for compatibility. Encrypted input is always rejected; use Unprotect-PGP -Verify.</maml:para>
         </maml:description>
         <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
         <dev:type>
@@ -5939,7 +5853,7 @@ Sign* parameter sets.</maml:para>
     <command:inputTypes>
       <command:inputType>
         <dev:type>
-          <maml:name>None</maml:name>
+          <maml:name>System.String</maml:name>
         </dev:type>
       </command:inputType>
     </command:inputTypes>
@@ -6061,6 +5975,18 @@ Sign* parameter sets.</maml:para>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>Password</maml:name>
           <maml:description>
             <maml:para>Password protecting the private key.</maml:para>
@@ -6135,6 +6061,18 @@ Sign* parameter sets.</maml:para>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
       </command:syntaxItem>
       <command:syntaxItem parameterSetName="FileCredential">
         <maml:name>Unprotect-PGP</maml:name>
@@ -6150,7 +6088,7 @@ Sign* parameter sets.</maml:para>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="True (ByValue, ByPropertyName)" position="named" aliases="FullName,LiteralPath">
           <maml:name>FilePath</maml:name>
           <maml:description>
             <maml:para>Encrypted file to decrypt.</maml:para>
@@ -6186,14 +6124,26 @@ Sign* parameter sets.</maml:para>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>OutFilePath</maml:name>
           <maml:description>
             <maml:para>Output file path for decrypted data.</maml:para>
           </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <command:parameterValue required="false" variableLength="false">String</command:parameterValue>
           <dev:type>
             <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -6201,7 +6151,7 @@ Sign* parameter sets.</maml:para>
       </command:syntaxItem>
       <command:syntaxItem parameterSetName="FileClearText">
         <maml:name>Unprotect-PGP</maml:name>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="True (ByValue, ByPropertyName)" position="named" aliases="FullName,LiteralPath">
           <maml:name>FilePath</maml:name>
           <maml:description>
             <maml:para>Encrypted file to decrypt.</maml:para>
@@ -6237,14 +6187,26 @@ Sign* parameter sets.</maml:para>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>OutFilePath</maml:name>
           <maml:description>
             <maml:para>Output file path for decrypted data.</maml:para>
           </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <command:parameterValue required="false" variableLength="false">String</command:parameterValue>
           <dev:type>
             <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -6393,7 +6355,7 @@ Sign* parameter sets.</maml:para>
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>FilePathPublic</maml:name>
           <maml:description>
-            <maml:para>Public key files reserved for signed-and-encrypted verification workflows.</maml:para>
+            <maml:para>Trusted public key files used to verify encrypted and signed content.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
           <dev:type>
@@ -6438,10 +6400,22 @@ Sign* parameter sets.</maml:para>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
         <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>Verify</maml:name>
           <maml:description>
-            <maml:para>Reserved for future signed-and-encrypted verification support.</maml:para>
+            <maml:para>Verifies the signature inside encrypted content before returning plaintext.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">SwitchParameter</command:parameterValue>
           <dev:type>
@@ -6468,7 +6442,7 @@ Sign* parameter sets.</maml:para>
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>FilePathPublic</maml:name>
           <maml:description>
-            <maml:para>Public key files reserved for signed-and-encrypted verification workflows.</maml:para>
+            <maml:para>Trusted public key files used to verify encrypted and signed content.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
           <dev:type>
@@ -6514,6 +6488,18 @@ Sign* parameter sets.</maml:para>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>Password</maml:name>
           <maml:description>
             <maml:para>Password protecting the private key.</maml:para>
@@ -6528,7 +6514,7 @@ Sign* parameter sets.</maml:para>
         <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>Verify</maml:name>
           <maml:description>
-            <maml:para>Reserved for future signed-and-encrypted verification support.</maml:para>
+            <maml:para>Verifies the signature inside encrypted content before returning plaintext.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">SwitchParameter</command:parameterValue>
           <dev:type>
@@ -6552,7 +6538,7 @@ Sign* parameter sets.</maml:para>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="True (ByValue, ByPropertyName)" position="named" aliases="FullName,LiteralPath">
           <maml:name>FilePath</maml:name>
           <maml:description>
             <maml:para>Encrypted file to decrypt.</maml:para>
@@ -6579,7 +6565,7 @@ Sign* parameter sets.</maml:para>
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>FilePathPublic</maml:name>
           <maml:description>
-            <maml:para>Public key files reserved for signed-and-encrypted verification workflows.</maml:para>
+            <maml:para>Trusted public key files used to verify encrypted and signed content.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
           <dev:type>
@@ -6600,14 +6586,26 @@ Sign* parameter sets.</maml:para>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>OutFilePath</maml:name>
           <maml:description>
             <maml:para>Output file path for decrypted data.</maml:para>
           </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <command:parameterValue required="false" variableLength="false">String</command:parameterValue>
           <dev:type>
             <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -6615,7 +6613,7 @@ Sign* parameter sets.</maml:para>
         <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>Verify</maml:name>
           <maml:description>
-            <maml:para>Reserved for future signed-and-encrypted verification support.</maml:para>
+            <maml:para>Verifies the signature inside encrypted content before returning plaintext.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">SwitchParameter</command:parameterValue>
           <dev:type>
@@ -6627,7 +6625,7 @@ Sign* parameter sets.</maml:para>
       </command:syntaxItem>
       <command:syntaxItem parameterSetName="FileVerifyClearText">
         <maml:name>Unprotect-PGP</maml:name>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="True (ByValue, ByPropertyName)" position="named" aliases="FullName,LiteralPath">
           <maml:name>FilePath</maml:name>
           <maml:description>
             <maml:para>Encrypted file to decrypt.</maml:para>
@@ -6654,7 +6652,7 @@ Sign* parameter sets.</maml:para>
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>FilePathPublic</maml:name>
           <maml:description>
-            <maml:para>Public key files reserved for signed-and-encrypted verification workflows.</maml:para>
+            <maml:para>Trusted public key files used to verify encrypted and signed content.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
           <dev:type>
@@ -6675,14 +6673,26 @@ Sign* parameter sets.</maml:para>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>OutFilePath</maml:name>
           <maml:description>
             <maml:para>Output file path for decrypted data.</maml:para>
           </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <command:parameterValue required="false" variableLength="false">String</command:parameterValue>
           <dev:type>
             <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -6702,7 +6712,7 @@ Sign* parameter sets.</maml:para>
         <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>Verify</maml:name>
           <maml:description>
-            <maml:para>Reserved for future signed-and-encrypted verification support.</maml:para>
+            <maml:para>Verifies the signature inside encrypted content before returning plaintext.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">SwitchParameter</command:parameterValue>
           <dev:type>
@@ -6729,7 +6739,7 @@ Sign* parameter sets.</maml:para>
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>FilePathPublic</maml:name>
           <maml:description>
-            <maml:para>Public key files reserved for signed-and-encrypted verification workflows.</maml:para>
+            <maml:para>Trusted public key files used to verify encrypted and signed content.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
           <dev:type>
@@ -6777,7 +6787,7 @@ Sign* parameter sets.</maml:para>
         <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>Verify</maml:name>
           <maml:description>
-            <maml:para>Reserved for future signed-and-encrypted verification support.</maml:para>
+            <maml:para>Verifies the signature inside encrypted content before returning plaintext.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">SwitchParameter</command:parameterValue>
           <dev:type>
@@ -6816,7 +6826,7 @@ Sign* parameter sets.</maml:para>
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>FilePathPublic</maml:name>
           <maml:description>
-            <maml:para>Public key files reserved for signed-and-encrypted verification workflows.</maml:para>
+            <maml:para>Trusted public key files used to verify encrypted and signed content.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
           <dev:type>
@@ -6852,7 +6862,7 @@ Sign* parameter sets.</maml:para>
         <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>Verify</maml:name>
           <maml:description>
-            <maml:para>Reserved for future signed-and-encrypted verification support.</maml:para>
+            <maml:para>Verifies the signature inside encrypted content before returning plaintext.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">SwitchParameter</command:parameterValue>
           <dev:type>
@@ -6900,6 +6910,18 @@ Sign* parameter sets.</maml:para>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
         <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>SymmetricPassphrase</maml:name>
           <maml:description>
@@ -6915,7 +6937,7 @@ Sign* parameter sets.</maml:para>
       </command:syntaxItem>
       <command:syntaxItem parameterSetName="FileSymmetric">
         <maml:name>Unprotect-PGP</maml:name>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="True (ByValue, ByPropertyName)" position="named" aliases="FullName,LiteralPath">
           <maml:name>FilePath</maml:name>
           <maml:description>
             <maml:para>Encrypted file to decrypt.</maml:para>
@@ -6939,14 +6961,26 @@ Sign* parameter sets.</maml:para>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
           <maml:name>OutFilePath</maml:name>
           <maml:description>
             <maml:para>Output file path for decrypted data.</maml:para>
           </maml:description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <command:parameterValue required="false" variableLength="false">String</command:parameterValue>
           <dev:type>
             <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+          <maml:name>PassThru</maml:name>
+          <maml:description>
+            <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -7017,7 +7051,7 @@ Sign* parameter sets.</maml:para>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="True (ByValue, ByPropertyName)" position="named" aliases="FullName,LiteralPath">
         <maml:name>FilePath</maml:name>
         <maml:description>
           <maml:para>Encrypted file to decrypt.</maml:para>
@@ -7044,7 +7078,7 @@ Sign* parameter sets.</maml:para>
       <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="None">
         <maml:name>FilePathPublic</maml:name>
         <maml:description>
-          <maml:para>Public key files reserved for signed-and-encrypted verification workflows.</maml:para>
+          <maml:para>Trusted public key files used to verify encrypted and signed content.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
         <dev:type>
@@ -7077,12 +7111,12 @@ Sign* parameter sets.</maml:para>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
         <maml:name>OutFilePath</maml:name>
         <maml:description>
           <maml:para>Output file path for decrypted data.</maml:para>
         </maml:description>
-        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <command:parameterValue required="false" variableLength="false">String</command:parameterValue>
         <dev:type>
           <maml:name>String</maml:name>
           <maml:uri />
@@ -7097,6 +7131,18 @@ Sign* parameter sets.</maml:para>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
           <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
+        <maml:name>PassThru</maml:name>
+        <maml:description>
+          <maml:para>Returns the completed output file for each successful file operation.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -7140,7 +7186,7 @@ Sign* parameter sets.</maml:para>
       <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="False" position="named" aliases="None">
         <maml:name>Verify</maml:name>
         <maml:description>
-          <maml:para>Reserved for future signed-and-encrypted verification support.</maml:para>
+          <maml:para>Verifies the signature inside encrypted content before returning plaintext.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">SwitchParameter</command:parameterValue>
         <dev:type>
@@ -7153,7 +7199,7 @@ Sign* parameter sets.</maml:para>
     <command:inputTypes>
       <command:inputType>
         <dev:type>
-          <maml:name>None</maml:name>
+          <maml:name>System.String</maml:name>
         </dev:type>
       </command:inputType>
     </command:inputTypes>

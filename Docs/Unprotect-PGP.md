@@ -11,77 +11,77 @@ Removes PGP encryption from files or strings using a private key or symmetric pa
 ## SYNTAX
 ### FolderClearText (Default)
 ```powershell
-Unprotect-PGP -FilePathPrivate <string[]> -FolderPath <string> -OutputFolderPath <string> [-Password <string>] [-IgnoreIntegrityCheckFailure] [<CommonParameters>]
+Unprotect-PGP -FilePathPrivate <string[]> -FolderPath <string> -OutputFolderPath <string> [-Password <string>] [-IgnoreIntegrityCheckFailure] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### FolderCredential
 ```powershell
-Unprotect-PGP -FilePathPrivate <string[]> -Credential <pscredential> -FolderPath <string> -OutputFolderPath <string> [-IgnoreIntegrityCheckFailure] [<CommonParameters>]
+Unprotect-PGP -FilePathPrivate <string[]> -Credential <pscredential> -FolderPath <string> -OutputFolderPath <string> [-IgnoreIntegrityCheckFailure] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### FileCredential
 ```powershell
-Unprotect-PGP -FilePathPrivate <string[]> -Credential <pscredential> -FilePath <string> -OutFilePath <string> [-IgnoreIntegrityCheckFailure] [<CommonParameters>]
+Unprotect-PGP -FilePathPrivate <string[]> -Credential <pscredential> -FilePath <string> [-OutFilePath <string>] [-IgnoreIntegrityCheckFailure] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### FileClearText
 ```powershell
-Unprotect-PGP -FilePathPrivate <string[]> -FilePath <string> -OutFilePath <string> [-Password <string>] [-IgnoreIntegrityCheckFailure] [<CommonParameters>]
+Unprotect-PGP -FilePathPrivate <string[]> -FilePath <string> [-Password <string>] [-OutFilePath <string>] [-IgnoreIntegrityCheckFailure] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### StringClearText
 ```powershell
-Unprotect-PGP -FilePathPrivate <string[]> -String <string> [-Password <string>] [-IgnoreIntegrityCheckFailure] [<CommonParameters>]
+Unprotect-PGP -FilePathPrivate <string[]> -String <string> [-Password <string>] [-IgnoreIntegrityCheckFailure] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### StringCredential
 ```powershell
-Unprotect-PGP -FilePathPrivate <string[]> -Credential <pscredential> -String <string> [-IgnoreIntegrityCheckFailure] [<CommonParameters>]
+Unprotect-PGP -FilePathPrivate <string[]> -Credential <pscredential> -String <string> [-IgnoreIntegrityCheckFailure] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### FolderVerifyCredential
 ```powershell
-Unprotect-PGP -FilePathPrivate <string[]> -FilePathPublic <string[]> -Credential <pscredential> -FolderPath <string> -OutputFolderPath <string> -Verify [-IgnoreIntegrityCheckFailure] [<CommonParameters>]
+Unprotect-PGP -FilePathPrivate <string[]> -FilePathPublic <string[]> -Credential <pscredential> -FolderPath <string> -OutputFolderPath <string> -Verify [-IgnoreIntegrityCheckFailure] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### FolderVerifyClearText
 ```powershell
-Unprotect-PGP -FilePathPrivate <string[]> -FilePathPublic <string[]> -FolderPath <string> -OutputFolderPath <string> -Verify [-Password <string>] [-IgnoreIntegrityCheckFailure] [<CommonParameters>]
+Unprotect-PGP -FilePathPrivate <string[]> -FilePathPublic <string[]> -FolderPath <string> -OutputFolderPath <string> -Verify [-Password <string>] [-IgnoreIntegrityCheckFailure] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### FileVerifyCredential
 ```powershell
-Unprotect-PGP -FilePathPrivate <string[]> -FilePathPublic <string[]> -Credential <pscredential> -FilePath <string> -OutFilePath <string> -Verify [-IgnoreIntegrityCheckFailure] [<CommonParameters>]
+Unprotect-PGP -FilePathPrivate <string[]> -FilePathPublic <string[]> -Credential <pscredential> -FilePath <string> -Verify [-OutFilePath <string>] [-IgnoreIntegrityCheckFailure] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### FileVerifyClearText
 ```powershell
-Unprotect-PGP -FilePathPrivate <string[]> -FilePathPublic <string[]> -FilePath <string> -OutFilePath <string> -Verify [-Password <string>] [-IgnoreIntegrityCheckFailure] [<CommonParameters>]
+Unprotect-PGP -FilePathPrivate <string[]> -FilePathPublic <string[]> -FilePath <string> -Verify [-Password <string>] [-OutFilePath <string>] [-IgnoreIntegrityCheckFailure] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### StringVerifyClearText
 ```powershell
-Unprotect-PGP -FilePathPrivate <string[]> -FilePathPublic <string[]> -String <string> -Verify [-Password <string>] [-IgnoreIntegrityCheckFailure] [<CommonParameters>]
+Unprotect-PGP -FilePathPrivate <string[]> -FilePathPublic <string[]> -String <string> -Verify [-Password <string>] [-IgnoreIntegrityCheckFailure] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### StringVerifyCredential
 ```powershell
-Unprotect-PGP -FilePathPrivate <string[]> -FilePathPublic <string[]> -Credential <pscredential> -String <string> -Verify [-IgnoreIntegrityCheckFailure] [<CommonParameters>]
+Unprotect-PGP -FilePathPrivate <string[]> -FilePathPublic <string[]> -Credential <pscredential> -String <string> -Verify [-IgnoreIntegrityCheckFailure] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### FolderSymmetric
 ```powershell
-Unprotect-PGP -SymmetricPassphrase <string> -FolderPath <string> -OutputFolderPath <string> [-IgnoreIntegrityCheckFailure] [<CommonParameters>]
+Unprotect-PGP -SymmetricPassphrase <string> -FolderPath <string> -OutputFolderPath <string> [-IgnoreIntegrityCheckFailure] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### FileSymmetric
 ```powershell
-Unprotect-PGP -SymmetricPassphrase <string> -FilePath <string> -OutFilePath <string> [-IgnoreIntegrityCheckFailure] [<CommonParameters>]
+Unprotect-PGP -SymmetricPassphrase <string> -FilePath <string> [-OutFilePath <string>] [-IgnoreIntegrityCheckFailure] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### StringSymmetric
 ```powershell
-Unprotect-PGP -SymmetricPassphrase <string> -String <string> [-IgnoreIntegrityCheckFailure] [<CommonParameters>]
+Unprotect-PGP -SymmetricPassphrase <string> -String <string> [-IgnoreIntegrityCheckFailure] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -131,13 +131,13 @@ Encrypted file to decrypt.
 ```yaml
 Type: String
 Parameter Sets: FileCredential, FileClearText, FileVerifyCredential, FileVerifyClearText, FileSymmetric
-Aliases: None
+Aliases: FullName, LiteralPath
 Possible values:
 
 Required: True
 Position: named
 Default value: None
-Accept pipeline input: False
+Accept pipeline input: True (ByValue, ByPropertyName)
 Accept wildcard characters: False
 ```
 
@@ -158,7 +158,7 @@ Accept wildcard characters: False
 ```
 
 ### -FilePathPublic
-Public key files reserved for signed-and-encrypted verification workflows.
+Trusted public key files used to verify encrypted and signed content.
 
 ```yaml
 Type: String[]
@@ -214,7 +214,7 @@ Parameter Sets: FileCredential, FileClearText, FileVerifyCredential, FileVerifyC
 Aliases: None
 Possible values:
 
-Required: True
+Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
@@ -231,6 +231,22 @@ Aliases: None
 Possible values:
 
 Required: True
+Position: named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -PassThru
+Returns the completed output file for each successful file operation.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: FolderClearText, FolderCredential, FileCredential, FileClearText, FolderVerifyCredential, FolderVerifyClearText, FileVerifyCredential, FileVerifyClearText, FolderSymmetric, FileSymmetric
+Aliases: None
+Possible values:
+
+Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
@@ -286,7 +302,7 @@ Accept wildcard characters: False
 ```
 
 ### -Verify
-Reserved for future signed-and-encrypted verification support.
+Verifies the signature inside encrypted content before returning plaintext.
 
 ```yaml
 Type: SwitchParameter
@@ -306,7 +322,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-- `None`
+- `System.String`
 
 ## OUTPUTS
 
