@@ -24,7 +24,7 @@ Build-Module -ModuleName 'PSPGP' -SkipInstall -ErrorAction Stop {
     New-ConfigurationBuild -Enable -SignModule:$SignModule `
         -CertificateThumbprint '92e95fb58effa6a4a75e77a33cdd6bfe6dd30f1a' `
         -NETProjectPath "$PSScriptRoot/../Sources/PSPGP" -NETProjectName 'PSPGP' `
-        -NETBinaryModule 'PSPGP.dll' -NETConfiguration 'Release' -NETFramework 'netstandard2.0', 'net472' `
+        -NETBinaryModule 'PSPGP.dll' -NETConfiguration 'Release' -NETFramework 'net8.0', 'net472' `
         -NETBinaryModuleDocumentation -NETHandleAssemblyWithSameName -NETAssemblyLoadContext `
         -NETDevelopmentBinaries -NETDevelopmentBinariesMode Environment `
         -NETDevelopmentBinariesEnvironmentVariable 'PSPGP_DEVELOPMENT' `

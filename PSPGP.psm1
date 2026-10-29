@@ -6,14 +6,17 @@
 # PowerForge script preamble end
 
 
+$UnregisterPowerForgeDesktopAssemblyResolver = $null
+$PowerForgeModuleImportCompleted = $false
+try {
 $PowerForgeDevelopmentBinaryLoaded = $false
 # Source development binary loader
 $PowerForgeDevelopmentBinaryRoot = [IO.Path]::GetFullPath([IO.Path]::Combine($PSScriptRoot, 'Sources', 'PSPGP', 'bin'))
 $PowerForgeDevelopmentBinaryMode = 'Environment'
 $PowerForgeDevelopmentBinaryEnvironmentVariable = 'PSPGP_DEVELOPMENT'
 $PowerForgeDevelopmentConfigurationEnvironmentVariable = 'PSPGP_DEVELOPMENT_CONFIGURATION'
-$PowerForgeDevelopmentCoreFrameworks = @('netstandard2.0', 'net472')
-$PowerForgeDevelopmentDesktopFrameworks = @('net472', 'netstandard2.0')
+$PowerForgeDevelopmentCoreFrameworks = @('net8.0', 'net472')
+$PowerForgeDevelopmentDesktopFrameworks = @('net472', 'net8.0')
 $PowerForgeDevelopmentUseAssemblyLoadContext = $true
 $PowerForgeDevelopmentEnabled = $false
 if ($PowerForgeDevelopmentBinaryMode -eq 'Auto') {
@@ -104,6 +107,11 @@ namespace PSPGP.DevelopmentModuleLoadContext
         protected override Assembly Load(AssemblyName assemblyName)
         {
             if (assemblyName == null || string.IsNullOrWhiteSpace(assemblyName.Name))
+                return null;
+
+            // Cmdlet and attribute types must come from the PowerShell host. Development
+            // outputs can include SDK runtime copies that have a different ALC identity.
+            if (string.Equals(assemblyName.Name, "System.Management.Automation", StringComparison.OrdinalIgnoreCase))
                 return null;
 
             var loaderAssembly = typeof(ModuleAssemblyLoadContext).Assembly.GetName();
@@ -272,7 +280,15 @@ namespace PSPGP.DevelopmentModuleLoadContext
 # PowerForge script payload begin
 
 # PowerForge script payload end
+# PowerForge exports begin
 $FunctionsToExport = @()
 $CmdletsToExport = @('Get-PGPInspect', 'Get-PGPKey', 'Get-PGPKeyInfo', 'New-PGPKey', 'Protect-PGP', 'Test-PGP', 'Unprotect-PGP')
 $AliasesToExport = @()
 Export-ModuleMember -Function $FunctionsToExport -Alias $AliasesToExport -Cmdlet $CmdletsToExport
+# PowerForge exports end
+    $PowerForgeModuleImportCompleted = $true
+} finally {
+    if (-not $PowerForgeModuleImportCompleted -and $null -ne $UnregisterPowerForgeDesktopAssemblyResolver) {
+        & $UnregisterPowerForgeDesktopAssemblyResolver
+    }
+}
