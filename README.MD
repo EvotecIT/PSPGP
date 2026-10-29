@@ -253,6 +253,6 @@ The build uses PSPublishModule 3.0.153 or later. Its default mode builds artifac
 ./PSPGP.Tests.ps1 -ModulePath './Artefacts/Unpacked/PSPGP/PSPGP.psd1'
 ```
 
-Tests use Pester 5.7.1 and exercise the packaged module on Windows PowerShell 5.1 and PowerShell 7. CI also runs that same artifact on Linux and macOS. The package contains .NET Framework 4.7.2 and .NET Standard 2.0 binaries. PowerShell Core uses the shared loader's assembly isolation to avoid conflicts with other modules' PGP dependencies.
+Tests use Pester 5.7.1 and exercise the packaged module on Windows PowerShell 5.1 and PowerShell 7. CI also runs that same artifact on Linux and macOS. The package contains .NET Framework 4.7.2 and .NET 8 binaries, supporting Windows PowerShell 5.1 and PowerShell 7.4 or later. PowerShell Core uses the shared loader's assembly isolation to avoid conflicts with other modules' PGP dependencies.
 
 The source bootstrapper loads development binaries only when `PSPGP_DEVELOPMENT=true`. Set `PSPGP_DEVELOPMENT_CONFIGURATION` to choose `Debug` or `Release`. Command help is generated from C# XML documentation; regenerate it through the build's `Documentation` mode.
