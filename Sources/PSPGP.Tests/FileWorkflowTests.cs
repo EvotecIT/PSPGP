@@ -6,6 +6,39 @@ namespace PSPGP.Tests;
 
 public class FileWorkflowTests {
     [Fact]
+    public void Plan_OutputInsideInput_ExcludesPriorOutputAndDoesNotWriteNewFiles() {
+        using var files = new TestFileHelper();
+        string input = files.CreateTempDirectory("input");
+        string output = Directory.CreateDirectory(Path.Combine(input, "encoded")).FullName;
+        string source = Path.Combine(input, "source.txt");
+        File.WriteAllText(source, "original input");
+        string prior = Path.Combine(output, "prior.txt.pgp");
+        File.WriteAllText(prior, "prior ciphertext");
+
+        FileWorkflow.Item[] plan = FileWorkflow.Plan(input, output, name => name + ".pgp");
+
+        FileWorkflow.Item item = Assert.Single(plan);
+        Assert.Equal(source, item.Input);
+        Assert.Equal(Path.Combine(output, "source.txt.pgp"), item.Output);
+        Assert.False(File.Exists(item.Output));
+        Assert.Equal("original input", File.ReadAllText(source));
+        Assert.Equal("prior ciphertext", File.ReadAllText(prior));
+    }
+
+    [Fact]
+    public void EnsureOutputDirectory_DistinctDestination_CreatesParentAndPreservesInput() {
+        using var files = new TestFileHelper();
+        string input = files.CreateTempFile("source.txt", "original input");
+        string output = Path.Combine(files.TempDirectory, "output", "source.txt.pgp");
+
+        FileWorkflow.EnsureOutputDirectory(input, output);
+
+        Assert.True(Directory.Exists(Path.GetDirectoryName(output)));
+        Assert.False(File.Exists(output));
+        Assert.Equal("original input", File.ReadAllText(input));
+    }
+
+    [Fact]
     public void FileDirectoryOutputCollision_IsRejectedBeforeOutputCreation() {
         using var files = new TestFileHelper();
         string input = files.CreateTempDirectory("input");
