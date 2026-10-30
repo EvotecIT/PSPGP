@@ -6,29 +6,47 @@ schema: 2.0.0
 ---
 # Get-PGPKey
 ## SYNOPSIS
-Downloads a public key from a key server.
+Downloads validated public certificates from an HTTPS key server.
 
 ## SYNTAX
 ### __AllParameterSets
 ```powershell
-Get-PGPKey -KeyServer <string> -Search <string> [-OutFilePath <string>] [<CommonParameters>]
+Get-PGPKey -KeyServer <string> -Search <string> [-ExpectedFingerprint <string>] [-OutFilePath <string>] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Downloads a public key from a key server.
+Downloads validated public certificates from an HTTPS key server.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```powershell
-Get-PGPKey -KeyServer "https://keys.example.com" -Search "user@example.com" -OutFilePath "key.asc"
+# Replace this example with the full primary fingerprint verified through an independently trusted channel.
+$fingerprint = '0123456789ABCDEF0123456789ABCDEF01234567'
+Get-PGPKey -KeyServer 'https://keys.openpgp.org' -Search 'user@example.com' -ExpectedFingerprint $fingerprint -OutFilePath .\user.asc -PassThru
 ```
 
 
 ## PARAMETERS
 
+### -ExpectedFingerprint
+Optional complete primary fingerprint obtained through an independently trusted channel.
+
+```yaml
+Type: String
+Parameter Sets: __AllParameterSets
+Aliases: None
+Possible values:
+
+Required: False
+Position: named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -KeyServer
-URL of the key server.
+HTTPS URL of the key server.
 
 ```yaml
 Type: String
@@ -44,7 +62,7 @@ Accept wildcard characters: False
 ```
 
 ### -OutFilePath
-File path where the downloaded key is stored.
+Optional destination file, replaced only after certificate validation.
 
 ```yaml
 Type: String
@@ -59,8 +77,24 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -PassThru
+Returns the written certificate file when OutFilePath is used.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: __AllParameterSets
+Aliases: None
+Possible values:
+
+Required: False
+Position: named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -Search
-Search string identifying the key.
+Search string identifying the key; a user ID or short key ID does not establish trust.
 
 ```yaml
 Type: String
