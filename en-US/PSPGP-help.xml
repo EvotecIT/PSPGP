@@ -286,7 +286,9 @@ Get-PGPInspect -String $Signature</dev:code>
     <command:examples>
       <command:example>
         <maml:title>EXAMPLE 1</maml:title>
-        <dev:code>Get-PGPKey -KeyServer 'https://keys.openpgp.org' -Search 'user@example.com' -ExpectedFingerprint $fingerprint -OutFilePath .\user.asc -PassThru</dev:code>
+        <dev:code># Replace this example with the full primary fingerprint verified through an independently trusted channel.&#xD;
+$fingerprint = '0123456789ABCDEF0123456789ABCDEF01234567'&#xD;
+Get-PGPKey -KeyServer 'https://keys.openpgp.org' -Search 'user@example.com' -ExpectedFingerprint $fingerprint -OutFilePath .\user.asc -PassThru</dev:code>
         <dev:remarks>
           <maml:para></maml:para>
         </dev:remarks>

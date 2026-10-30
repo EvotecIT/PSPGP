@@ -21,6 +21,8 @@ Downloads validated public certificates from an HTTPS key server.
 
 ### EXAMPLE 1
 ```powershell
+# Replace this example with the full primary fingerprint verified through an independently trusted channel.
+$fingerprint = '0123456789ABCDEF0123456789ABCDEF01234567'
 Get-PGPKey -KeyServer 'https://keys.openpgp.org' -Search 'user@example.com' -ExpectedFingerprint $fingerprint -OutFilePath .\user.asc -PassThru
 ```
 
