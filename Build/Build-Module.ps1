@@ -2,7 +2,9 @@ param(
     [Alias('RunMode')]
     [ValidateSet('Manifest', 'Documentation', 'Build', 'Publish')]
     [string] $ConfigurationGateMode = 'Build',
-    [bool] $SignModule = $true
+    [bool] $SignModule = $true,
+    [string] $PowerShellGalleryApiKeyPath = 'C:\Support\Important\PowerShellGalleryAPI.txt',
+    [string] $GitHubApiKeyPath = 'C:\Support\Important\GitHubAPI.txt'
 )
 
 Import-Module PSPublishModule -MinimumVersion 3.0.153 -Force -ErrorAction Stop
@@ -34,4 +36,8 @@ Build-Module -ModuleName 'PSPGP' -SkipInstall -ErrorAction Stop {
     New-ConfigurationArtefact -Type Unpacked -Enable -Path "$PSScriptRoot/../Artefacts/Unpacked" -CopyFilesRelative
     New-ConfigurationArtefact -Type Packed -Enable -Path "$PSScriptRoot/../Artefacts/Packed" `
         -ArtefactName '<ModuleName>.v<ModuleVersion>.zip'
+
+    New-ConfigurationPublish -Type PowerShellGallery -FilePath $PowerShellGalleryApiKeyPath -Enabled:$false
+    New-ConfigurationPublish -Type GitHub -FilePath $GitHubApiKeyPath -UserName 'EvotecIT' `
+        -RepositoryName 'PSPGP' -GenerateReleaseNotes -Enabled:$false
 } -ExitCode
