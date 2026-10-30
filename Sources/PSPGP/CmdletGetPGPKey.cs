@@ -8,6 +8,11 @@ using System.Threading.Tasks;
 namespace PSPGP;
 
 /// <summary>Downloads validated public certificates from an HTTPS key server.</summary>
+/// <example>
+/// <code>
+/// Get-PGPKey -KeyServer 'https://keys.openpgp.org' -Search 'user@example.com' -ExpectedFingerprint $fingerprint -OutFilePath .\user.asc -PassThru
+/// </code>
+/// </example>
 [Cmdlet(VerbsCommon.Get, "PGPKey", SupportsShouldProcess = true)]
 public class CmdletGetPGPKey : AsyncPSCmdlet {
     /// <summary>HTTPS URL of the key server.</summary>
@@ -26,7 +31,7 @@ public class CmdletGetPGPKey : AsyncPSCmdlet {
     [Parameter]
     public string OutFilePath { get; set; }
 
-    /// <summary>Returns the successfully written key file or key-pair files.</summary>
+    /// <summary>Returns the written certificate file when OutFilePath is used.</summary>
     [Parameter]
     public SwitchParameter PassThru { get; set; }
 

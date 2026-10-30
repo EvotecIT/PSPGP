@@ -20,7 +20,10 @@ public static class KeyServerHelper {
         DownloadKeyAsync(serverUri, search, null, CancellationToken.None);
 
     /// <summary>Downloads public certificates, optionally matching an independently trusted fingerprint.</summary>
-    public static async Task<string> DownloadKeyAsync(Uri serverUri, string search, string expectedFingerprint, CancellationToken cancellationToken) {
+    public static Task<string> DownloadKeyAsync(Uri serverUri, string search, string expectedFingerprint, CancellationToken cancellationToken) =>
+        DownloadKeyAsync(serverUri, search, expectedFingerprint, cancellationToken, Client);
+
+    internal static async Task<string> DownloadKeyAsync(Uri serverUri, string search, string expectedFingerprint, CancellationToken cancellationToken, HttpClient client) {
         ValidateServer(serverUri);
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         timeout.CancelAfter(TimeSpan.FromSeconds(60));
@@ -28,7 +31,7 @@ public static class KeyServerHelper {
         if (string.IsNullOrWhiteSpace(search)) throw new ArgumentException("A key search is required.", nameof(search));
         using var request = new HttpRequestMessage(HttpMethod.Get,
             serverUri.AbsoluteUri.TrimEnd('/') + "/pks/lookup?op=get&search=" + Uri.EscapeDataString(search));
-        using var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+        using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         if (response.Content.Headers.ContentLength > MaximumKeyBytes) throw new InvalidDataException("Key-server response exceeds 8 MiB.");
         using var body = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
@@ -51,7 +54,10 @@ public static class KeyServerHelper {
         UploadKeyAsync(serverUri, armoredKey, CancellationToken.None);
 
     /// <summary>Uploads validated public certificates with cancellation.</summary>
-    public static async Task UploadKeyAsync(Uri serverUri, string armoredKey, CancellationToken cancellationToken) {
+    public static Task UploadKeyAsync(Uri serverUri, string armoredKey, CancellationToken cancellationToken) =>
+        UploadKeyAsync(serverUri, armoredKey, cancellationToken, Client);
+
+    internal static async Task UploadKeyAsync(Uri serverUri, string armoredKey, CancellationToken cancellationToken, HttpClient client) {
         ValidateServer(serverUri);
         using var input = new MemoryStream(Encoding.UTF8.GetBytes(armoredKey));
         using var normalized = new MemoryStream();
@@ -60,7 +66,7 @@ public static class KeyServerHelper {
             Encoding.UTF8, "application/x-www-form-urlencoded");
         using var request = new HttpRequestMessage(HttpMethod.Post, serverUri.AbsoluteUri.TrimEnd('/') + "/pks/add") { Content = content };
         // Only the status is useful. Do not buffer or wait for an untrusted response body.
-        using var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+        using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
     }
 

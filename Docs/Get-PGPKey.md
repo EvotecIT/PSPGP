@@ -21,7 +21,7 @@ Downloads validated public certificates from an HTTPS key server.
 
 ### EXAMPLE 1
 ```powershell
-Get-PGPKey -KeyServer 'Value' -Search 'Value'
+Get-PGPKey -KeyServer 'https://keys.openpgp.org' -Search 'user@example.com' -ExpectedFingerprint $fingerprint -OutFilePath .\user.asc -PassThru
 ```
 
 
@@ -76,7 +76,7 @@ Accept wildcard characters: False
 ```
 
 ### -PassThru
-Returns the successfully written key file or key-pair files.
+Returns the written certificate file when OutFilePath is used.
 
 ```yaml
 Type: SwitchParameter
